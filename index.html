@@ -11,10 +11,21 @@
       padding: 0;
       overflow: hidden;
     }
-    #mainIframe {
-      width: 100vw;
+    #postContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
+      max-width: 100vw;
       height: 100vh;
+      overflow-y: auto;
+    }
+    .iframe-container {
+      width: 100%;
+      height: 200px;
       border: none;
+      border-radius: 5px;
+      overflow: hidden;
     }
     .float-button {
       position: fixed;
@@ -70,14 +81,11 @@
   </style>
 </head>
 <body>
-  
-  <!-- Iframe Principal -->
-  <iframe id="mainIframe"></iframe>
 
-  <!-- Botão Flutuante para Adicionar Postagem -->
+  <div id="postContainer"></div>
+
   <button class="float-button" id="openModalBtn">+</button>
 
-  <!-- Modal para o Formulário de Postagem -->
   <div id="postModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -91,25 +99,17 @@
   </div>
 
   <script>
-    // Função para carregar o iframe com as postagens a partir da URL com hash
-    function loadIframeContent() {
-      const hash = window.location.hash.substring(1); // Remove o '#' da hash
-      const iframe = document.getElementById('mainIframe');
-      
-      if (hash) {
-        const posts = JSON.parse(decodeURIComponent(hash));
-
-        // Gera o conteúdo do iframe
-        let iframeContent = '<html><body><div style="padding: 20px; font-family: Arial, sans-serif;">';
-        posts.forEach((post, index) => {
-          iframeContent += `<div style="border-bottom: 1px solid #ddd; margin-bottom: 10px;"><h3>Post ${index + 1}</h3><p>${post}</p></div>`;
-        });
-        iframeContent += '</div></body></html>';
-        
-        iframe.srcdoc = iframeContent;
-      } else {
-        iframe.srcdoc = "<html><body><h2>Nenhuma postagem ainda!</h2></body></html>";
-      }
+    // Função para atualizar o conteúdo das postagens
+    function updatePostContainer() {
+      const postContainer = document.getElementById('postContainer');
+      const posts = JSON.parse(localStorage.getItem('posts')) || [];
+      postContainer.innerHTML = '';
+      posts.forEach(postUrl => {
+        const iframe = document.createElement('iframe');
+        iframe.src = postUrl;
+        iframe.className = 'iframe-container';
+        postContainer.appendChild(iframe);
+      });
     }
 
     // Função para abrir o modal
@@ -122,32 +122,24 @@
       document.getElementById('postModal').style.display = 'none';
     }
 
-    // Função para adicionar nova postagem e atualizar o iframe
+    // Função para adicionar nova postagem e atualizar o conteúdo
     function addPost(event) {
       event.preventDefault(); // Evita o reload da página
       const postData = document.getElementById('postContent').value;
+      const postUrl = `data:text/html,<!DOCTYPE html><html><body><h1>Postagem</h1><p>${postData}</p></body></html>`;
+      
+      // Salva o URL da postagem no localStorage
+      let posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts.push(postUrl);
+      localStorage.setItem('posts', JSON.stringify(posts));
 
-      // Pega as postagens existentes da URL ou cria um array vazio
-      const hash = window.location.hash.substring(1);
-      const posts = hash ? JSON.parse(decodeURIComponent(hash)) : [];
-
-      // Adiciona a nova postagem
-      posts.push(postData);
-
-      // Atualiza a hash da URL com as postagens codificadas
-      const encodedPosts = encodeURIComponent(JSON.stringify(posts));
-      window.location.hash = encodedPosts;
-
-      // Recarrega o iframe com as novas postagens
-      loadIframeContent();
+      // Atualiza o conteúdo das postagens
+      updatePostContainer();
 
       // Limpa o campo de texto e fecha o modal
       document.getElementById('postContent').value = '';
       closeModal();
     }
-
-    // Monitora a alteração da hash para detectar mudanças entre dispositivos
-    window.addEventListener('hashchange', loadIframeContent);
 
     // Abrir e Fechar Modal
     document.getElementById('openModalBtn').addEventListener('click', openModal);
@@ -156,8 +148,8 @@
     // Associa o formulário de post ao evento de submit
     document.getElementById('postForm').addEventListener('submit', addPost);
 
-    // Carrega o conteúdo do iframe ao carregar a página
-    loadIframeContent();
+    // Carrega o conteúdo das postagens ao carregar a página
+    updatePostContainer();
   </script>
 </body>
 </html>
