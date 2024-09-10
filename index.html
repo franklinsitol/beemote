@@ -3,96 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Página com Iframe e Postagens</title>
+  <title>Postagens em Iframe</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      overflow-x: hidden;
+      overflow: hidden;
     }
-
-    /* Iframe grande */
-    iframe {
+    #mainIframe {
       width: 100vw;
       height: 100vh;
       border: none;
     }
-
-    /* Botão flutuante */
-    .floating-button {
+    /* Estilo do botão flutuante */
+    .float-button {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background-color: #007bff;
+      background-color: #28a745;
       color: white;
       border: none;
-      padding: 15px;
       border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
       cursor: pointer;
-      font-size: 20px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     }
-
-    /* Modal de postagem */
+    /* Modal */
     .modal {
-      display: none; /* Inicialmente escondido */
+      display: none;
       position: fixed;
-      top: 0;
+      z-index: 1;
       left: 0;
+      top: 0;
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
     }
-
     .modal-content {
       background-color: white;
+      margin: 15% auto;
       padding: 20px;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 400px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 500px;
     }
-
-    .modal textarea {
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    textarea {
       width: 100%;
       height: 100px;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-
-    .modal button {
-      background-color: #007bff;
-      color: white;
-      padding: 10px;
-      border: none;
-      cursor: pointer;
-      width: 100%;
     }
   </style>
 </head>
 <body>
-
-  <!-- Iframe principal -->
+  
+  <!-- Iframe Principal -->
   <iframe id="mainIframe"></iframe>
 
-  <!-- Botão flutuante para abrir o modal -->
-  <button class="floating-button" id="openModalButton">+</button>
+  <!-- Botão Flutuante para Adicionar Postagem -->
+  <button class="float-button" id="openModalBtn">+</button>
 
-  <!-- Modal para postar -->
-  <div class="modal" id="postModal">
+  <!-- Modal para o Formulário de Postagem -->
+  <div id="postModal" class="modal">
     <div class="modal-content">
-      <h3>Nova Postagem</h3>
-      <textarea id="postData" placeholder="Digite o conteúdo"></textarea>
-      <button id="postButton">Postar</button>
+      <span class="close">&times;</span>
+      <h2>Nova Postagem</h2>
+      <form id="postForm">
+        <label for="postContent">Digite seu conteúdo:</label>
+        <textarea id="postContent" required></textarea><br><br>
+        <button type="submit">Postar</button>
+      </form>
     </div>
   </div>
 
   <script>
+    // Função para pegar o conteúdo salvo da URL e exibi-lo no iframe
+    function loadIframeContent() {
+      const hash = window.location.hash.substring(1); // Remove o '#' da hash
+      const iframe = document.getElementById('mainIframe');
+      const posts = hash ? JSON.parse(decodeURIComponent(hash)) : [];
+      
+      // Gera o conteúdo HTML que será inserido no iframe
+      let iframeContent = '<html><body><div style="padding: 20px; font-family: Arial, sans-serif;">';
+      posts.forEach((post, index) => {
+        iframeContent += `<div style="border-bottom: 1px solid #ddd; margin-bottom: 10px;"><h3>Post ${index + 1}</h3><p>${post}</p></div>`;
+      });
+      iframeContent += '</div></body></html>';
+      
+      // Escreve o conteúdo no iframe
+      iframe.srcdoc = iframeContent;
+    }
+
     // Função para abrir o modal
     function openModal() {
-      document.getElementById('postModal').style.display = 'flex';
+      document.getElementById('postModal').style.display = 'block';
     }
 
     // Função para fechar o modal
@@ -100,46 +120,14 @@
       document.getElementById('postModal').style.display = 'none';
     }
 
-    // Adiciona a função de abrir o modal ao botão flutuante
-    document.getElementById('openModalButton').addEventListener('click', openModal);
-
-    // Função para criar o conteúdo HTML que será embutido no iframe
-    function generateIframeContent(posts) {
-      let content = `
-        <html>
-          <body style="font-family: Arial, sans-serif; padding: 20px;">
-            <h1>Postagens</h1>
-            ${posts.map(post => `<div style="margin-bottom: 20px;"><p>${post}</p></div>`).join('')}
-          </body>
-        </html>
-      `;
-      return content;
-    }
-
-    // Função para carregar as postagens salvas na URL (hash)
-    function loadPostsFromURL() {
-      const hash = window.location.hash.substring(1); // Remove o '#' do início
-      if (hash) {
-        return JSON.parse(decodeURIComponent(hash));
-      } else {
-        return [];
-      }
-    }
-
-    // Função para atualizar o iframe com o conteúdo atual de posts
-    function updateIframe(posts) {
-      const iframe = document.getElementById('mainIframe');
-      const iframeContent = generateIframeContent(posts);
-      iframe.srcdoc = iframeContent;
-    }
-
-    // Função para adicionar uma nova postagem
+    // Função para adicionar nova postagem e atualizar o iframe
     function addPost(event) {
-      event.preventDefault();
-      const postData = document.getElementById('postData').value;
+      event.preventDefault(); // Evita o reload da página
+      const postData = document.getElementById('postContent').value;
 
       // Pega as postagens existentes da URL ou cria um array vazio
-      const posts = loadPostsFromURL();
+      const hash = window.location.hash.substring(1);
+      const posts = hash ? JSON.parse(decodeURIComponent(hash)) : [];
 
       // Adiciona a nova postagem
       posts.push(postData);
@@ -148,22 +136,31 @@
       const encodedPosts = encodeURIComponent(JSON.stringify(posts));
       window.location.hash = encodedPosts;
 
-      // Atualiza o iframe com as novas postagens
-      updateIframe(posts);
+      // Recarrega o iframe com as novas postagens
+      loadIframeContent();
 
       // Limpa o campo de texto e fecha o modal
-      document.getElementById('postData').value = '';
+      document.getElementById('postContent').value = '';
       closeModal();
     }
 
-    // Carrega as postagens existentes e as insere no iframe ao carregar a página
-    window.onload = function() {
-      const posts = loadPostsFromURL();
-      updateIframe(posts);
+    // Abrir e Fechar Modal
+    document.getElementById('openModalBtn').addEventListener('click', openModal);
+    document.querySelector('.close').addEventListener('click', closeModal);
+
+    // Associa o formulário de post ao evento de submit
+    document.getElementById('postForm').addEventListener('submit', addPost);
+
+    // Fecha o modal se o usuário clicar fora da janela de conteúdo
+    window.onclick = function(event) {
+      const modal = document.getElementById('postModal');
+      if (event.target === modal) {
+        closeModal();
+      }
     };
 
-    // Adiciona a função de adicionar post ao botão de postagem
-    document.getElementById('postButton').addEventListener('click', addPost);
+    // Carrega o conteúdo do iframe ao carregar a página
+    loadIframeContent();
   </script>
 </body>
 </html>
