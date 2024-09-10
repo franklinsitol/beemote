@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Postagens em Iframe</title>
+  <title>Postagens Interativas</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,7 +16,6 @@
       height: 100vh;
       border: none;
     }
-    /* Estilo do botão flutuante */
     .float-button {
       position: fixed;
       bottom: 20px;
@@ -34,7 +33,6 @@
       align-items: center;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
     }
-    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -98,22 +96,18 @@
       const hash = window.location.hash.substring(1); // Remove o '#' da hash
       const iframe = document.getElementById('mainIframe');
       
-      // Verifica se há uma hash na URL
       if (hash) {
-        // Decodifica a hash para obter as postagens
         const posts = JSON.parse(decodeURIComponent(hash));
-        
-        // Cria o conteúdo para ser exibido dentro do iframe
+
+        // Gera o conteúdo do iframe
         let iframeContent = '<html><body><div style="padding: 20px; font-family: Arial, sans-serif;">';
         posts.forEach((post, index) => {
           iframeContent += `<div style="border-bottom: 1px solid #ddd; margin-bottom: 10px;"><h3>Post ${index + 1}</h3><p>${post}</p></div>`;
         });
         iframeContent += '</div></body></html>';
         
-        // Define o conteúdo no iframe
         iframe.srcdoc = iframeContent;
       } else {
-        // Se não houver hash, exibe uma mensagem padrão
         iframe.srcdoc = "<html><body><h2>Nenhuma postagem ainda!</h2></body></html>";
       }
     }
@@ -152,20 +146,15 @@
       closeModal();
     }
 
+    // Monitora a alteração da hash para detectar mudanças entre dispositivos
+    window.addEventListener('hashchange', loadIframeContent);
+
     // Abrir e Fechar Modal
     document.getElementById('openModalBtn').addEventListener('click', openModal);
     document.querySelector('.close').addEventListener('click', closeModal);
 
     // Associa o formulário de post ao evento de submit
     document.getElementById('postForm').addEventListener('submit', addPost);
-
-    // Fecha o modal se o usuário clicar fora da janela de conteúdo
-    window.onclick = function(event) {
-      const modal = document.getElementById('postModal');
-      if (event.target === modal) {
-        closeModal();
-      }
-    };
 
     // Carrega o conteúdo do iframe ao carregar a página
     loadIframeContent();
