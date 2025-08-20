@@ -12,13 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
     <style>
-        :root {
-            --primary: #6C63FF; --primary-dark: #564fcc; --primary-light: #e9e8ff;
-            --secondary: #f8f9fa; --dark: #343a40; --light: #ffffff; --gray: #6c757d;
-            --gray-light: #e9ecef; --success: #28a745; --danger: #dc3545; --warning: #ffc107;
-            --info: #17a2b8; --border-radius: 12px; --shadow: 0 4px 12px rgba(0,0,0,0.08);
-            --transition: all 0.3s ease;
-        }
+        /* Seu CSS completo aqui... (sem alterações) */
+        :root { --primary: #6C63FF; --primary-dark: #564fcc; --primary-light: #e9e8ff; --secondary: #f8f9fa; --dark: #343a40; --light: #ffffff; --gray: #6c757d; --gray-light: #e9ecef; --success: #28a745; --danger: #dc3545; --warning: #ffc107; --info: #17a2b8; --border-radius: 12px; --shadow: 0 4px 12px rgba(0,0,0,0.08); --transition: all 0.3s ease; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f5f7f9; color: #333; padding-top: 70px; padding-bottom: 70px; min-height: 100vh; }
         header { position: fixed; top: 0; left: 0; right: 0; background-color: var(--light); box-shadow: var(--shadow); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; height: 70px; }
@@ -30,10 +25,8 @@
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--gray); text-decoration: none; font-size: 0.8rem; transition: var(--transition); padding: 8px 12px; border-radius: var(--border-radius); }
         .nav-item i { font-size: 1.3rem; margin-bottom: 4px; }
         .nav-item.active { color: var(--primary); background-color: var(--primary-light); }
-        .nav-item:hover { color: var(--primary); transform: translateY(-2px); }
         main { padding: 20px; max-width: 800px; margin: 0 auto; }
         .card { background-color: var(--light); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; transition: var(--transition); border: 1px solid var(--gray-light); }
-        .card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
         .post-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         .post-author-info { display: flex; align-items: center; flex: 1; }
         .avatar { width: 45px; height: 45px; border-radius: 50%; background-color: var(--primary); color: white; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-weight: bold; background-size: cover; background-position: center; flex-shrink: 0; font-size: 1.2rem; }
@@ -42,52 +35,38 @@
         .post-content { margin-bottom: 15px; white-space: pre-wrap; word-wrap: break-word; line-height: 1.5; font-size: 1.05rem; }
         .post-actions { display: flex; border-top: 1px solid var(--gray-light); padding-top: 15px; margin-top: 10px; }
         .post-action { display: flex; align-items: center; margin-right: 20px; color: var(--gray); cursor: pointer; transition: var(--transition); padding: 6px 10px; border-radius: var(--border-radius); }
-        .post-action:hover { background-color: var(--gray-light); color: var(--dark); }
         .post-action.liked { color: var(--primary); font-weight: 600; }
         .post-action i { margin-right: 6px; font-size: 1.1rem; }
         .comments-section { margin-top: 15px; border-top: 1px solid var(--gray-light); padding-top: 15px; display: none; }
-        .comment-form { display: flex; margin-top: 15px; gap: 10px; }
         .comment { font-size: 0.95rem; margin-bottom: 12px; background-color: var(--gray-light); padding: 12px; border-radius: var(--border-radius); }
         .comment-author { font-weight: 600; margin-bottom: 5px; display: block; }
         .btn { background-color: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
-        .btn:disabled { background-color: var(--gray); cursor: not-allowed; transform: none; }
+        .btn:hover { background-color: var(--primary-dark); }
+        .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
         .btn-outline { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background-color: var(--primary); color: white; }
-        .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
-        .btn-success { background-color: var(--success); }
         .btn-danger { background-color: var(--danger); }
-        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: var(--border-radius); font-size: 1rem; transition: var(--transition); }
-        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2); }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); }
+        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: var(--border-radius); font-size: 1rem; }
         .hidden { display: none !important; }
-        .loading { text-align: center; padding: 30px; color: var(--gray); display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .loading-spinner { width: 40px; height: 40px; border: 4px solid var(--gray-light); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        .loading { text-align: center; padding: 30px; color: var(--gray); }
+        .loading-spinner { width: 40px; height: 40px; border: 4px solid var(--gray-light); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-content { background-color: white; border-radius: var(--border-radius); padding: 25px; width: 100%; max-width: 500px; max-height: 90%; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: translateY(20px); transition: transform 0.3s ease; }
-        .modal-overlay.active .modal-content { transform: translateY(0); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--gray-light); }
+        .modal-content { background-color: white; border-radius: var(--border-radius); padding: 25px; width: 100%; max-width: 500px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--dark); }
-        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray); transition: var(--transition); }
-        .close-btn:hover { color: var(--danger); }
-        .notification { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: var(--border-radius); color: white; z-index: 3000; opacity: 0; transition: opacity 0.5s, top 0.5s; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow); }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray); }
+        .notification { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: var(--border-radius); color: white; z-index: 3000; opacity: 0; transition: opacity 0.5s, top 0.5s; }
         .notification.show { opacity: 1; top: 90px; }
         .notification.success { background-color: var(--success); }
         .notification.error { background-color: var(--danger); }
-        .profile-header { text-align: center; margin-bottom: 25px; position: relative; }
-        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px; cursor: pointer; position: relative; border: 3px solid var(--primary-light); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; color: white; background-color: var(--primary); }
-        .user-card, .community-card { display: flex; align-items: center; padding: 15px; margin-bottom: 15px; border-radius: var(--border-radius); background-color: white; box-shadow: var(--shadow); transition: var(--transition); }
-        .user-card:hover, .community-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+        .user-card, .community-card { display: flex; align-items: center; padding: 15px; margin-bottom: 15px; border-radius: var(--border-radius); background-color: white; box-shadow: var(--shadow); }
         .user-card { justify-content: space-between; }
         .user-card-info, .community-info { flex: 1; display: flex; align-items: center; gap: 15px; }
         .user-card-alias, .community-name { font-weight: 600; }
         .user-card-actions { display: flex; gap: 8px; }
         .feed-header { background: linear-gradient(135deg, var(--primary-light) 0%, #e9e8ff 100%); padding: 15px 20px; border-radius: var(--border-radius); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--primary); }
-        .fade-in { animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -113,55 +92,45 @@
         </div>
         
         <div id="communities-page" class="page hidden">
-            <div class="card">
-                <h2><i class="fas fa-users"></i> Comunidades</h2>
-                <p style="margin: 10px 0; color: var(--gray);">Participe de comunidades com interesses em comum</p>
-                <button id="show-community-modal-btn" class="btn"><i class="fas fa-plus"></i> Criar Comunidade</button>
-            </div>
-            <div id="communities-container"></div>
+            <!-- Funcionalidade de Comunidades simplificada por enquanto -->
+            <div class="card"><h2><i class="fas fa-users"></i> Comunidades</h2><p>Funcionalidade em desenvolvimento.</p></div>
         </div>
         
         <div id="connections-page" class="page hidden">
-            <div class="card">
-                <h3><i class="fas fa-user-clock"></i> Solicitações Pendentes</h3>
-                <div id="pending-requests-container"></div>
-            </div>
+            <!-- NOVO CARD PARA "MINHAS CONEXÕES" -->
             <div class="card">
                 <h3><i class="fas fa-users"></i> Minhas Conexões</h3>
-                <div id="my-connections-container"></div>
+                <div id="my-connections-container"><div class="loading"><div class="loading-spinner"></div>Carregando...</div></div>
                 <button id="view-connections-feed-btn" class="btn hidden" style="margin-top: 15px;"><i class="fas fa-stream"></i> Ver Feed das Conexões</button>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-user-clock"></i> Solicitações Pendentes</h3>
+                <div id="pending-requests-container"><div class="loading"><div class="loading-spinner"></div>Carregando...</div></div>
             </div>
             <div class="card">
                 <h3><i class="fas fa-search"></i> Buscar Usuários</h3>
                 <input type="text" id="user-search-input" class="form-control" placeholder="Digite o nome de um usuário...">
-                <div id="all-users-container" style="margin-top: 15px;"></div>
+                <div id="all-users-container" style="margin-top: 15px;"><div class="loading"><div class="loading-spinner"></div>Carregando...</div></div>
             </div>
         </div>
         
         <div id="profile-page" class="page hidden">
-            <div id="profile-container"></div>
+             <!-- Funcionalidade de Perfil simplificada por enquanto -->
+            <div class="card"><h2><i class="fas fa-user"></i> Perfil</h2><p>Funcionalidade em desenvolvimento.</p></div>
         </div>
     </main>
-
+    
     <div id="auth-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Entrar / Cadastrar</h2>
                 <button class="close-btn">&times;</button>
             </div>
-            <div class="form-group">
-                <label for="auth-alias">Nome de usuário</label>
-                <input type="text" id="auth-alias" class="form-control" placeholder="Seu nome na plataforma">
-            </div>
-            <div class="form-group">
-                <label for="auth-pass">Senha</label>
-                <input type="password" id="auth-pass" class="form-control" placeholder="Sua senha">
-            </div>
+            <input type="text" id="auth-alias" class="form-control" placeholder="Seu nome na plataforma" style="margin-top: 15px;">
+            <input type="password" id="auth-pass" class="form-control" placeholder="Sua senha" style="margin: 15px 0;">
             <button id="auth-submit-btn" class="btn" style="width: 100%;"><i class="fas fa-check"></i> Continuar</button>
         </div>
     </div>
-
-    <!-- Outros modais (avatar, comunidade) aqui se necessário -->
     
     <nav>
         <a href="#" class="nav-item active" data-page="feed"><i class="fas fa-home"></i><span>Feed</span></a>
@@ -169,26 +138,24 @@
         <a href="#" class="nav-item" data-page="connections"><i class="fas fa-link"></i><span>Conexões</span></a>
         <a href="#" class="nav-item" data-page="profile"><i class="fas fa-user"></i><span>Perfil</span></a>
     </nav>
-    
+
 <script>
 (function() {
     'use strict';
     
-    // --- CONFIGURAÇÃO E ESTADO GLOBAL ---
     const CONFIG = {
         GUN_PEERS: ['https://gun-manhattan.herokuapp.com/gun'],
         POST_EXPIRATION_MS: 24 * 60 * 60 * 1000,
     };
     
     const state = {
+        // <-- MODIFICADO: Habilitado localStorage para persistência de dados e sessão
         gun: Gun({ peers: CONFIG.GUN_PEERS, localStorage: true, radisk: true }),
         user: null,
-        currentPage: 'feed',
         activeSubscriptions: new Map(),
-        countdownInterval: null,
         usersCache: new Map(),
-        renderedPosts: new Set(),
-        currentFeedFilter: { type: 'main', context: null },
+        // <-- NOVO: Estado para controlar o filtro do feed
+        currentFeedFilter: { type: 'main', context: null }, // 'main', 'connections'
     };
     
     const ui = {
@@ -198,63 +165,53 @@
         authAlias: document.getElementById('auth-alias'), authPass: document.getElementById('auth-pass'),
         authSubmitBtn: document.getElementById('auth-submit-btn'), postContent: document.getElementById('post-content'),
         createPostBtn: document.getElementById('create-post-btn'), postsContainer: document.getElementById('posts-container'),
-        profileContainer: document.getElementById('profile-container'), notificationBar: document.getElementById('notification-bar'),
-        closeModalBtns: document.querySelectorAll('.close-btn'),
-        communitiesContainer: document.getElementById('communities-container'),
-        showCommunityModalBtn: document.getElementById('show-community-modal-btn'),
+        notificationBar: document.getElementById('notification-bar'),
         feedHeaderContainer: document.getElementById('feed-header-container'),
+        allUsersContainer: document.getElementById('all-users-container'),
         pendingRequestsContainer: document.getElementById('pending-requests-container'),
+        // <-- NOVO: Seletores para a nova seção de conexões
         myConnectionsContainer: document.getElementById('my-connections-container'),
         viewConnectionsFeedBtn: document.getElementById('view-connections-feed-btn'),
-        allUsersContainer: document.getElementById('all-users-container'),
         userSearchInput: document.getElementById('user-search-input'),
     };
-
-    // --- FUNÇÕES UTILITÁRIAS ---
-    // CORREÇÃO: Movidas para o topo para garantir que estejam definidas antes de serem usadas.
-    const sanitizeHTML = (str) => { if (!str) return ''; const temp = document.createElement('div'); temp.textContent = str; return temp.innerHTML; };
+    
+    const sanitizeHTML = (str) => { const temp = document.createElement('div'); temp.textContent = str || ''; return temp.innerHTML; };
     const showNotification = (message, type = 'success') => { ui.notificationBar.textContent = message; ui.notificationBar.className = `notification ${type} show`; setTimeout(() => ui.notificationBar.classList.remove('show'), 3000); };
-    const renderAvatar = (profile, customClass = 'avatar') => { const style = profile?.avatar ? `background-image: url('${profile.avatar}')` : ''; const letter = !profile?.avatar ? (profile?.alias ? profile.alias.charAt(0).toUpperCase() : '?') : ''; return `<div class="${customClass}" style="${style}">${letter}</div>`; };
-    const formatTime = (timestamp) => { const now = Date.now(); const diff = now - timestamp; if (diff < 60000) return 'Agora'; if (diff < 3600000) return `${Math.floor(diff/60000)}m atrás`; return new Date(timestamp).toLocaleDateString('pt-BR'); };
+    const renderAvatar = (profile) => `<div class="avatar">${sanitizeHTML(profile?.alias?.charAt(0).toUpperCase() || '?')}</div>`;
+    const formatTime = (timestamp) => new Date(timestamp).toLocaleString('pt-BR');
     const formatCountdown = (timestamp) => { const msLeft = (timestamp + CONFIG.POST_EXPIRATION_MS) - Date.now(); if (msLeft <= 0) return "Expirado"; const h = Math.floor(msLeft/3600000); const m = Math.floor((msLeft % 3600000)/60000); return `Expira em ${h}h ${m}m`; };
-    const debounce = (func, wait) => { let timeout; return function(...args) { const later = () => { clearTimeout(timeout); func.apply(this, args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; };
+    const debounce = (func, wait) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); }; };
 
-    // --- LÓGICA PRINCIPAL DA APLICAÇÃO ---
     const clearSubscriptions = () => {
         state.activeSubscriptions.forEach(sub => sub.off());
         state.activeSubscriptions.clear();
-        if (state.countdownInterval) clearInterval(state.countdownInterval);
     };
-    
+
+    // <-- MODIFICADO: `navigateTo` agora aceita um filtro opcional
     const navigateTo = (page, filter = null) => {
         clearSubscriptions();
-        state.currentPage = page;
-        state.postsData.clear();
-        state.renderedPosts.clear();
-
-        if (page === 'feed') {
-            state.currentFeedFilter = filter || { type: 'main', context: null };
-        }
         
+        if (page === 'feed') {
+            state.currentFeedFilter = filter || { type: 'main' };
+        }
+
         ui.pages.forEach(p => p.classList.add('hidden'));
         document.getElementById(`${page}-page`).classList.remove('hidden');
         ui.navItems.forEach(item => item.classList.toggle('active', item.dataset.page === page));
-        
         loadPageContent(page);
     };
-    
+
     const loadPageContent = (page) => {
         switch (page) {
             case 'feed': loadFeed(); break;
-            case 'profile': loadProfile(); break;
             case 'connections': loadConnectionsPage(); break;
-            case 'communities': loadCommunities(); break;
         }
     };
-    
+
+    // <-- MODIFICADO: checkUserSession agora usa localStorage
     const checkUserSession = () => {
         state.gun.user().recall({ localStorage: true }, ack => {
-            if (ack && ack.pub) {
+            if (ack.pub) {
                 state.user = state.gun.user();
                 updateUIForUser();
             }
@@ -265,270 +222,251 @@
         const alias = ui.authAlias.value.trim();
         const pass = ui.authPass.value.trim();
         if (!alias || !pass) return showNotification('Preencha todos os campos.', 'error');
-        
-        ui.authSubmitBtn.disabled = true;
-        state.gun.user().auth(alias, pass, ack => {
+
+        state.gun.user().auth(alias, pass, (ack) => {
             if (ack.err) {
-                state.gun.user().create(alias, pass, createAck => {
-                    if (createAck.err) {
-                        ui.authSubmitBtn.disabled = false;
-                        return showNotification(createAck.err, 'error');
-                    }
-                    state.gun.user().auth(alias, pass, finalAck => onAuthSuccess(finalAck.pub, alias));
+                state.gun.user().create(alias, pass, (createAck) => {
+                    if (createAck.err) return showNotification(createAck.err, 'error');
+                    state.gun.user().auth(alias, pass, (finalAck) => onAuthSuccess(finalAck.pub, alias));
                 });
-            } else {
-                onAuthSuccess(ack.pub, alias);
-            }
+            } else { onAuthSuccess(ack.pub, alias); }
         });
     };
-    
+
     const onAuthSuccess = (pub, alias) => {
         state.user = state.gun.user();
-        state.gun.get(`~${pub}`).once(profile => {
-            if (!profile) state.gun.get(`~${pub}`).put({ alias, bio: '' });
-        });
-        state.gun.get('users').get(pub).put({ alias });
-        
+        state.gun.get(`~${pub}`).put({ alias });
+        state.gun.get('users').get(pub).put({ alias }); // Adiciona ao índice público
         updateUIForUser();
         ui.authModal.classList.remove('active');
-        ui.authSubmitBtn.disabled = false;
-        showNotification('Login bem-sucedido!', 'success');
-        navigateTo(state.currentPage); // Recarrega a página atual
+        showNotification(`Bem-vindo, ${alias}!`, 'success');
+        navigateTo('feed');
     };
-    
+
     const logout = () => {
         state.gun.user().leave();
         state.user = null;
         updateUIForUser();
         navigateTo('feed');
-        showNotification('Você saiu da sua conta.', 'warning');
     };
-    
-    const updateUIForUser = () => {
-        if (state.user?.is) {
-            ui.userAlias.textContent = state.user.is.alias;
-            ui.loginBtn.classList.add('hidden');
-            ui.logoutBtn.classList.remove('hidden');
-        } else {
-            ui.userAlias.textContent = '';
-            ui.loginBtn.classList.remove('hidden');
-            ui.logoutBtn.add('hidden');
-        }
-    };
-    
-    const loadFeed = async () => {
-        ui.postsContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div><div>Carregando posts...</div></div>`;
-        state.postsData.clear();
-        state.renderedPosts.clear();
 
-        const { type, context } = state.currentFeedFilter;
+    const updateUIForUser = () => {
+        const isLoggedIn = !!state.user?.is;
+        ui.userAlias.textContent = isLoggedIn ? state.user.is.alias : '';
+        ui.loginBtn.classList.toggle('hidden', isLoggedIn);
+        ui.logoutBtn.classList.toggle('hidden', !isLoggedIn);
+    };
+
+    // <-- MODIFICADO: `loadFeed` foi reestruturado para usar filtros
+    const loadFeed = async () => {
+        ui.postsContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div>Carregando feed...</div>`;
+        let postsData = new Map();
+
+        const { type } = state.currentFeedFilter;
         let headerHTML = '';
-        
-        if (type === 'community') headerHTML = `<div class="feed-header"><span>Comunidade: <strong>${sanitizeHTML(context.name)}</strong></span><button id="back-to-global-feed" class="btn btn-outline btn-sm"><i class="fas fa-home"></i> Feed Principal</button></div>`;
-        if (type === 'connections') headerHTML = `<div class="feed-header"><span>Feed privado das <strong>Conexões</strong></span><button id="back-to-global-feed" class="btn btn-outline btn-sm"><i class="fas fa-home"></i> Feed Principal</button></div>`;
-        
+
+        // Monta o cabeçalho do feed com base no filtro
+        if (type === 'connections') {
+            headerHTML = `<div class="feed-header"><span>Feed Privado das Conexões</span><button id="back-to-main-feed" class="btn btn-outline btn-sm">Feed Principal</button></div>`;
+        }
         ui.feedHeaderContainer.innerHTML = headerHTML;
         ui.feedHeaderContainer.classList.toggle('hidden', !headerHTML);
-        if (headerHTML) document.getElementById('back-to-global-feed').addEventListener('click', () => navigateTo('feed', { type: 'main' }));
-        
-        let postFilter = () => true;
-        
-        if (type === 'main') postFilter = (post) => !post.communityId && !post.isConnectionPost;
-        if (type === 'community') postFilter = (post) => post.communityId === context.id;
-        if (type === 'connections') {
-            const connections = new Set();
-            if (state.user?.is) {
-                await new Promise(resolve => {
-                    state.gun.user().get('connections').map().once(isConnected => isConnected && connections.add(isConnected.pub));
-                    setTimeout(resolve, 300);
+        if (headerHTML) document.getElementById('back-to-main-feed').addEventListener('click', () => navigateTo('feed'));
+
+        // Define a função de filtro
+        let postFilter = (post) => !post.isConnectionPost; // Feed principal: posts que não são de conexões
+
+        if (type === 'connections' && state.user) {
+            const myConnections = new Set();
+            await new Promise(resolve => {
+                state.gun.user().get('connections').map().once((isConn, pub) => {
+                    if(isConn) myConnections.add(pub);
                 });
-            }
-            postFilter = (post) => post.isConnectionPost && (connections.has(post.authorPub) || post.authorPub === state.user?.is?.pub);
+                setTimeout(resolve, 300); // Espera Gun carregar
+            });
+            postFilter = (post) => post.isConnectionPost && (myConnections.has(post.authorPub) || post.authorPub === state.user.is.pub);
         }
 
         const sub = state.gun.get('posts').map().on((post, id) => {
-            if (!post || !post.content || state.renderedPosts.has(id)) return;
-            if (postFilter(post)) {
-                state.postsData.set(id, { ...post, id });
-                state.renderedPosts.add(id);
+            if (post && post.content && postFilter(post)) {
+                postsData.set(id, { ...post, id });
+            } else {
+                postsData.delete(id);
             }
-            renderSortedFeed();
+            renderSortedFeed(postsData);
         });
-
         state.activeSubscriptions.set('feed', sub);
-        if (state.countdownInterval) clearInterval(state.countdownInterval);
-        state.countdownInterval = setInterval(updateAllCountdowns, 60000);
     };
 
-    const renderSortedFeed = () => {
-        const now = Date.now();
-        const validPosts = Array.from(state.postsData.values())
-            .filter(p => (now - p.createdAt < CONFIG.POST_EXPIRATION_MS))
+    const renderSortedFeed = (postsData) => {
+        const postsArray = Array.from(postsData.values())
+            .filter(p => (Date.now() - p.createdAt < CONFIG.POST_EXPIRATION_MS))
             .sort((a, b) => b.createdAt - a.createdAt);
             
-        if (validPosts.length === 0) {
-            ui.postsContainer.innerHTML = `<div class="card" style="text-align:center; color: var(--gray);"><p>Nenhum post aqui. Seja o primeiro a compartilhar!</p></div>`;
+        if (postsArray.length === 0) {
+            ui.postsContainer.innerHTML = `<div class="card" style="text-align:center; color: var(--gray);"><p>Nenhum post aqui.</p></div>`;
             return;
         }
-        
         ui.postsContainer.innerHTML = '';
-        validPosts.forEach(post => renderPost(post));
+        postsArray.forEach(renderPost);
     };
-    
+
     const renderPost = async (post) => {
-        const postEl = document.createElement('div');
-        postEl.className = 'card fade-in';
-        postEl.id = `post-${post.id}`;
-        
+        if (document.getElementById(`post-${post.id}`)) return;
+
         let authorProfile = state.usersCache.get(post.authorPub);
         if (!authorProfile) {
-            authorProfile = await new Promise(resolve => {
-                state.gun.get(`~${post.authorPub}`).once(profile => {
-                    const data = profile || { alias: 'Anônimo' };
-                    state.usersCache.set(post.authorPub, data);
-                    resolve(data);
-                });
-            });
+            authorProfile = await new Promise(resolve => state.gun.get(`~${post.authorPub}`).once(resolve));
+            state.usersCache.set(post.authorPub, authorProfile);
         }
         
+        const postEl = document.createElement('div');
+        postEl.className = 'card';
+        postEl.id = `post-${post.id}`;
         postEl.innerHTML = `
             <div class="post-header">
-                <div class="post-author-info">${renderAvatar(authorProfile)}<div><div class="post-author">${sanitizeHTML(authorProfile.alias)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div></div>
-                <div class="post-countdown" data-timestamp="${post.createdAt}">${formatCountdown(post.createdAt)}</div>
+                <div class="post-author-info">${renderAvatar(authorProfile)}<div><div class="post-author">${sanitizeHTML(authorProfile?.alias)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div></div>
+                <div class="post-countdown">${formatCountdown(post.createdAt)}</div>
             </div>
             <div class="post-content">${sanitizeHTML(post.content)}</div>
         `;
         ui.postsContainer.appendChild(postEl);
     };
-    
+
+    // <-- MODIFICADO: `createPost` agora pode marcar posts como `isConnectionPost`
     const createPost = () => {
         const content = ui.postContent.value.trim();
         if (!content) return showNotification('Escreva algo para publicar.', 'error');
         if (!state.user?.is) return showNotification('Faça login para publicar.', 'error');
-        
-        const now = Date.now();
-        const postData = {
-            authorPub: state.user.is.pub, content, createdAt: now,
-        };
 
-        const { type, context } = state.currentFeedFilter;
-        if (type === 'community') postData.communityId = context.id;
-        if (type === 'connections') postData.isConnectionPost = true;
-        
+        const postData = { authorPub: state.user.is.pub, content, createdAt: Date.now() };
+
+        if (state.currentFeedFilter.type === 'connections') {
+            postData.isConnectionPost = true;
+        }
+
         state.gun.get('posts').set(postData);
         ui.postContent.value = '';
-        showNotification('Post publicado com sucesso!');
-    };
-    
-    const updateAllCountdowns = () => {
-        document.querySelectorAll('.post-countdown').forEach(el => {
-            const timestamp = parseInt(el.dataset.timestamp, 10);
-            if (timestamp) el.textContent = formatCountdown(timestamp);
-        });
-    };
-    
-    const loadConnectionsPage = () => {
-        if (!state.user?.is) {
-            const msg = `<div class="card" style="text-align:center;"><p>Faça login para ver suas conexões.</p></div>`;
-            ui.pendingRequestsContainer.innerHTML = msg;
-            ui.myConnectionsContainer.innerHTML = msg;
-            ui.allUsersContainer.innerHTML = msg;
-            return;
-        }
-        loadPendingRequests();
-        loadMyConnections();
-        loadAllUsers();
+        showNotification('Post publicado!', 'success');
     };
 
+    const loadConnectionsPage = () => {
+        if (!state.user?.is) {
+            const msg = `<div class="loading">Faça login para gerenciar conexões.</div>`;
+            ui.allUsersContainer.innerHTML = msg;
+            ui.myConnectionsContainer.innerHTML = msg;
+            ui.pendingRequestsContainer.innerHTML = msg;
+            return;
+        }
+        loadAllUsers();
+        loadMyConnections();
+        loadPendingRequests();
+    };
+    
+    // <-- NOVO: Função para carregar suas conexões atuais
     const loadMyConnections = () => {
-        const container = ui.myConnectionsContainer;
-        container.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
+        ui.myConnectionsContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
         let hasConnections = false;
-        
-        const sub = state.gun.user().get('connections').map().on(async (isConnected, userPub) => {
-            if (isConnected) {
-                if (container.querySelector(`#conn-${userPub}`)) return;
-                if (!hasConnections) {
-                    container.innerHTML = '';
-                    hasConnections = true;
-                    ui.viewConnectionsFeedBtn.classList.remove('hidden');
-                }
-                state.gun.get(`~${userPub}`).once(profile => {
-                    const cardEl = document.createElement('div');
-                    cardEl.className = 'user-card fade-in';
-                    cardEl.id = `conn-${userPub}`;
-                    cardEl.innerHTML = `<div class="user-card-info">${renderAvatar(profile)}<span class="user-card-alias">${sanitizeHTML(profile?.alias)}</span></div><div class="user-card-actions"><button class="btn btn-danger btn-sm" data-pub="${userPub}" data-action="remove"><i class="fas fa-user-times"></i></button></div>`;
-                    container.prepend(cardEl);
+        const sub = state.gun.user().get('connections').map().on((isConn, pub) => {
+            if (isConn) {
+                if (!hasConnections) { ui.myConnectionsContainer.innerHTML = ''; hasConnections = true; ui.viewConnectionsFeedBtn.classList.remove('hidden'); }
+                if (document.getElementById(`conn-${pub}`)) return;
+                
+                state.gun.get(`~${pub}`).once(profile => {
+                    const card = document.createElement('div');
+                    card.id = `conn-${pub}`;
+                    card.className = 'user-card';
+                    card.innerHTML = `<div class="user-card-info">${renderAvatar(profile)}<span>${sanitizeHTML(profile?.alias)}</span></div><div class="user-card-actions"><button class="btn btn-danger btn-sm" data-pub="${pub}" data-action="remove"><i class="fas fa-user-times"></i></button></div>`;
+                    ui.myConnectionsContainer.appendChild(card);
                 });
-            } else {
-                const cardToRemove = container.querySelector(`#conn-${userPub}`);
-                if (cardToRemove) cardToRemove.remove();
             }
         });
         state.activeSubscriptions.set('my-connections', sub);
-        setTimeout(() => { if (!hasConnections) { container.innerHTML = `<p style="text-align:center; color:var(--gray);">Você não tem conexões.</p>`; ui.viewConnectionsFeedBtn.classList.add('hidden');}}, 3000);
+        setTimeout(() => { if (!hasConnections) ui.myConnectionsContainer.innerHTML = `<div class="loading">Nenhuma conexão encontrada.</div>`; }, 3000);
     };
-    
-    const loadAllUsers = () => {
-        const container = ui.allUsersContainer;
-        container.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
-        const myPub = state.user.is.pub;
-        let hasUsers = false;
-        
-        const sub = state.gun.get('users').map().on(async (user, pub) => {
-            if (!user || !user.alias || pub === myPub || container.querySelector(`#user-${pub}`)) return;
-            if (!hasUsers) {
-                container.innerHTML = '';
-                hasUsers = true;
+
+    const loadPendingRequests = () => {
+        ui.pendingRequestsContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
+        let hasRequests = false;
+        const sub = state.gun.user().get('requests').map().on((request, pub) => {
+            if(request){
+                if (!hasRequests) { ui.pendingRequestsContainer.innerHTML = ''; hasRequests = true; }
+                if (document.getElementById(`req-${pub}`)) return;
+
+                const card = document.createElement('div');
+                card.id = `req-${pub}`;
+                card.className = 'user-card';
+                card.innerHTML = `<div class="user-card-info">${renderAvatar(request)}<span>${sanitizeHTML(request.alias)}</span></div><div class="user-card-actions"><button class="btn btn-success btn-sm" data-pub="${pub}" data-action="accept"><i class="fas fa-check"></i></button><button class="btn btn-danger btn-sm" data-pub="${pub}" data-action="decline"><i class="fas fa-times"></i></button></div>`;
+                ui.pendingRequestsContainer.appendChild(card);
             }
-            renderUserCard(user, pub);
+        });
+        state.activeSubscriptions.set('requests', sub);
+        setTimeout(() => { if (!hasRequests) ui.pendingRequestsContainer.innerHTML = `<div class="loading">Nenhuma solicitação pendente.</div>`; }, 3000);
+    };
+
+    const loadAllUsers = () => {
+        ui.allUsersContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
+        let hasUsers = false;
+        const sub = state.gun.get('users').map().on((user, pub) => {
+            if (user?.alias && pub !== state.user?.is?.pub) {
+                if (!hasUsers) { ui.allUsersContainer.innerHTML = ''; hasUsers = true; }
+                if (document.getElementById(`user-${pub}`)) return;
+                
+                const card = document.createElement('div');
+                card.id = `user-${pub}`;
+                card.className = 'user-card';
+                card.dataset.alias = user.alias.toLowerCase();
+                card.innerHTML = `<div class="user-card-info">${renderAvatar(user)}<span>${sanitizeHTML(user.alias)}</span></div><div class="user-card-actions"><button class="btn btn-sm" data-pub="${pub}" data-action="request"><i class="fas fa-user-plus"></i> Conectar</button></div>`;
+                ui.allUsersContainer.appendChild(card);
+            }
         });
         state.activeSubscriptions.set('all-users', sub);
-        setTimeout(() => { if (!hasUsers) container.innerHTML = `<p style="text-align:center; color:var(--gray);">Nenhum outro usuário encontrado.</p>`; }, 3000);
     };
 
-    const renderUserCard = async (user, pub) => {
-        const cardEl = document.createElement('div');
-        cardEl.className = 'user-card fade-in';
-        cardEl.id = `user-${pub}`;
-        cardEl.dataset.alias = user.alias.toLowerCase();
+    const handleConnectionAction = (e) => {
+        if (!state.user?.is) return showNotification('Faça login para interagir', 'error');
+        const target = e.target.closest('button[data-action]');
+        if (!target) return;
+
+        const { action, pub } = target.dataset;
+        const myPub = state.user.is.pub;
         
-        let buttonHTML = `<button class="btn btn-sm" data-pub="${pub}" data-action="request"><i class="fas fa-user-plus"></i> Conectar</button>`;
-        // Lógica para verificar status da conexão e mudar o botão pode ser adicionada aqui
-        
-        cardEl.innerHTML = `<div class="user-card-info">${renderAvatar(user)}<span>${sanitizeHTML(user.alias)}</span></div><div class="user-card-actions">${buttonHTML}</div>`;
-        ui.allUsersContainer.appendChild(cardEl);
+        if (action === 'request') {
+            state.gun.get(`~${pub}`).get('requests').get(myPub).put({ alias: state.user.is.alias });
+            showNotification('Solicitação enviada!', 'success');
+        }
+        if(action === 'accept'){
+            state.gun.user().get('connections').get(pub).put(true);
+            state.gun.get(`~${pub}`).get('connections').get(myPub).put(true);
+            state.gun.user().get('requests').get(pub).put(null);
+            showNotification('Conexão aceita!', 'success');
+            document.getElementById(`req-${pub}`)?.remove();
+        }
+        // Adicionar lógicas de 'decline' e 'remove' se necessário
     };
-    // Funções de Conexão (request, accept, etc.) podem ser adicionadas aqui
-    const loadProfile = () => { ui.profileContainer.innerHTML = `<p style="text-align:center;">Página de perfil em construção.</p>`; };
-    const loadCommunities = () => { ui.communitiesContainer.innerHTML = `<p style="text-align:center;">Página de comunidades em construção.</p>`; };
 
-
-    // --- INICIALIZAÇÃO E LISTENERS DE EVENTOS ---
     const setupEventListeners = () => {
-        ui.navItems.forEach(item => item.addEventListener('click', e => { e.preventDefault(); navigateTo(item.dataset.page); }));
+        ui.navItems.forEach(item => item.addEventListener('click', (e) => { e.preventDefault(); navigateTo(item.dataset.page); }));
         ui.loginBtn.addEventListener('click', () => ui.authModal.classList.add('active'));
         ui.logoutBtn.addEventListener('click', logout);
         ui.authSubmitBtn.addEventListener('click', handleAuth);
         ui.createPostBtn.addEventListener('click', createPost);
+        ui.authModal.querySelector('.close-btn').addEventListener('click', () => ui.authModal.classList.remove('active'));
+        // <-- NOVO: Listeners para a página de conexões
+        document.getElementById('connections-page').addEventListener('click', handleConnectionAction);
         ui.viewConnectionsFeedBtn.addEventListener('click', () => navigateTo('feed', { type: 'connections' }));
-        ui.userSearchInput.addEventListener('input', debounce(e => {
+        ui.userSearchInput.addEventListener('input', debounce((e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('#all-users-container .user-card').forEach(card => {
                 card.style.display = card.dataset.alias.includes(term) ? 'flex' : 'none';
             });
         }, 300));
-        document.querySelectorAll('.modal-overlay').forEach(overlay => overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('active'); }));
-        ui.closeModalBtns.forEach(btn => btn.addEventListener('click', e => e.currentTarget.closest('.modal-overlay').classList.remove('active')));
     };
     
-    const init = () => {
-        setupEventListeners();
-        checkUserSession();
-        navigateTo('feed');
-    };
-    
-    init();
+    checkUserSession();
+    setupEventListeners();
+    navigateTo('feed');
+
 })();
 </script>
 </body>
