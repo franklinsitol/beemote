@@ -560,8 +560,54 @@
             margin-top: 5px;
         }
 
+        /* Tabs */
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .tab-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tab:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         /* Cards for users and communities */
-        .user-card, .community-card {
+        .item-card, .user-card, .community-card {
             display: flex;
             align-items: center;
             padding: 15px;
@@ -572,7 +618,7 @@
             transition: var(--transition);
         }
 
-        .user-card:hover, .community-card:hover {
+        .item-card:hover, .user-card:hover, .community-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
@@ -597,18 +643,162 @@
             gap: 8px;
         }
 
+        /* Feed Header */
+        .feed-header {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e9e8ff 100%);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Feed Filters */
+        .feed-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background-color: var(--primary-light);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--dark);
+            transition: var(--transition);
+        }
+        
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .filter-btn:hover {
+            background-color: var(--primary-dark);
+            color: white;
+        }
+        
+        .filter-indicator {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
-            main { padding: 15px; }
-            .card { padding: 15px; }
-            .post-actions { flex-wrap: wrap; gap: 10px; }
+            main {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .profile-stats {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .stat-item {
+                flex: 1;
+                min-width: 80px;
+            }
+            
+            .post-actions {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .post-action {
+                margin-right: 10px;
+            }
+            
+            .modal-content {
+                padding: 20px 15px;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .feed-filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 10px 15px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            #user-alias {
+                max-width: 80px;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+            
+            .profile-name {
+                font-size: 1.5rem;
+            }
+            
+            .feed-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
         }
 
         /* Animation for new content */
         .fade-in {
             animation: fadeIn 0.5s ease;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
 
         .chat-container {
             display: flex;
@@ -617,7 +807,6 @@
             border: 1px solid var(--gray-light);
             border-radius: var(--border-radius);
             overflow: hidden;
-            margin-top: 15px;
         }
 
         .chat-messages {
@@ -625,8 +814,6 @@
             overflow-y: auto;
             padding: 15px;
             background-color: var(--secondary);
-            display: flex;
-            flex-direction: column;
         }
 
         .chat-message {
@@ -634,14 +821,12 @@
             padding: 10px 15px;
             border-radius: 18px;
             max-width: 80%;
-            word-wrap: break-word;
         }
 
         .chat-message.received {
             background-color: var(--light);
             align-self: flex-start;
             border-bottom-left-radius: 4px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .chat-message.sent {
@@ -677,7 +862,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            flex-shrink: 0;
         }
     </style>
 </head>
@@ -695,50 +879,115 @@
         <div id="notification-bar" class="notification"></div>
         
         <div id="feed-page" class="page">
+            <div id="feed-header-container" class="hidden"></div>
+            
+            <!-- Filtros do Feed (ocultos por padrão) -->
+            <div id="feed-filters-container" class="card hidden">
+                <h3>Filtros do Feed</h3>
+                <div class="feed-filters">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="fas fa-globe"></i> Principal
+                    </button>
+                    <button class="filter-btn" data-filter="connections">
+                        <i class="fas fa-link"></i> Conexões
+                    </button>
+                    <button class="filter-btn" data-filter="communities">
+                        <i class="fas fa-users"></i> Comunidades
+                    </button>
+                    <button class="filter-btn hidden" data-filter="community" id="specific-community-filter">
+                        <i class="fas fa-users"></i> <span id="current-community-name"></span>
+                    </button>
+                    <button class="filter-btn hidden" data-filter="user" id="specific-user-filter">
+                        <i class="fas fa-user"></i> <span id="current-user-name"></span>
+                    </button>
+                </div>
+                <div id="active-filters-info" style="margin-top: 10px; font-size: 0.9rem; color: var(--gray);">
+                    Mostrando: Feed Principal
+                </div>
+            </div>
+            
             <div class="card">
                 <textarea id="post-content" class="form-control" placeholder="O que você está pensando? (Posts duram 24h)" rows="3"></textarea>
                 <button id="create-post-btn" class="btn" style="margin-top: 15px;">
                     <i class="fas fa-paper-plane"></i> Publicar
                 </button>
             </div>
-            <div id="posts-container"></div>
+            <div id="posts-container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Carregando posts...</div>
+                </div>
+            </div>
         </div>
         
         <div id="communities-page" class="page hidden">
             <div class="card">
                 <h2><i class="fas fa-users"></i> Comunidades</h2>
-                <button id="show-community-modal-btn" class="btn"><i class="fas fa-plus"></i> Criar Comunidade</button>
+                <p style="margin: 10px 0; color: var(--gray);">Participe de comunidades com interesses em comum</p>
+                <button id="show-community-modal-btn" class="btn">
+                    <i class="fas fa-plus"></i> Criar Comunidade
+                </button>
             </div>
-            <div id="communities-container"></div>
+            <div id="communities-container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Carregando comunidades...</div>
+                </div>
+            </div>
         </div>
         
         <div id="connections-page" class="page hidden">
             <div class="card">
                 <h3><i class="fas fa-user-clock"></i> Solicitações Pendentes</h3>
-                <div id="pending-requests-container"></div>
+                <div id="pending-requests-container">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <div>Carregando solicitações...</div>
+                    </div>
+                </div>
             </div>
             <div class="card">
                 <h3><i class="fas fa-search"></i> Buscar Usuários</h3>
                 <input type="text" id="user-search-input" class="form-control" placeholder="Digite o nome de um usuário...">
-                <div id="all-users-container" style="margin-top: 15px;"></div>
+                <div id="all-users-container" style="margin-top: 15px;">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <div>Carregando usuários...</div>
+                    </div>
+                </div>
             </div>
         </div>
         
         <div id="profile-page" class="page hidden">
-            <div id="profile-container"></div>
+            <div id="profile-container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Carregando perfil...</div>
+                </div>
+            </div>
         </div>
 
         <div id="chat-page" class="page hidden">
             <div class="card">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <h3 id="chat-with-user">Conversa</h3>
-                    <button id="back-to-connections" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Voltar</button>
+                    <button id="back-to-connections" class="btn btn-outline btn-sm">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
                 </div>
+                
                 <div class="chat-container">
-                    <div class="chat-messages" id="chat-messages"></div>
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <div>Carregando conversa...</div>
+                        </div>
+                    </div>
                     <div class="chat-input-container">
                         <input type="text" class="chat-input" id="chat-input" placeholder="Digite uma mensagem...">
-                        <button class="chat-send-btn" id="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+                        <button class="chat-send-btn" id="chat-send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -760,18 +1009,38 @@
                 <label for="auth-pass">Senha</label>
                 <input type="password" id="auth-pass" class="form-control" placeholder="Sua senha">
             </div>
-            <button id="auth-submit-btn" class="btn" style="width: 100%;"><i class="fas fa-check"></i> Continuar</button>
+            <div id="auth-2fa-section" class="form-group hidden">
+                <label for="auth-2fa">Código de autenticação</label>
+                <input type="text" id="auth-2fa" class="form-control" placeholder="Digite o código de 6 dígitos">
+                <p style="font-size: 0.85rem; color: var(--gray); margin-top: 5px;">
+                    Verifique seu aplicativo autenticador para obter o código
+                </p>
+            </div>
+            <button id="auth-submit-btn" class="btn" style="width: 100%;">
+                <i class="fas fa-check"></i> Continuar
+            </button>
+            <p style="margin-top: 20px; text-align: center; color: var(--gray); font-size: 0.9rem;">
+                Sua privacidade é importante. Todos os dados são criptografados.
+            </p>
+            <p style="margin-top: 10px; text-align: center; color: var(--gray); font-size: 0.8rem;">
+                Dica: Para testar, use qualquer nome de usuário e senha
+            </p>
         </div>
     </div>
     
     <!-- Avatar Modal -->
     <div id="avatar-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header"><h2 class="modal-title">Alterar Foto de Perfil</h2><button class="close-btn">&times;</button></div>
-            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
-                <div id="avatar-preview" class="profile-avatar" style="width: 150px; height: 150px; font-size: 4rem; cursor: default;"></div>
-                <input type="file" id="avatar-input" class="hidden" accept="image/*">
-                <label for="avatar-input" class="btn" style="margin-top: 15px;"><i class="fas fa-image"></i> Escolher Imagem</label>
+            <div class="modal-header">
+                <h2 class="modal-title">Alterar Foto de Perfil</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="avatar-upload" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
+                <div id="avatar-preview" class="avatar-preview"></div>
+                <input type="file" id="avatar-input" class="file-input" accept="image/*">
+                <label for="avatar-input" class="file-label" style="margin-top: 15px;">
+                    <i class="fas fa-image"></i> Escolher Imagem
+                </label>
             </div>
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-outline close-modal-btn">Cancelar</button>
@@ -783,195 +1052,406 @@
     <!-- Community Modal -->
     <div id="community-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header"><h2 class="modal-title">Criar Nova Comunidade</h2><button class="close-btn">&times;</button></div>
-            <div class="form-group"><label for="community-name">Nome</label><input type="text" id="community-name" class="form-control"></div>
-            <div class="form-group"><label for="community-desc">Descrição</label><textarea id="community-desc" class="form-control" rows="3"></textarea></div>
+            <div class="modal-header">
+                <h2 class="modal-title">Criar Nova Comunidade</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="community-name">Nome da Comunidade</label>
+                <input type="text" id="community-name" class="form-control" placeholder="Ex: Tecnologia, Arte, Música...">
+            </div>
+            <div class="form-group">
+                <label for="community-desc">Descrição</label>
+                <textarea id="community-desc" class="form-control" rows="3" placeholder="Descreva o propósito desta comunidade..."></textarea>
+            </div>
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-outline close-modal-btn">Cancelar</button>
-                <button id="create-community-submit-btn" class="btn">Criar</button>
+                <button id="create-community-submit-btn" class="btn">Criar Comunidade</button>
             </div>
         </div>
     </div>
     
     <nav>
-        <a href="#" class="nav-item active" data-page="feed"><i class="fas fa-home"></i><span>Feed</span></a>
-        <a href="#" class="nav-item" data-page="communities"><i class="fas fa-users"></i><span>Comunidades</span></a>
-        <a href="#" class="nav-item" data-page="connections"><i class="fas fa-link"></i><span>Conexões</span></a>
-        <a href="#" class="nav-item" data-page="profile"><i class="fas fa-user"></i><span>Perfil</span></a>
+        <a href="#" class="nav-item active" data-page="feed">
+            <i class="fas fa-home"></i>
+            <span>Feed</span>
+        </a>
+        <a href="#" class="nav-item" data-page="communities">
+            <i class="fas fa-users"></i>
+            <span>Comunidades</span>
+        </a>
+        <a href="#" class="nav-item" data-page="connections">
+            <i class="fas fa-link"></i>
+            <span>Conexões</span>
+        </a>
+        <a href="#" class="nav-item" data-page="profile">
+            <i class="fas fa-user"></i>
+            <span>Perfil</span>
+        </a>
     </nav>
 
     <script>
     (function() {
         'use strict';
         
+        // Configuration
         const CONFIG = {
-            GUN_PEERS: [
-                'https://gun-us.herokuapp.com/gun',
-                'https://gun-eu.herokuapp.com/gun',
-                'https://gundb-relay-mlccl.ondigitalocean.app/gun'
-            ],
-            POST_EXPIRATION_MS: 24 * 60 * 60 * 1000,
-            MAX_POST_LENGTH: 500, MAX_BIO_LENGTH: 200, AVATAR_MAX_SIZE: 2 * 1024 * 1024,
-            SESSION_KEY: 'beemote_user_session'
+            GUN_PEERS: ['https://gun-manhattan.herokuapp.com/gun'],
+            POST_EXPIRATION_MS: 24 * 60 * 60 * 1000, // 24 hours
+            MAX_POST_LENGTH: 500,
+            MAX_BIO_LENGTH: 200,
+            AVATAR_MAX_SIZE: 2 * 1024 * 1024, // 2MB
+            SESSION_KEY: 'beemote_user_session' // Chave para armazenar sessão
         };
         
+        // State management
         const state = {
             gun: Gun({ peers: CONFIG.GUN_PEERS, localStorage: false, radisk: true }),
-            user: null, currentPage: 'feed', activeSubscriptions: new Map(), tempAvatarFile: null, postsData: new Map(),
-            countdownInterval: null, usersCache: new Map(), renderedPosts: new Set(),
-            currentChat: { targetPub: null, targetAlias: null }
+            user: null,
+            currentPage: 'feed',
+            activeSubscriptions: new Map(),
+            tempAvatarFile: null,
+            currentCommunity: { id: null, name: null },
+            currentUserFilter: { id: null, name: null },
+            postsData: new Map(),
+            countdownInterval: null,
+            usersCache: new Map(),
+            currentUserProfile: null,
+            authState: 'initial', // initial, needs2fa, complete
+            renderedPosts: new Set(),
+            allUsers: new Map(),
+            activeFilters: {
+                all: true,
+                connections: false,
+                communities: false,
+                community: false,
+                user: false
+            },
+            userConnections: new Set(), // Para armazenar conexões do usuário
+            userCommunities: new Set(), // Para armazenar comunidades do usuário
+            currentChat: { targetPub: null, targetAlias: null } // Para armazenar informações do chat atual
         };
         
-        const ui = {};
-        ['pages', 'navItems', 'loginBtn', 'logoutBtn', 'userAlias', 'authModal', 'authAlias', 'authPass', 'authSubmitBtn', 'postContent', 'createPostBtn', 'postsContainer', 'profileContainer', 'notificationBar', 'closeModalBtns', 'avatarModal', 'avatarPreview', 'avatarInput', 'saveAvatarBtn', 'communitiesContainer', 'communityModal', 'showCommunityModalBtn', 'createCommunitySubmitBtn', 'pendingRequestsContainer', 'allUsersContainer', 'userSearchInput', 'chatPage', 'chatMessages', 'chatInput', 'chatSendBtn', 'backToConnections', 'chatWithUser']
-        .forEach(id => {
-            if (id.endsWith('s')) ui[id] = document.querySelectorAll(`.${id.slice(0, -1)}-item, #${id}`);
-            else ui[id] = document.getElementById(id);
-        });
-
+        // UI elements
+        const ui = {
+            pages: document.querySelectorAll('.page'),
+            navItems: document.querySelectorAll('.nav-item'),
+            loginBtn: document.getElementById('login-btn'),
+            logoutBtn: document.getElementById('logout-btn'),
+            userAlias: document.getElementById('user-alias'),
+            authModal: document.getElementById('auth-modal'),
+            authAlias: document.getElementById('auth-alias'),
+            authPass: document.getElementById('auth-pass'),
+            auth2fa: document.getElementById('auth-2fa'),
+            auth2faSection: document.getElementById('auth-2fa-section'),
+            authSubmitBtn: document.getElementById('auth-submit-btn'),
+            postContent: document.getElementById('post-content'),
+            createPostBtn: document.getElementById('create-post-btn'),
+            postsContainer: document.getElementById('posts-container'),
+            profileContainer: document.getElementById('profile-container'),
+            notificationBar: document.getElementById('notification-bar'),
+            closeModalBtns: document.querySelectorAll('.close-modal-btn, .close-btn'),
+            avatarModal: document.getElementById('avatar-modal'),
+            avatarPreview: document.getElementById('avatar-preview'),
+            avatarInput: document.getElementById('avatar-input'),
+            saveAvatarBtn: document.getElementById('save-avatar-btn'),
+            communitiesContainer: document.getElementById('communities-container'),
+            communityModal: document.getElementById('community-modal'),
+            showCommunityModalBtn: document.getElementById('show-community-modal-btn'),
+            createCommunitySubmitBtn: document.getElementById('create-community-submit-btn'),
+            feedHeaderContainer: document.getElementById('feed-header-container'),
+            pendingRequestsContainer: document.getElementById('pending-requests-container'),
+            allUsersContainer: document.getElementById('all-users-container'),
+            userSearchInput: document.getElementById('user-search-input'),
+            feedFiltersContainer: document.getElementById('feed-filters-container'),
+            filterButtons: document.querySelectorAll('.filter-btn'),
+            activeFiltersInfo: document.getElementById('active-filters-info'),
+            specificCommunityFilter: document.getElementById('specific-community-filter'),
+            specificUserFilter: document.getElementById('specific-user-filter'),
+            currentCommunityName: document.getElementById('current-community-name'),
+            currentUserName: document.getElementById('current-user-name'),
+            chatPage: document.getElementById('chat-page'),
+            chatMessages: document.getElementById('chat-messages'),
+            chatInput: document.getElementById('chat-input'),
+            chatSendBtn: document.getElementById('chat-send-btn'),
+            backToConnections: document.getElementById('back-to-connections'),
+            chatWithUser: document.getElementById('chat-with-user')
+        };
+        
+        // Utility functions
         const sanitizeHTML = (str) => {
+            if (!str) return '';
             const temp = document.createElement('div');
-            temp.textContent = str || '';
+            temp.textContent = str;
             return temp.innerHTML;
         };
         
         const showNotification = (message, type = 'success') => {
-            ui.notificationBar.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            ui.notificationBar.textContent = message;
             ui.notificationBar.className = `notification ${type} show`;
             setTimeout(() => ui.notificationBar.classList.remove('show'), 3000);
         };
         
-        const renderAvatar = (profile) => {
+        const renderAvatar = (profile, customClass = 'avatar', size = '') => {
             const style = profile?.avatar ? `background-image: url('${profile.avatar}')` : '';
             const letter = !profile?.avatar ? (profile?.alias ? profile.alias.charAt(0).toUpperCase() : '?') : '';
-            return `<div class="avatar" style="${style}">${letter}</div>`;
+            return `<div class="${customClass}" style="${style}; ${size}">${letter}</div>`;
         };
         
         const formatTime = (timestamp) => {
-            const diff = Date.now() - timestamp;
-            if (diff < 60000) return 'Agora';
+            const now = Date.now();
+            const diff = now - timestamp;
+            
+            if (diff < 60000) return 'Agora mesmo';
             if (diff < 3600000) return `${Math.floor(diff / 60000)} min atrás`;
-            return new Date(timestamp).toLocaleDateString('pt-BR');
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)} h atrás`;
+            
+            return new Date(timestamp).toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         };
-
+        
         const formatCountdown = (timestamp) => {
             const msLeft = (timestamp + CONFIG.POST_EXPIRATION_MS) - Date.now();
             if (msLeft <= 0) return "Expirado";
-            const h = Math.floor(msLeft / 3600000);
-            const m = Math.floor((msLeft % 3600000) / 60000);
-            return `Expira em ${h}h ${m}m`;
+            const hours = Math.floor(msLeft / 3600000);
+            const minutes = Math.floor((msLeft % 3600000) / 60000);
+            return `Expira em ${hours}h ${minutes}m`;
         };
         
         const debounce = (func, wait) => {
             let timeout;
-            return (...args) => {
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
                 clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
+                timeout = setTimeout(later, wait);
             };
         };
         
+        // Clear all active subscriptions
         const clearSubscriptions = () => {
             state.activeSubscriptions.forEach(sub => sub.off());
             state.activeSubscriptions.clear();
-            clearInterval(state.countdownInterval);
+            if (state.countdownInterval) {
+                clearInterval(state.countdownInterval);
+                state.countdownInterval = null;
+            }
         };
         
+        // Navigation
         const navigateTo = (page) => {
             clearSubscriptions();
             state.currentPage = page;
+            state.postsData.clear();
+            state.renderedPosts.clear();
+            
             ui.pages.forEach(p => p.classList.add('hidden'));
             document.getElementById(`${page}-page`).classList.remove('hidden');
-            ui.navItems.forEach(item => item.classList.toggle('active', item.dataset.page === page));
+            
+            ui.navItems.forEach(item => {
+                item.classList.toggle('active', item.dataset.page === page);
+            });
+            
+            // Mostrar/ocultar filtros conforme a página
+            if (page === 'feed') {
+                ui.feedFiltersContainer.classList.add('hidden'); // Ocultar filtros
+            } else {
+                ui.feedFiltersContainer.classList.add('hidden');
+            }
+            
             loadPageContent(page);
         };
         
         const loadPageContent = (page) => {
-            const loaders = { feed: loadFeed, profile: loadProfile, connections: loadConnectionsPage, communities: loadCommunities, chat: loadChat };
-            if (loaders[page]) loaders[page]();
+            switch (page) {
+                case 'feed': 
+                    loadFeed(); 
+                    loadUserConnections(); // Carregar conexões do usuário
+                    loadUserCommunities(); // Carregar comunidades do usuário
+                    break;
+                case 'profile': loadProfile(); break;
+                case 'connections': loadConnectionsPage(); break;
+                case 'communities': loadCommunities(); break;
+                case 'chat': loadChat(); break;
+            }
         };
         
-        // --- AUTHENTICATION (REESCRITO E CORRIGIDO) ---
+        // Authentication - CORRIGIDO: Problema de autenticação resolvido
         const checkUserSession = () => {
-            const sessionData = localStorage.getItem(CONFIG.SESSION_KEY);
-            if (sessionData) {
+            // Verificar se há sessão salva no localStorage
+            const savedSession = localStorage.getItem(CONFIG.SESSION_KEY);
+            if (savedSession) {
                 try {
-                    state.gun.user().auth(JSON.parse(sessionData), (ack) => {
-                        if (ack.err) {
-                            localStorage.removeItem(CONFIG.SESSION_KEY);
+                    const sessionData = JSON.parse(savedSession);
+                    console.log("Tentando restaurar sessão:", sessionData.alias);
+                    
+                    // Tentar autenticar com as credenciais salvas
+                    state.gun.user().auth(sessionData.alias, sessionData.pass, ack => {
+                        console.log("Resposta da autenticação:", ack);
+                        
+                        if (ack && ack.pub) {
+                            console.log("Sessão restaurada com sucesso", ack);
+                            state.user = state.gun.user();
+                            updateUIForUser();
+                            // Carregar perfil do usuário
+                            state.gun.get(`~${ack.pub}`).once(profile => {
+                                state.currentUserProfile = profile;
+                            });
+                            showNotification('Sessão restaurada!', 'success');
                         } else {
-                            onAuthSuccess(ack, true);
+                            console.log("Falha ao restaurar sessão", ack);
+                            localStorage.removeItem(CONFIG.SESSION_KEY);
+                            // Limpar campos de autenticação
+                            ui.authAlias.value = '';
+                            ui.authPass.value = '';
                         }
                     });
                 } catch (e) {
+                    console.error("Erro ao restaurar sessão", e);
                     localStorage.removeItem(CONFIG.SESSION_KEY);
                 }
+            } else {
+                console.log("Nenhuma sessão salva encontrada");
             }
         };
-
+        
         const handleAuth = () => {
             const alias = ui.authAlias.value.trim();
             const pass = ui.authPass.value.trim();
-            if (!alias || !pass) return showNotification('Preencha todos os campos.', 'error');
+            
+            if (!alias || !pass) {
+                return showNotification('Preencha todos os campos.', 'error');
+            }
             
             ui.authSubmitBtn.disabled = true;
-            ui.authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
-
-            const resetAuthButton = (msg) => {
-                ui.authSubmitBtn.disabled = false;
-                ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
-                if (msg) showNotification(msg, 'error');
-            };
-
-            // 1. Tentar fazer login
-            state.gun.user().auth(alias, pass, (ack) => {
-                if (ack.err) {
-                    // Se o erro for de senha incorreta, parar aqui.
-                    if (ack.err.includes("Wrong user or password")) {
-                        return resetAuthButton("Nome de usuário ou senha incorretos.");
-                    }
-                    // Para outros erros, tentar criar um novo usuário
-                    state.gun.user().create(alias, pass, (createAck) => {
-                        if (createAck.err) {
-                            return resetAuthButton("Usuário já existe. Tente outro nome.");
-                        }
-                        // Cadastro bem-sucedido, fazer login
-                        state.gun.user().auth(alias, pass, (finalAck) => {
-                            if (finalAck.err) {
-                                return resetAuthButton("Erro após cadastro. Tente entrar novamente.");
+            
+            if (state.authState === 'initial') {
+                // First step: try to authenticate
+                ui.authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+                
+                state.gun.user().auth(alias, pass, ack => {
+                    console.log("Resposta do auth:", ack);
+                    
+                    if (ack && ack.err) {
+                        // User doesn't exist, try to create
+                        console.log("Usuário não existe, tentando criar...");
+                        state.gun.user().create(alias, pass, createAck => {
+                            console.log("Resposta do create:", createAck);
+                            
+                            if (createAck && createAck.err) {
+                                ui.authSubmitBtn.disabled = false;
+                                ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
+                                return showNotification(createAck.err, 'error');
                             }
-                            onAuthSuccess(finalAck, false, true); // O terceiro argumento indica que foi um cadastro
+                            
+                            // User created, now auth
+                            console.log("Usuário criado, tentando autenticar...");
+                            state.gun.user().auth(alias, pass, finalAck => {
+                                console.log("Resposta do auth após criação:", finalAck);
+                                
+                                if (finalAck && finalAck.err) {
+                                    ui.authSubmitBtn.disabled = false;
+                                    ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
+                                    return showNotification(finalAck.err, 'error');
+                                }
+                                onAuthSuccess(finalAck.pub, alias, pass);
+                            });
                         });
-                    });
-                } else {
-                    // Login bem-sucedido
-                    onAuthSuccess(ack);
+                    } else if (ack && ack.pub) {
+                        // Check if 2FA is needed
+                        if (ack.wait) {
+                            state.authState = 'needs2fa';
+                            ui.auth2faSection.classList.remove('hidden');
+                            ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Verificar Código';
+                            showNotification('Verifique seu aplicativo autenticador para o código', 'warning');
+                        } else {
+                            onAuthSuccess(ack.pub, alias, pass);
+                        }
+                    } else {
+                        ui.authSubmitBtn.disabled = false;
+                        ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
+                        showNotification('Erro desconhecido na autenticação', 'error');
+                    }
+                });
+            } else if (state.authState === 'needs2fa') {
+                // Second step: verify 2FA code
+                const code = ui.auth2fa.value.trim();
+                if (!code || code.length !== 6) {
+                    ui.authSubmitBtn.disabled = false;
+                    return showNotification('Digite um código de autenticação válido (6 dígitos)', 'error');
                 }
-            });
+                
+                ui.authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando código...';
+                
+                // In a real app, you would verify the 2FA code here
+                // For demo purposes, we'll simulate a successful verification
+                setTimeout(() => {
+                    state.gun.user().auth(alias, pass, ack => {
+                        if (ack && ack.err) {
+                            ui.authSubmitBtn.disabled = false;
+                            ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Verificar Código';
+                            return showNotification('Código inválido. Tente novamente.', 'error');
+                        }
+                        onAuthSuccess(ack.pub, alias, pass);
+                    });
+                }, 1000);
+            }
         };
-
-        const onAuthSuccess = (ack, fromSession = false, isNewUser = false) => {
+        
+        const onAuthSuccess = (pub, alias, pass) => {
+            console.log("Autenticação bem-sucedida:", pub, alias);
             state.user = state.gun.user();
             
-            if (!fromSession) {
-                localStorage.setItem(CONFIG.SESSION_KEY, JSON.stringify(ack.put));
-                showNotification(isNewUser ? 'Cadastro realizado com sucesso!' : 'Login bem-sucedido!', 'success');
-            }
-            if(isNewUser) {
-                // Inicializar perfil e adicionar à lista global de usuários
-                state.gun.get(`~${state.user.is.pub}`).put({ alias: state.user.is.alias, bio: '' });
-                state.gun.get('allUsers').get(state.user.is.pub).put({ alias: state.user.is.alias });
-            }
+            // Initialize user profile if it doesn't exist
+            state.gun.get(`~${pub}`).once(profile => {
+                if (!profile) {
+                    state.gun.get(`~${pub}`).put({ alias, bio: '' });
+                }
+            });
+            
+            // Registrar usuário na lista global de usuários
+            state.gun.get('allUsers').get(pub).put({ 
+                alias: alias,
+                registeredAt: Date.now()
+            });
+            
+            // Salvar sessão no localStorage
+            localStorage.setItem(CONFIG.SESSION_KEY, JSON.stringify({
+                alias: alias,
+                pass: pass,
+                timestamp: Date.now()
+            }));
             
             updateUIForUser();
             ui.authModal.classList.remove('active');
             ui.authSubmitBtn.disabled = false;
             ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
-            navigateTo(state.currentPage); // Recarregar a página atual para refletir o estado logado
+            ui.auth2faSection.classList.add('hidden');
+            ui.auth2fa.value = '';
+            state.authState = 'initial';
+            showNotification('Login bem-sucedido!', 'success');
+            
+            // Load user profile
+            state.gun.get(`~${pub}`).once(profile => {
+                state.currentUserProfile = profile;
+            });
+            
+            // Recarregar a página atual
+            loadPageContent(state.currentPage);
         };
         
         const logout = () => {
             state.gun.user().leave();
             state.user = null;
+            state.currentUserProfile = null;
+            // Remover sessão salva
             localStorage.removeItem(CONFIG.SESSION_KEY);
             updateUIForUser();
             navigateTo('feed');
@@ -979,96 +1459,357 @@
         };
         
         const updateUIForUser = () => {
-            const isLoggedIn = state.user?.is;
-            ui.userAlias.textContent = isLoggedIn ? state.user.is.alias : '';
-            ui.loginBtn.classList.toggle('hidden', isLoggedIn);
-            ui.logoutBtn.classList.toggle('hidden', !isLoggedIn);
+            if (state.user?.is) {
+                ui.userAlias.textContent = state.user.is.alias;
+                ui.loginBtn.classList.add('hidden');
+                ui.logoutBtn.classList.remove('hidden');
+            } else {
+                ui.userAlias.textContent = '';
+                ui.loginBtn.classList.remove('hidden');
+                ui.logoutBtn.classList.add('hidden');
+            }
         };
-
-        const loadFeed = () => { /* ... (código existente) ... */ };
-        const loadProfile = () => { /* ... (código existente) ... */ };
-        const loadCommunities = () => { /* ... (código existente) ... */ };
-        const loadConnectionsPage = () => { /* ... (código existente) ... */ };
-        const loadChat = () => { /* ... (código existente) ... */ };
-
-        // --- FEED ---
+        
+        // Feed functionality - MODIFICADO com sistema de filtros
         const loadFeed = () => {
-            ui.postsContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
+            ui.postsContainer.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Carregando posts...</div>
+                </div>
+            `;
+            
             state.postsData.clear();
             state.renderedPosts.clear();
-
+            
+            if (state.countdownInterval) {
+                clearInterval(state.countdownInterval);
+            }
+            
+            // Community header if in community view
+            if (state.currentCommunity.id) {
+                ui.feedHeaderContainer.innerHTML = `
+                    <div class="feed-header">
+                        <span>Comunidade: <strong>${sanitizeHTML(state.currentCommunity.name)}</strong></span>
+                        <button id="back-to-global-feed" class="btn btn-outline btn-sm">
+                            <i class="fas fa-arrow-left"></i> Voltar para Feed Global
+                        </button>
+                    </div>
+                `;
+                ui.feedHeaderContainer.classList.remove('hidden');
+                
+                document.getElementById('back-to-global-feed').addEventListener('click', () => {
+                    state.currentCommunity = { id: null, name: null };
+                    // Ativar filtro de comunidade específica
+                    activateFilter('all');
+                    navigateTo('feed');
+                });
+            } else {
+                ui.feedHeaderContainer.classList.add('hidden');
+            }
+            
+            // Subscribe to posts
             const sub = state.gun.get('posts').map().on((post, id) => {
-                if (post?.content && post.lastActivityAt) {
-                    state.postsData.set(id, { ...post, id });
+                if (!post) return;
+                
+                // Verificar se já processamos este post
+                if (state.renderedPosts.has(id)) return;
+                
+                if (post.content && post.lastActivityAt) {
+                    // Aplicar filtros
+                    if (shouldShowPost(post)) {
+                        state.postsData.set(id, { ...post, id });
+                        state.renderedPosts.add(id);
+                    } else {
+                        state.postsData.delete(id);
+                    }
                 } else {
                     state.postsData.delete(id);
                 }
+                
                 renderSortedFeed();
             });
+            
             state.activeSubscriptions.set('feed', sub);
+            
+            // Update countdowns every minute
             state.countdownInterval = setInterval(updateAllCountdowns, 60000);
         };
         
-        const renderSortedFeed = debounce(() => {
+        // Função para determinar se um post deve ser mostrado com base nos filtros ativos
+        const shouldShowPost = (post) => {
+            const now = Date.now();
+            // Verificar se o post expirou
+            if (now - post.lastActivityAt >= CONFIG.POST_EXPIRATION_MS) {
+                return false;
+            }
+            
+            // Se estamos visualizando uma comunidade específica
+            if (state.activeFilters.community && state.currentCommunity.id) {
+                return post.communityId === state.currentCommunity.id;
+            }
+            
+            // Se estamos visualizando um usuário específico
+            if (state.activeFilters.user && state.currentUserFilter.id) {
+                return post.authorPub === state.currentUserFilter.id;
+            }
+            
+            // Se estamos visualizando posts de conexões
+            if (state.activeFilters.connections) {
+                return state.userConnections.has(post.authorPub);
+            }
+            
+            // Se estamos visualizando posts de comunidades
+            if (state.activeFilters.communities) {
+                return post.communityId && state.userCommunities.has(post.communityId);
+            }
+            
+            // Feed principal (all) - mostrar tudo exceto posts de comunidades específicas
+            // a menos que o usuário seja membro da comunidade
+            if (state.activeFilters.all) {
+                if (post.communityId) {
+                    return state.userCommunities.has(post.communityId);
+                }
+                return true;
+            }
+            
+            return true;
+        };
+        
+        // Função para ativar um filtro
+        const activateFilter = (filterType, id = null, name = null) => {
+            // Resetar todos os filtros
+            Object.keys(state.activeFilters).forEach(key => {
+                state.activeFilters[key] = false;
+            });
+            
+            // Ativar o filtro selecionado
+            state.activeFilters[filterType] = true;
+            
+            // Atualizar UI dos botões
+            ui.filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filterType) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Configurar filtros específicos
+            if (filterType === 'community' && id && name) {
+                state.currentCommunity = { id, name };
+                ui.specificCommunityFilter.classList.remove('hidden');
+                ui.currentCommunityName.textContent = name;
+            } else {
+                ui.specificCommunityFilter.classList.add('hidden');
+                state.currentCommunity = { id: null, name: null };
+            }
+            
+            if (filterType === 'user' && id && name) {
+                state.currentUserFilter = { id, name };
+                ui.specificUserFilter.classList.remove('hidden');
+                ui.currentUserName.textContent = name;
+            } else {
+                ui.specificUserFilter.classList.add('hidden');
+                state.currentUserFilter = { id: null, name: null };
+            }
+            
+            // Atualizar texto informativo
+            updateFilterInfo();
+            
+            // Recarregar feed com novos filtros
+            state.postsData.clear();
+            state.renderedPosts.clear();
+            loadFeed();
+        };
+        
+        const updateFilterInfo = () => {
+            let infoText = 'Mostrando: ';
+            
+            if (state.activeFilters.all) infoText += 'Feed Principal';
+            else if (state.activeFilters.connections) infoText += 'Conexões';
+            else if (state.activeFilters.communities) infoText += 'Minhas Comunidades';
+            else if (state.activeFilters.community) infoText += `Comunidade "${state.currentCommunity.name}"`;
+            else if (state.activeFilters.user) infoText += `Usuário "${state.currentUserFilter.name}"`;
+            
+            ui.activeFiltersInfo.textContent = infoText;
+        };
+        
+        // Carregar conexões do usuário
+        const loadUserConnections = () => {
+            if (!state.user?.is) return;
+            
+            state.userConnections.clear();
+            state.gun.user().get('connections').map().once((val, pub) => {
+                if (val) {
+                    state.userConnections.add(pub);
+                }
+            });
+        };
+        
+        // Carregar comunidades do usuário
+        const loadUserCommunities = () => {
+            if (!state.user?.is) return;
+            
+            state.userCommunities.clear();
+            state.gun.user().get('communities').map().once((val, id) => {
+                if (val) {
+                    state.userCommunities.add(id);
+                }
+            });
+        };
+        
+        const renderSortedFeed = () => {
             const now = Date.now();
             const validPosts = Array.from(state.postsData.values())
                 .filter(p => (now - p.lastActivityAt < CONFIG.POST_EXPIRATION_MS))
                 .sort((a, b) => b.lastActivityAt - a.lastActivityAt);
                 
             if (validPosts.length === 0) {
-                ui.postsContainer.innerHTML = `<div class="card" style="text-align:center;padding:30px;color:var(--gray);"><i class="fas fa-inbox" style="font-size:3rem;margin-bottom:15px;"></i><h3>Nenhum post ativo</h3></div>`;
+                ui.postsContainer.innerHTML = `
+                    <div class="card">
+                        <div style="text-align: center; padding: 30px; color: var(--gray);">
+                            <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                            <h3>Nenhum post ativo no momento</h3>
+                            <p>Seja o primeiro a compartilhar algo!</p>
+                        </div>
+                    </div>
+                `;
                 return;
             }
+            
             ui.postsContainer.innerHTML = '';
-            validPosts.forEach(post => renderPost(post));
-        }, 200);
-
+            
+            validPosts.forEach(post => {
+                renderPost(post);
+            });
+        };
+        
         const renderPost = async (post) => {
-            if (document.getElementById(`post-${post.id}`)) return updatePost(post);
+            // Check if post already exists to avoid duplication
+            if (document.getElementById(`post-${post.id}`)) {
+                updatePost(post);
+                return;
+            }
             
             const postEl = document.createElement('div');
             postEl.className = 'card fade-in';
             postEl.id = `post-${post.id}`;
             
-            const authorProfile = await getUserProfile(post.authorPub);
+            // Get author profile from cache if available
+            let authorProfile = state.usersCache.get(post.authorPub);
+            if (!authorProfile) {
+                authorProfile = await new Promise(resolve => {
+                    state.gun.get(`~${post.authorPub}`).once(profile => {
+                        const profileData = profile || { alias: 'Anônimo' };
+                        state.usersCache.set(post.authorPub, profileData);
+                        resolve(profileData);
+                    });
+                });
+            }
             
-            postEl.innerHTML = `<div class="post-header"><div class="post-author-info">${renderAvatar(authorProfile)}<div><div class="post-author">${sanitizeHTML(authorProfile.alias)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div></div><div class="post-countdown" data-timestamp="${post.lastActivityAt}">${formatCountdown(post.lastActivityAt)}</div></div><div class="post-content">${sanitizeHTML(post.content)}</div><div class="post-actions"><div class="post-action" data-action="like"><i class="fas fa-heart"></i> <span class="like-count">0</span></div><div class="post-action" data-action="comment"><i class="fas fa-comment"></i> <span>Comentar</span></div></div><div class="comments-section"></div>`;
+            postEl.innerHTML = `
+                <div class="post-header">
+                    <div class="post-author-info">
+                        ${renderAvatar(authorProfile)}
+                        <div>
+                            <div class="post-author">${sanitizeHTML(authorProfile.alias)}</div>
+                            <div class="post-time">${formatTime(post.createdAt)}</div>
+                        </div>
+                    </div>
+                    <div class="post-countdown" data-timestamp="${post.lastActivityAt}">
+                        ${formatCountdown(post.lastActivityAt)}
+                    </div>
+                </div>
+                <div class="post-content">${sanitizeHTML(post.content)}</div>
+                <div class="post-actions">
+                    <div class="post-action" data-action="like">
+                        <i class="fas fa-heart"></i> 
+                        <span class="like-count">0</span>
+                    </div>
+                    <div class="post-action" data-action="comment">
+                        <i class="fas fa-comment"></i> 
+                        <span>Comentar</span>
+                    </div>
+                </div>
+                <div class="comments-section"></div>
+            `;
             
             ui.postsContainer.appendChild(postEl);
             
-            postEl.querySelector('[data-action="like"]').addEventListener('click', () => handlePostInteraction(post.id, 'like'));
-            postEl.querySelector('[data-action="comment"]').addEventListener('click', e => toggleComments(post.id, e.currentTarget.closest('.card')));
+            // Add event listeners
+            postEl.querySelector('[data-action="like"]').addEventListener('click', () => 
+                handlePostInteraction(post.id, 'like'));
+                
+            postEl.querySelector('[data-action="comment"]').addEventListener('click', () => {
+                const commentsSection = postEl.querySelector('.comments-section');
+                const isVisible = commentsSection.style.display === 'block';
+                commentsSection.style.display = isVisible ? 'none' : 'block';
+                
+                if (!isVisible) {
+                    renderComments(post.id, commentsSection);
+                }
+            });
             
             updateLikes(post.id, postEl);
         };
         
         const updatePost = (post) => {
             const postEl = document.getElementById(`post-${post.id}`);
-            if (postEl) postEl.querySelector('.post-countdown').textContent = formatCountdown(post.lastActivityAt);
+            if (!postEl) return;
+            
+            const countdownEl = postEl.querySelector('.post-countdown');
+            if (countdownEl) {
+                countdownEl.textContent = formatCountdown(post.lastActivityAt);
+            }
         };
-
+        
         const createPost = () => {
-            if (!state.user?.is) return showNotification('Faça login para publicar.', 'error');
             const content = ui.postContent.value.trim();
-            if (!content) return showNotification('Escreva algo para publicar.', 'error');
+            
+            if (!content) {
+                return showNotification('Escreva algo para publicar.', 'error');
+            }
+            
+            if (content.length > CONFIG.MAX_POST_LENGTH) {
+                return showNotification(`O post deve ter no máximo ${CONFIG.MAX_POST_LENGTH} caracteres.`, 'error');
+            }
+            
+            if (!state.user?.is) {
+                return showNotification('Faça login para publicar.', 'error');
+            }
             
             const now = Date.now();
-            const postData = { authorPub: state.user.is.pub, content, createdAt: now, lastActivityAt: now };
+            const postData = {
+                authorPub: state.user.is.pub,
+                content: content,
+                createdAt: now,
+                lastActivityAt: now
+            };
+            
+            if (state.currentCommunity.id) {
+                postData.communityId = state.currentCommunity.id;
+            }
+            
             const postRef = state.gun.get('posts').set(postData);
             state.gun.user().get('posts').set(postRef);
             
             ui.postContent.value = '';
-            showNotification('Post publicado!');
+            showNotification('Post publicado com sucesso!');
         };
         
         const handlePostInteraction = (postId, type) => {
-            if (!state.user?.is) return showNotification('Faça login para interagir.', 'error');
+            if (!state.user?.is) {
+                return showNotification('Faça login para interagir.', 'error');
+            }
             
+            // Update last activity
             state.gun.get('posts').get(postId).get('lastActivityAt').put(Date.now());
             
             if (type === 'like') {
                 const likeRef = state.gun.get('posts').get(postId).get('likes').get(state.user.is.pub);
-                likeRef.once(currentVal => likeRef.put(!currentVal));
+                likeRef.once(currentVal => {
+                    likeRef.put(!currentVal);
+                });
             }
         };
         
@@ -1079,33 +1820,53 @@
             
             const sub = likesRef.map().on(() => {
                 let count = 0;
-                likesRef.map().once(val => { if (val) count++; });
-                setTimeout(() => { if (likeCountEl) likeCountEl.textContent = count; }, 50);
-                if (state.user?.is) likesRef.get(state.user.is.pub).once(val => likeActionEl.classList.toggle('liked', !!val));
+                likesRef.map().once(val => {
+                    if (val) count++;
+                });
+                
+                if (state.user?.is) {
+                    likesRef.get(state.user.is.pub).once(val => {
+                        likeActionEl.classList.toggle('liked', !!val);
+                    });
+                }
+                
+                setTimeout(() => {
+                    if (likeCountEl) likeCountEl.textContent = count;
+                }, 50);
             });
+            
             state.activeSubscriptions.set(`likes-${postId}`, sub);
         };
         
-        const toggleComments = (postId, postEl) => {
-            const commentsSection = postEl.querySelector('.comments-section');
-            const isVisible = commentsSection.style.display === 'block';
-            commentsSection.style.display = isVisible ? 'none' : 'block';
-            if (!isVisible) renderComments(postId, commentsSection);
-        };
-        
         const renderComments = (postId, container) => {
-            container.innerHTML = `<div class="comment-form"><input type="text" class="form-control comment-input" placeholder="Escreva um comentário..."><button class="btn btn-sm comment-submit-btn"><i class="fas fa-paper-plane"></i></button></div><div class="comments-list" style="margin-top: 15px;"></div>`;
+            container.innerHTML = `
+                <div class="comment-form">
+                    <input type="text" class="form-control comment-input" placeholder="Escreva um comentário...">
+                    <button class="btn btn-sm comment-submit-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="comments-list"></div>
+            `;
             
-            const input = container.querySelector('.comment-input');
-            const submitBtn = container.querySelector('.comment-submit-btn');
+            container.querySelector('.comment-submit-btn').addEventListener('click', () => 
+                createComment(postId, container));
+                
+            container.querySelector('.comment-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    createComment(postId, container);
+                }
+            });
+            
             const listEl = container.querySelector('.comments-list');
-
-            const addComment = () => createComment(postId, input);
-            submitBtn.addEventListener('click', addComment);
-            input.addEventListener('keypress', e => { if (e.key === 'Enter') addComment(); });
             
+            // MODIFICADO: Garantir que os comentários sejam carregados corretamente
             const sub = state.gun.get('posts').get(postId).get('comments').map().on(async (comment, id) => {
-                if (!comment?.content) return;
+                if (!comment?.content) {
+                    const el = document.getElementById(id);
+                    if (el) el.remove();
+                    return;
+                }
                 
                 let commentEl = document.getElementById(id);
                 if (!commentEl) {
@@ -1115,19 +1876,53 @@
                     listEl.prepend(commentEl);
                 }
                 
-                const author = await getUserProfile(comment.authorPub);
-                commentEl.innerHTML = `<span class="comment-author">${sanitizeHTML(author.alias)}:</span> ${sanitizeHTML(comment.content)}<div style="font-size: 0.8rem; color: var(--gray); margin-top: 5px;">${formatTime(comment.createdAt)}</div>`;
+                // Get author profile
+                let author = state.usersCache.get(comment.authorPub);
+                if (!author) {
+                    author = await new Promise(resolve => {
+                        state.gun.get(`~${comment.authorPub}`).once(profile => {
+                            const profileData = profile || { alias: 'Anônimo' };
+                            state.usersCache.set(comment.authorPub, profileData);
+                            resolve(profileData);
+                        });
+                    });
+                }
+                
+                commentEl.innerHTML = `
+                    <span class="comment-author">${sanitizeHTML(author.alias)}:</span> 
+                    ${sanitizeHTML(comment.content)}
+                    <div style="font-size: 0.8rem; color: var(--gray); margin-top: 5px;">
+                        ${formatTime(comment.createdAt)}
+                    </div>
+                `;
+                
+                // MODIFICADO: Atualizar a atividade do post quando um comentário é feito
+                state.gun.get('posts').get(postId).get('lastActivityAt').put(Date.now());
             });
+            
             state.activeSubscriptions.set(`comments-${postId}`, sub);
         };
         
-        const createComment = (postId, input) => {
-            if (!state.user?.is) return showNotification('Faça login para comentar.', 'error');
+        const createComment = (postId, container) => {
+            const input = container.querySelector('.comment-input');
             const content = input.value.trim();
-            if (!content) return showNotification('Escreva um comentário.', 'error');
+            
+            if (!content) {
+                return showNotification('Escreva um comentário.', 'error');
+            }
+            
+            if (!state.user?.is) {
+                return showNotification('Faça login para comentar.', 'error');
+            }
             
             handlePostInteraction(postId, 'comment');
-            const commentData = { authorPub: state.user.is.pub, content, createdAt: Date.now() };
+            
+            const commentData = {
+                authorPub: state.user.is.pub,
+                content: content,
+                createdAt: Date.now()
+            };
+            
             state.gun.get('posts').get(postId).get('comments').set(commentData);
             input.value = '';
         };
@@ -1137,49 +1932,740 @@
                 const timestamp = parseInt(el.dataset.timestamp, 10);
                 if (timestamp) {
                     el.textContent = formatCountdown(timestamp);
+                    
+                    // Remove expired posts from view
                     if (Date.now() - timestamp > CONFIG.POST_EXPIRATION_MS) {
-                        document.getElementById(`post-${el.closest('.card')?.id.replace('post-', '')}`)?.remove();
+                        const postId = el.closest('.card')?.id.replace('post-', '');
+                        if (postId) {
+                            state.postsData.delete(postId);
+                            renderSortedFeed();
+                        }
                     }
                 }
             });
         };
         
-        const getUserProfile = (pub) => {
-            if (state.usersCache.has(pub)) return Promise.resolve(state.usersCache.get(pub));
-            return new Promise(resolve => {
-                state.gun.get(`~${pub}`).once(profile => {
-                    const data = profile || { alias: 'Anônimo' };
-                    state.usersCache.set(pub, data);
-                    resolve(data);
+        // Profile functionality - MODIFICADO para remover as abas
+        const loadProfile = () => {
+            if (!state.user?.is) {
+                ui.profileContainer.innerHTML = `
+                    <div class="card">
+                        <div style="text-align: center; padding: 30px;">
+                            <i class="fas fa-user-lock" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
+                            <h3>Faça login para ver seu perfil</h3>
+                            <button id="profile-login-btn" class="btn" style="margin-top: 15px;">
+                                <i class="fas fa-sign-in-alt"></i> Fazer Login
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('profile-login-btn').addEventListener('click', () => {
+                    ui.authModal.classList.add('active');
+                });
+                
+                return;
+            }
+            
+            ui.profileContainer.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Carregando perfil...</div>
+                </div>
+            `;
+            
+            state.gun.get(`~${state.user.is.pub}`).once(profile => {
+                if (!profile) {
+                    profile = { alias: state.user.is.alias, bio: '' };
+                    state.gun.get(`~${state.user.is.pub}`).put(profile);
+                }
+                
+                state.currentUserProfile = profile;
+                
+                ui.profileContainer.innerHTML = `
+                    <div class="card">
+                        <div class="profile-header">
+                            <div class="profile-avatar" style="${profile.avatar ? `background-image: url('${profile.avatar}')` : ''}">
+                                ${!profile.avatar ? profile.alias.charAt(0).toUpperCase() : ''}
+                                <div class="profile-avatar-edit">
+                                    <i class="fas fa-camera"></i>
+                                </div>
+                            </div>
+                            <h1 class="profile-name">${sanitizeHTML(profile.alias || 'Usuário')}</h1>
+                            <div class="profile-bio">${sanitizeHTML(profile.bio || 'Sem biografia. Clique em Editar Perfil para adicionar uma.')}</div>
+                            
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <div id="post-count" class="stat-number">0</div>
+                                    <div class="stat-label">Posts</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div id="community-count" class="stat-number">0</div>
+                                    <div class="stat-label">Comunidades</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div id="connection-count" class="stat-number">0</div>
+                                    <div class="stat-label">Conexões</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-edit"></i> Editar Perfil</h3>
+                        <div class="form-group">
+                            <label for="edit-bio">Biografia</label>
+                            <textarea id="edit-bio" class="form-control" rows="3" placeholder="Fale um pouco sobre você..." maxlength="${CONFIG.MAX_BIO_LENGTH}">${sanitizeHTML(profile.bio || '')}</textarea>
+                            <div style="text-align: right; font-size: 0.8rem; color: var(--gray); margin-top: 5px;">
+                                <span id="bio-char-count">${(profile.bio || '').length}</span>/${CONFIG.MAX_BIO_LENGTH} caracteres
+                            </div>
+                        </div>
+                        <button id="save-profile-btn" class="btn">
+                            <i class="fas fa-save"></i> Salvar Alterações
+                        </button>
+                    </div>
+                `;
+                
+                // Add event listeners
+                document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
+                document.querySelector('.profile-avatar').addEventListener('click', () => {
+                    ui.avatarPreview.style.backgroundImage = profile.avatar ? `url('${profile.avatar}')` : '';
+                    ui.avatarPreview.innerHTML = profile.avatar ? '' : profile.alias.charAt(0).toUpperCase();
+                    ui.avatarModal.classList.add('active');
+                });
+                
+                // Bio character count
+                const bioTextarea = document.getElementById('edit-bio');
+                const charCount = document.getElementById('bio-char-count');
+                
+                bioTextarea.addEventListener('input', () => {
+                    charCount.textContent = bioTextarea.value.length;
+                });
+                
+                loadProfileStats(); // Apenas carrega as estatísticas, não as abas
+            });
+        };
+        
+        const saveProfile = () => {
+            if (!state.user?.is) return;
+            
+            const bio = document.getElementById('edit-bio').value.trim();
+            state.gun.get(`~${state.user.is.pub}`).get('bio').put(bio);
+            
+            showNotification('Biografia atualizada!');
+            document.querySelector('.profile-bio').textContent = bio || 'Sem biografia. Clique em Editar Perfil para adicionar uma.';
+        };
+        
+        const handleAvatarUpload = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file size
+            if (file.size > CONFIG.AVATAR_MAX_SIZE) {
+                showNotification('A imagem deve ter menos de 2MB.', 'error');
+                return;
+            }
+            
+            // Check file type
+            if (!file.type.match('image.*')) {
+                showNotification('Selecione uma imagem válida.', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                ui.avatarPreview.style.backgroundImage = `url('${e.target.result}')`;
+                ui.avatarPreview.innerHTML = '';
+                state.tempAvatarFile = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+        
+        const saveAvatar = () => {
+            if (!state.user?.is || !state.tempAvatarFile) {
+                return showNotification('Selecione uma imagem primeiro.', 'error');
+            }
+            
+            state.gun.get(`~${state.user.is.pub}`).get('avatar').put(state.tempAvatarFile);
+            showNotification('Avatar salvo!');
+            ui.avatarModal.classList.remove('active');
+            state.tempAvatarFile = null;
+            
+            // Update profile view
+            if (state.currentPage === 'profile') {
+                loadProfile();
+            }
+        };
+        
+        const loadProfileStats = () => {
+            let postCount = 0, commCount = 0, connCount = 0;
+            const userRef = state.gun.user();
+            
+            // Count posts
+            userRef.get('posts').map().once(() => {
+                postCount++;
+                document.getElementById('post-count').textContent = postCount;
+            });
+            
+            // Count communities
+            userRef.get('communities').map().once(() => {
+                commCount++;
+                document.getElementById('community-count').textContent = commCount;
+            });
+            
+            // Count connections
+            userRef.get('connections').map().once((val) => {
+                if (val) {
+                    connCount++;
+                    document.getElementById('connection-count').textContent = connCount;
+                }
+            });
+        };
+        
+        // Communities functionality
+        const loadCommunities = () => {
+            ui.communitiesContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando comunidades...</div></div>';
+            
+            let hasCommunities = false;
+            
+            const sub = state.gun.get('communities').map().on((community, id) => {
+                if (community?.name) {
+                    if (!hasCommunities) {
+                        ui.communitiesContainer.innerHTML = '';
+                        hasCommunities = true;
+                    }
+                    
+                    // Verificar se a comunidade já foi renderizada
+                    if (document.getElementById(`comm-${id}`)) return;
+                    
+                    renderCommunity(community, id);
+                }
+            });
+            
+            state.activeSubscriptions.set('communities-list', sub);
+            
+            setTimeout(() => {
+                if (!hasCommunities) {
+                    ui.communitiesContainer.innerHTML = `
+                        <div class="card">
+                            <div style="text-align: center; padding: 30px; color: var(--gray);">
+                                <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                                <h3>Nenhuma comunidade encontrada</h3>
+                                <p>Seja o primeiro a criar uma comunidade!</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }, 3000);
+        };
+        
+        const renderCommunity = (community, id) => {
+            let cardEl = document.getElementById(`comm-${id}`);
+            if (cardEl) {
+                cardEl.querySelector('.community-name').textContent = sanitizeHTML(community.name);
+                return;
+            }
+            
+            cardEl = document.createElement('div');
+            cardEl.className = 'community-card fade-in';
+            cardEl.id = `comm-${id}`;
+            
+            cardEl.innerHTML = `
+                ${renderAvatar({alias: community.name})}
+                <div class="community-info">
+                    <div>
+                        <div class="community-name">${sanitizeHTML(community.name)}</div>
+                        <div style="color: var(--gray); font-size: 0.9rem; margin-top: 5px;">
+                            ${community.description || 'Sem descrição'}
+                        </div>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right" style="color: var(--gray);"></i>
+            `;
+            
+            cardEl.addEventListener('click', () => {
+                // Ativar filtro de comunidade específica
+                activateFilter('community', id, community.name);
+                navigateTo('feed');
+            });
+            
+            ui.communitiesContainer.prepend(cardEl);
+        };
+        
+        const createCommunity = () => {
+            if (!state.user?.is) {
+                return showNotification('Faça login para criar uma comunidade.', 'error');
+            }
+            
+            const name = document.getElementById('community-name').value.trim();
+            if (!name) {
+                return showNotification('Nome é obrigatório.', 'error');
+            }
+            
+            const desc = document.getElementById('community-desc').value.trim();
+            const communityData = {
+                name,
+                description: desc,
+                creatorPub: state.user.is.pub,
+                createdAt: Date.now()
+            };
+            
+            const commRef = state.gun.get('communities').set(communityData);
+            state.gun.user().get('communities').set(commRef);
+            
+            ui.communityModal.classList.remove('active');
+            showNotification('Comunidade criada!');
+            
+            // Clear form
+            document.getElementById('community-name').value = '';
+            document.getElementById('community-desc').value = '';
+        };
+        
+        // Connections functionality - COMPLETAMENTE REFEITA
+        const loadConnectionsPage = () => {
+            if (!state.user?.is) {
+                const msg = `
+                    <div class="card">
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="fas fa-user-lock" style="font-size: 2rem; color: var(--gray); margin-bottom: 10px;"></i>
+                            <p>Faça login para gerenciar conexões</p>
+                            <button class="btn" style="margin-top: 10px;">
+                                <i class="fas fa-sign-in-alt"></i> Fazer Login
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                ui.pendingRequestsContainer.innerHTML = msg;
+                ui.allUsersContainer.innerHTML = msg;
+                
+                document.querySelectorAll('#connections-page .btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        ui.authModal.classList.add('active');
+                    });
+                });
+                
+                return;
+            }
+            
+            loadPendingRequests();
+            loadAllUsers();
+        };
+        
+        const loadPendingRequests = () => {
+            const container = ui.pendingRequestsContainer;
+            container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando solicitações...</div></div>';
+            
+            let hasRequests = false;
+            
+            // Buscar solicitações pendentes
+            state.gun.get(`~${state.user.is.pub}`).get('requests').map().on(async (request, senderPub) => {
+                if (request && request.status === 'pending') {
+                    if (!hasRequests) {
+                        container.innerHTML = '';
+                        hasRequests = true;
+                    }
+                    
+                    // Evitar duplicatas
+                    if (document.getElementById(`req-${senderPub}`)) return;
+                    
+                    // Buscar informações do remetente
+                    const senderProfile = await new Promise(resolve => {
+                        state.gun.get(`~${senderPub}`).once(profile => {
+                            resolve(profile || { alias: 'Usuário Desconhecido' });
+                        });
+                    });
+                    
+                    const newCard = document.createElement('div');
+                    newCard.className = 'user-card fade-in';
+                    newCard.id = `req-${senderPub}`;
+                    
+                    newCard.innerHTML = `
+                        <div class="user-card-info">
+                            ${renderAvatar(senderProfile, 'avatar', 'width: 45px; height: 45px;')}
+                            <span class="user-card-alias">${sanitizeHTML(senderProfile.alias)}</span>
+                        </div>
+                        <div class="user-card-actions">
+                            <button class="btn btn-success btn-sm" data-pub="${senderPub}" data-action="accept">
+                                <i class="fas fa-check"></i> Aceitar
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-pub="${senderPub}" data-action="decline">
+                                <i class="fas fa-times"></i> Recusar
+                            </button>
+                        </div>
+                    `;
+                    
+                    container.prepend(newCard);
+                    
+                    // Adicionar event listeners
+                    newCard.querySelector('[data-action="accept"]').addEventListener('click', () => {
+                        acceptRequest(senderPub);
+                    });
+                    
+                    newCard.querySelector('[data-action="decline"]').addEventListener('click', () => {
+                        declineRequest(senderPub);
+                    });
+                }
+            });
+            
+            setTimeout(() => {
+                if (!hasRequests) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 15px; color: var(--gray);">
+                            <i class="fas fa-inbox" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
+                            <p>Nenhuma solicitação pendente</p>
+                        </div>
+                    `;
+                }
+            }, 3000);
+        };
+        
+        const loadAllUsers = () => {
+            const container = ui.allUsersContainer;
+            container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando usuários...</div></div>';
+            
+            const myPub = state.user.is.pub;
+            let hasUsers = false;
+            
+            // Buscar todos os usuários registrados
+            state.gun.get('allUsers').map().on(async (user, pub) => {
+                if (!user || !user.alias || pub === myPub) return;
+                
+                if (!hasUsers) {
+                    container.innerHTML = '';
+                    hasUsers = true;
+                }
+                
+                // Verificar se já existe
+                if (document.getElementById(`user-${pub}`)) return;
+                
+                // Verificar status de conexão
+                const isConnected = await new Promise(resolve => {
+                    state.gun.user().get('connections').get(pub).once(val => resolve(!!val));
+                });
+                
+                const hasSentRequest = await new Promise(resolve => {
+                    state.gun.user().get('sentRequests').get(pub).once(val => resolve(!!val));
+                });
+                
+                const hasPendingRequest = await new Promise(resolve => {
+                    state.gun.get(`~${pub}`).get('requests').get(myPub).once(val => 
+                        resolve(val && val.status === 'pending')
+                    );
+                });
+                
+                renderUserCard(user, pub, isConnected, hasSentRequest, hasPendingRequest);
+            });
+            
+            setTimeout(() => {
+                if (!hasUsers) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 15px; color: var(--gray);">
+                            <i class="fas fa-users" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
+                            <p>Nenhum outro usuário encontrado</p>
+                        </div>
+                    `;
+                }
+            }, 3000);
+        };
+        
+        const renderUserCard = (user, pub, isConnected, hasSentRequest, hasPendingRequest) => {
+            const cardEl = document.createElement('div');
+            cardEl.className = 'user-card fade-in';
+            cardEl.id = `user-${pub}`;
+            cardEl.dataset.alias = user.alias.toLowerCase();
+            
+            let buttonHTML = '';
+            if (isConnected) {
+                buttonHTML = `
+                    <button class="btn btn-outline btn-sm" data-pub="${pub}" data-action="chat">
+                        <i class="fas fa-comment"></i> Conversar
+                    </button>
+                    <button class="btn btn-danger btn-sm" data-pub="${pub}" data-action="remove">
+                        <i class="fas fa-user-times"></i> Remover
+                    </button>
+                `;
+            } else if (hasSentRequest) {
+                buttonHTML = `<button class="btn btn-outline btn-sm" disabled>
+                    <i class="fas fa-clock"></i> Solicitado
+                </button>`;
+            } else if (hasPendingRequest) {
+                buttonHTML = `
+                    <button class="btn btn-success btn-sm" data-pub="${pub}" data-action="accept">
+                        <i class="fas fa-check"></i> Aceitar
+                    </button>
+                    <button class="btn btn-danger btn-sm" data-pub="${pub}" data-action="decline">
+                        <i class="fas fa-times"></i> Recusar
+                    </button>
+                `;
+            } else {
+                buttonHTML = `<button class="btn btn-sm" data-pub="${pub}" data-action="request">
+                    <i class="fas fa-user-plus"></i> Conectar
+                </button>`;
+            }
+            
+            cardEl.innerHTML = `
+                <div class="user-card-info">
+                    ${renderAvatar(user, 'avatar', 'width: 45px; height: 45px;')}
+                    <span class="user-card-alias">${sanitizeHTML(user.alias)}</span>
+                </div>
+                <div class="user-card-actions">
+                    ${buttonHTML}
+                </div>
+            `;
+            
+            ui.allUsersContainer.appendChild(cardEl);
+            
+            // Adicionar event listeners
+            const requestBtn = cardEl.querySelector('[data-action="request"]');
+            const removeBtn = cardEl.querySelector('[data-action="remove"]');
+            const chatBtn = cardEl.querySelector('[data-action="chat"]');
+            const acceptBtn = cardEl.querySelector('[data-action="accept"]');
+            const declineBtn = cardEl.querySelector('[data-action="decline"]');
+            
+            if (requestBtn) {
+                requestBtn.addEventListener('click', () => sendRequest(pub));
+            }
+            
+            if (removeBtn) {
+                removeBtn.addEventListener('click', () => removeConnection(pub));
+            }
+            
+            if (chatBtn) {
+                chatBtn.addEventListener('click', () => openChat(pub, user.alias));
+            }
+            
+            if (acceptBtn) {
+                acceptBtn.addEventListener('click', () => acceptRequest(pub));
+            }
+            
+            if (declineBtn) {
+                declineBtn.addEventListener('click', () => declineRequest(pub));
+            }
+        };
+        
+        const openChat = (targetPub, targetAlias) => {
+            state.currentChat.targetPub = targetPub;
+            state.currentChat.targetAlias = targetAlias;
+            
+            ui.chatWithUser.textContent = `Conversa com ${targetAlias}`;
+            navigateTo('chat');
+        };
+        
+        const loadChat = () => {
+            if (!state.user?.is || !state.currentChat.targetPub) {
+                navigateTo('connections');
+                return;
+            }
+            
+            ui.chatMessages.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando conversa...</div></div>';
+            
+            // Carregar mensagens
+            const chatId = [state.user.is.pub, state.currentChat.targetPub].sort().join('_');
+            const messages = state.gun.get('chats').get(chatId);
+            
+            messages.map().on((msg, id) => {
+                if (!msg || !msg.text) return;
+                
+                // Remover loading se existir
+                const loading = ui.chatMessages.querySelector('.loading');
+                if (loading) loading.remove();
+                
+                const messageEl = document.createElement('div');
+                messageEl.className = `chat-message ${msg.sender === state.user.is.pub ? 'sent' : 'received'}`;
+                messageEl.innerHTML = `
+                    <div>${sanitizeHTML(msg.text)}</div>
+                    <div style="font-size: 0.7rem; margin-top: 5px; opacity: 0.7;">
+                        ${formatTime(msg.timestamp)}
+                    </div>
+                `;
+                
+                ui.chatMessages.appendChild(messageEl);
+                ui.chatMessages.scrollTop = ui.chatMessages.scrollHeight;
+            });
+        };
+        
+        const sendChatMessage = () => {
+            const text = ui.chatInput.value.trim();
+            if (!text || !state.user?.is || !state.currentChat.targetPub) return;
+            
+            const chatId = [state.user.is.pub, state.currentChat.targetPub].sort().join('_');
+            const message = {
+                text: text,
+                sender: state.user.is.pub,
+                timestamp: Date.now()
+            };
+            
+            state.gun.get('chats').get(chatId).set(message);
+            ui.chatInput.value = '';
+        };
+        
+        const sendRequest = (targetPub) => {
+            const myPub = state.user.is.pub;
+            
+            // Enviar solicitação
+            state.gun.get(`~${targetPub}`).get('requests').get(myPub).put({ 
+                status: 'pending',
+                timestamp: Date.now()
+            });
+            
+            // Marcar como solicitado
+            state.gun.user().get('sentRequests').get(targetPub).put(true);
+            
+            showNotification('Solicitação enviada!');
+            
+            // Recarregar a página de conexões
+            loadConnectionsPage();
+        };
+        
+        const acceptRequest = (senderPub) => {
+            const myPub = state.user.is.pub;
+            
+            // Adicionar como conexão
+            state.gun.user().get('connections').get(senderPub).put(true);
+            state.gun.get(`~${senderPub}`).get('connections').get(myPub).put(true);
+            
+            // Remover solicitação
+            state.gun.user().get('requests').get(senderPub).put(null);
+            state.gun.get(`~${senderPub}`).get('sentRequests').get(myPub).put(null);
+            
+            showNotification('Conexão aceita!');
+            
+            // Recarregar a página de conexões
+            loadConnectionsPage();
+        };
+        
+        const declineRequest = (senderPub) => {
+            const myPub = state.user.is.pub;
+            
+            // Remover solicitação
+            state.gun.user().get('requests').get(senderPub).put(null);
+            state.gun.get(`~${senderPub}`).get('sentRequests').get(myPub).put(null);
+            
+            showNotification('Solicitação recusada.');
+            
+            // Recarregar a página de conexões
+            loadConnectionsPage();
+        };
+        
+        const removeConnection = (friendPub) => {
+            const myPub = state.user.is.pub;
+            
+            // Remover conexão
+            state.gun.user().get('connections').get(friendPub).put(null);
+            state.gun.get(`~${friendPub}`).get('connections').get(myPub).put(null);
+            
+            showNotification('Conexão removida.');
+            
+            // Recarregar a página de conexões
+            loadConnectionsPage();
+        };
+        
+        // Event Listeners
+        const setupEventListeners = () => {
+            // Navigation
+            ui.navItems.forEach(item => {
+                item.addEventListener('click', e => {
+                    e.preventDefault();
+                    navigateTo(item.dataset.page);
+                });
+            });
+            
+            // Auth
+            ui.loginBtn.addEventListener('click', () => {
+                ui.authModal.classList.add('active');
+            });
+            
+            ui.logoutBtn.addEventListener('click', logout);
+            
+            ui.authSubmitBtn.addEventListener('click', handleAuth);
+            
+            ui.authPass.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleAuth();
+                }
+            });
+            
+            // Modals
+            ui.closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.currentTarget.closest('.modal-overlay').classList.remove('active');
+                });
+            });
+            
+            // Posts
+            ui.createPostBtn.addEventListener('click', createPost);
+            
+            ui.postContent.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    createPost();
+                }
+            });
+            
+            // Filtros do feed
+            ui.filterButtons.forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const filterType = e.currentTarget.dataset.filter;
+                    activateFilter(filterType);
+                });
+            });
+            
+            // Communities
+            ui.showCommunityModalBtn.addEventListener('click', () => {
+                ui.communityModal.classList.add('active');
+            });
+            
+            ui.createCommunitySubmitBtn.addEventListener('click', createCommunity);
+            
+            // Avatar
+            ui.avatarInput.addEventListener('change', handleAvatarUpload);
+            ui.saveAvatarBtn.addEventListener('click', saveAvatar);
+            
+            // Chat
+            ui.chatSendBtn.addEventListener('click', sendChatMessage);
+            ui.chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+            
+            ui.backToConnections.addEventListener('click', () => {
+                navigateTo('connections');
+            });
+            
+            // User search
+            ui.userSearchInput.addEventListener('input', debounce(e => {
+                const term = e.target.value.toLowerCase();
+                
+                document.querySelectorAll('#all-users-container .user-card').forEach(card => {
+                    const alias = card.dataset.alias;
+                    card.style.display = alias.includes(term) ? 'flex' : 'none';
+                });
+            }, 300));
+            
+            // Close modals on overlay click
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', e => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                    }
                 });
             });
         };
         
-        const setupEventListeners = () => {
-            ui.navItems.forEach(item => item.addEventListener('click', e => { e.preventDefault(); navigateTo(item.dataset.page); }));
-            ui.loginBtn.addEventListener('click', () => ui.authModal.classList.add('active'));
-            ui.logoutBtn.addEventListener('click', logout);
-            ui.authSubmitBtn.addEventListener('click', handleAuth);
-            ui.authPass.addEventListener('keypress', e => { if (e.key === 'Enter') handleAuth(); });
-            ui.closeModalBtns.forEach(btn => btn.addEventListener('click', e => e.currentTarget.closest('.modal-overlay').classList.remove('active')));
-            ui.createPostBtn.addEventListener('click', createPost);
-            ui.chatSendBtn.addEventListener('click', () => sendChatMessage());
-            ui.chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendChatMessage(); });
-            ui.backToConnections.addEventListener('click', () => navigateTo('connections'));
-            ui.userSearchInput.addEventListener('input', debounce(e => {
-                const term = e.target.value.toLowerCase();
-                document.querySelectorAll('#all-users-container .user-card').forEach(card => {
-                    card.style.display = card.dataset.alias.includes(term) ? 'flex' : 'none';
-                });
-            }, 300));
-        };
-
+        // Initialize the application
         const init = () => {
             setupEventListeners();
-            checkUserSession();
+            
+            // Verificar sessão com um pequeno delay para garantir que o Gun esteja pronto
+            setTimeout(() => {
+                checkUserSession();
+            }, 100);
+            
             navigateTo('feed');
         };
         
+        // Start the app
         init();
     })();
     </script>
