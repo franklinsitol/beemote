@@ -821,8 +821,8 @@
         <div id="feed-page" class="page">
             <div id="feed-header-container" class="hidden"></div>
             
-            <!-- Filtros do Feed (adicionado) -->
-            <div id="feed-filters-container" class="card">
+            <!-- Filtros do Feed (ocultos por padrão) -->
+            <div id="feed-filters-container" class="card hidden">
                 <h3>Filtros do Feed</h3>
                 <div class="feed-filters">
                     <button class="filter-btn active" data-filter="all">
@@ -1165,7 +1165,7 @@
             
             // Mostrar/ocultar filtros conforme a página
             if (page === 'feed') {
-                ui.feedFiltersContainer.classList.remove('hidden');
+                ui.feedFiltersContainer.classList.add('hidden'); // Ocultar filtros
             } else {
                 ui.feedFiltersContainer.classList.add('hidden');
             }
