@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
     <style>
         :root {
             --primary: #6C63FF;
@@ -655,48 +659,6 @@
             border-left: 4px solid var(--primary);
         }
 
-        /* Feed Filters */
-        .feed-filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .filter-btn {
-            background-color: var(--primary-light);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            color: var(--dark);
-            transition: var(--transition);
-        }
-        
-        .filter-btn.active {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .filter-btn:hover {
-            background-color: var(--primary-dark);
-            color: white;
-        }
-        
-        .filter-indicator {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            text-align: center;
-            line-height: 20px;
-            font-size: 0.7rem;
-            margin-left: 5px;
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
             main {
@@ -733,11 +695,6 @@
             .tab {
                 padding: 10px 15px;
                 font-size: 0.9rem;
-            }
-
-            .feed-filters {
-                flex-direction: column;
-                align-items: stretch;
             }
         }
 
@@ -799,70 +756,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary-dark);
         }
-
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 500px;
-            border: 1px solid var(--gray-light);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            background-color: var(--secondary);
-        }
-
-        .chat-message {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 18px;
-            max-width: 80%;
-        }
-
-        .chat-message.received {
-            background-color: var(--light);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-message.sent {
-            background-color: var(--primary-light);
-            align-self: flex-end;
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-input-container {
-            display: flex;
-            padding: 15px;
-            border-top: 1px solid var(--gray-light);
-            background-color: var(--light);
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid var(--gray-light);
-            border-radius: 20px;
-            margin-right: 10px;
-        }
-
-        .chat-send-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -880,32 +773,6 @@
         
         <div id="feed-page" class="page">
             <div id="feed-header-container" class="hidden"></div>
-            
-            <!-- Filtros do Feed (ocultos por padrão) -->
-            <div id="feed-filters-container" class="card hidden">
-                <h3>Filtros do Feed</h3>
-                <div class="feed-filters">
-                    <button class="filter-btn active" data-filter="all">
-                        <i class="fas fa-globe"></i> Principal
-                    </button>
-                    <button class="filter-btn" data-filter="connections">
-                        <i class="fas fa-link"></i> Conexões
-                    </button>
-                    <button class="filter-btn" data-filter="communities">
-                        <i class="fas fa-users"></i> Comunidades
-                    </button>
-                    <button class="filter-btn hidden" data-filter="community" id="specific-community-filter">
-                        <i class="fas fa-users"></i> <span id="current-community-name"></span>
-                    </button>
-                    <button class="filter-btn hidden" data-filter="user" id="specific-user-filter">
-                        <i class="fas fa-user"></i> <span id="current-user-name"></span>
-                    </button>
-                </div>
-                <div id="active-filters-info" style="margin-top: 10px; font-size: 0.9rem; color: var(--gray);">
-                    Mostrando: Feed Principal
-                </div>
-            </div>
-            
             <div class="card">
                 <textarea id="post-content" class="form-control" placeholder="O que você está pensando? (Posts duram 24h)" rows="3"></textarea>
                 <button id="create-post-btn" class="btn" style="margin-top: 15px;">
@@ -966,32 +833,6 @@
                 </div>
             </div>
         </div>
-
-        <div id="chat-page" class="page hidden">
-            <div class="card">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <h3 id="chat-with-user">Conversa</h3>
-                    <button id="back-to-connections" class="btn btn-outline btn-sm">
-                        <i class="fas fa-arrow-left"></i> Voltar
-                    </button>
-                </div>
-                
-                <div class="chat-container">
-                    <div class="chat-messages" id="chat-messages">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
-                            <div>Carregando conversa...</div>
-                        </div>
-                    </div>
-                    <div class="chat-input-container">
-                        <input type="text" class="chat-input" id="chat-input" placeholder="Digite uma mensagem...">
-                        <button class="chat-send-btn" id="chat-send-btn">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </main>
     
     <!-- Auth Modal -->
@@ -1021,9 +862,6 @@
             </button>
             <p style="margin-top: 20px; text-align: center; color: var(--gray); font-size: 0.9rem;">
                 Sua privacidade é importante. Todos os dados são criptografados.
-            </p>
-            <p style="margin-top: 10px; text-align: center; color: var(--gray); font-size: 0.8rem;">
-                Dica: Para testar, use qualquer nome de usuário e senha
             </p>
         </div>
     </div>
@@ -1100,8 +938,7 @@
             POST_EXPIRATION_MS: 24 * 60 * 60 * 1000, // 24 hours
             MAX_POST_LENGTH: 500,
             MAX_BIO_LENGTH: 200,
-            AVATAR_MAX_SIZE: 2 * 1024 * 1024, // 2MB
-            SESSION_KEY: 'beemote_user_session' // Chave para armazenar sessão
+            AVATAR_MAX_SIZE: 2 * 1024 * 1024 // 2MB
         };
         
         // State management
@@ -1112,24 +949,13 @@
             activeSubscriptions: new Map(),
             tempAvatarFile: null,
             currentCommunity: { id: null, name: null },
-            currentUserFilter: { id: null, name: null },
             postsData: new Map(),
             countdownInterval: null,
             usersCache: new Map(),
             currentUserProfile: null,
             authState: 'initial', // initial, needs2fa, complete
-            renderedPosts: new Set(),
-            allUsers: new Map(),
-            activeFilters: {
-                all: true,
-                connections: false,
-                communities: false,
-                community: false,
-                user: false
-            },
-            userConnections: new Set(), // Para armazenar conexões do usuário
-            userCommunities: new Set(), // Para armazenar comunidades do usuário
-            currentChat: { targetPub: null, targetAlias: null } // Para armazenar informações do chat atual
+            renderedPosts: new Set(), // Para evitar posts duplicados
+            allUsers: new Map() // Para armazenar todos os usuários
         };
         
         // UI elements
@@ -1163,19 +989,6 @@
             pendingRequestsContainer: document.getElementById('pending-requests-container'),
             allUsersContainer: document.getElementById('all-users-container'),
             userSearchInput: document.getElementById('user-search-input'),
-            feedFiltersContainer: document.getElementById('feed-filters-container'),
-            filterButtons: document.querySelectorAll('.filter-btn'),
-            activeFiltersInfo: document.getElementById('active-filters-info'),
-            specificCommunityFilter: document.getElementById('specific-community-filter'),
-            specificUserFilter: document.getElementById('specific-user-filter'),
-            currentCommunityName: document.getElementById('current-community-name'),
-            currentUserName: document.getElementById('current-user-name'),
-            chatPage: document.getElementById('chat-page'),
-            chatMessages: document.getElementById('chat-messages'),
-            chatInput: document.getElementById('chat-input'),
-            chatSendBtn: document.getElementById('chat-send-btn'),
-            backToConnections: document.getElementById('back-to-connections'),
-            chatWithUser: document.getElementById('chat-with-user')
         };
         
         // Utility functions
@@ -1250,7 +1063,7 @@
             clearSubscriptions();
             state.currentPage = page;
             state.postsData.clear();
-            state.renderedPosts.clear();
+            state.renderedPosts.clear(); // Limpar posts renderizados ao navegar
             
             ui.pages.forEach(p => p.classList.add('hidden'));
             document.getElementById(`${page}-page`).classList.remove('hidden');
@@ -1259,67 +1072,30 @@
                 item.classList.toggle('active', item.dataset.page === page);
             });
             
-            // Mostrar/ocultar filtros conforme a página
-            if (page === 'feed') {
-                ui.feedFiltersContainer.classList.add('hidden'); // Ocultar filtros
-            } else {
-                ui.feedFiltersContainer.classList.add('hidden');
-            }
-            
             loadPageContent(page);
         };
         
         const loadPageContent = (page) => {
             switch (page) {
-                case 'feed': 
-                    loadFeed(); 
-                    loadUserConnections(); // Carregar conexões do usuário
-                    loadUserCommunities(); // Carregar comunidades do usuário
-                    break;
+                case 'feed': loadFeed(); break;
                 case 'profile': loadProfile(); break;
                 case 'connections': loadConnectionsPage(); break;
                 case 'communities': loadCommunities(); break;
-                case 'chat': loadChat(); break;
             }
         };
         
-        // Authentication - CORRIGIDO: Problema de autenticação resolvido
+        // Authentication
         const checkUserSession = () => {
-            // Verificar se há sessão salva no localStorage
-            const savedSession = localStorage.getItem(CONFIG.SESSION_KEY);
-            if (savedSession) {
-                try {
-                    const sessionData = JSON.parse(savedSession);
-                    console.log("Tentando restaurar sessão:", sessionData.alias);
-                    
-                    // Tentar autenticar com as credenciais salvas
-                    state.gun.user().auth(sessionData.alias, sessionData.pass, ack => {
-                        console.log("Resposta da autenticação:", ack);
-                        
-                        if (ack && ack.pub) {
-                            console.log("Sessão restaurada com sucesso", ack);
-                            state.user = state.gun.user();
-                            updateUIForUser();
-                            // Carregar perfil do usuário
-                            state.gun.get(`~${ack.pub}`).once(profile => {
-                                state.currentUserProfile = profile;
-                            });
-                            showNotification('Sessão restaurada!', 'success');
-                        } else {
-                            console.log("Falha ao restaurar sessão", ack);
-                            localStorage.removeItem(CONFIG.SESSION_KEY);
-                            // Limpar campos de autenticação
-                            ui.authAlias.value = '';
-                            ui.authPass.value = '';
-                        }
+            state.gun.user().recall({ sessionStorage: true }, ack => {
+                if (ack && ack.pub) {
+                    state.user = state.gun.user();
+                    updateUIForUser();
+                    // Load user profile
+                    state.gun.get(`~${ack.pub}`).once(profile => {
+                        state.currentUserProfile = profile;
                     });
-                } catch (e) {
-                    console.error("Erro ao restaurar sessão", e);
-                    localStorage.removeItem(CONFIG.SESSION_KEY);
                 }
-            } else {
-                console.log("Nenhuma sessão salva encontrada");
-            }
+            });
         };
         
         const handleAuth = () => {
@@ -1337,34 +1113,26 @@
                 ui.authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
                 
                 state.gun.user().auth(alias, pass, ack => {
-                    console.log("Resposta do auth:", ack);
-                    
-                    if (ack && ack.err) {
+                    if (ack.err) {
                         // User doesn't exist, try to create
-                        console.log("Usuário não existe, tentando criar...");
                         state.gun.user().create(alias, pass, createAck => {
-                            console.log("Resposta do create:", createAck);
-                            
-                            if (createAck && createAck.err) {
+                            if (createAck.err) {
                                 ui.authSubmitBtn.disabled = false;
                                 ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
                                 return showNotification(createAck.err, 'error');
                             }
                             
                             // User created, now auth
-                            console.log("Usuário criado, tentando autenticar...");
                             state.gun.user().auth(alias, pass, finalAck => {
-                                console.log("Resposta do auth após criação:", finalAck);
-                                
-                                if (finalAck && finalAck.err) {
+                                if (finalAck.err) {
                                     ui.authSubmitBtn.disabled = false;
                                     ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
                                     return showNotification(finalAck.err, 'error');
                                 }
-                                onAuthSuccess(finalAck.pub, alias, pass);
+                                onAuthSuccess(finalAck.pub, alias);
                             });
                         });
-                    } else if (ack && ack.pub) {
+                    } else {
                         // Check if 2FA is needed
                         if (ack.wait) {
                             state.authState = 'needs2fa';
@@ -1372,12 +1140,8 @@
                             ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Verificar Código';
                             showNotification('Verifique seu aplicativo autenticador para o código', 'warning');
                         } else {
-                            onAuthSuccess(ack.pub, alias, pass);
+                            onAuthSuccess(ack.pub, alias);
                         }
-                    } else {
-                        ui.authSubmitBtn.disabled = false;
-                        ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
-                        showNotification('Erro desconhecido na autenticação', 'error');
                     }
                 });
             } else if (state.authState === 'needs2fa') {
@@ -1394,40 +1158,26 @@
                 // For demo purposes, we'll simulate a successful verification
                 setTimeout(() => {
                     state.gun.user().auth(alias, pass, ack => {
-                        if (ack && ack.err) {
+                        if (ack.err) {
                             ui.authSubmitBtn.disabled = false;
                             ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Verificar Código';
                             return showNotification('Código inválido. Tente novamente.', 'error');
                         }
-                        onAuthSuccess(ack.pub, alias, pass);
+                        onAuthSuccess(ack.pub, alias);
                     });
                 }, 1000);
             }
         };
         
-        const onAuthSuccess = (pub, alias, pass) => {
-            console.log("Autenticação bem-sucedida:", pub, alias);
+        const onAuthSuccess = (pub, alias) => {
             state.user = state.gun.user();
-            
             // Initialize user profile if it doesn't exist
             state.gun.get(`~${pub}`).once(profile => {
                 if (!profile) {
                     state.gun.get(`~${pub}`).put({ alias, bio: '' });
                 }
             });
-            
-            // Registrar usuário na lista global de usuários
-            state.gun.get('allUsers').get(pub).put({ 
-                alias: alias,
-                registeredAt: Date.now()
-            });
-            
-            // Salvar sessão no localStorage
-            localStorage.setItem(CONFIG.SESSION_KEY, JSON.stringify({
-                alias: alias,
-                pass: pass,
-                timestamp: Date.now()
-            }));
+            state.gun.get('users').get(pub).put({ alias });
             
             updateUIForUser();
             ui.authModal.classList.remove('active');
@@ -1442,17 +1192,12 @@
             state.gun.get(`~${pub}`).once(profile => {
                 state.currentUserProfile = profile;
             });
-            
-            // Recarregar a página atual
-            loadPageContent(state.currentPage);
         };
         
         const logout = () => {
             state.gun.user().leave();
             state.user = null;
             state.currentUserProfile = null;
-            // Remover sessão salva
-            localStorage.removeItem(CONFIG.SESSION_KEY);
             updateUIForUser();
             navigateTo('feed');
             showNotification('Você saiu da sua conta.', 'warning');
@@ -1470,7 +1215,7 @@
             }
         };
         
-        // Feed functionality - MODIFICADO com sistema de filtros
+        // Feed functionality
         const loadFeed = () => {
             ui.postsContainer.innerHTML = `
                 <div class="loading">
@@ -1480,7 +1225,7 @@
             `;
             
             state.postsData.clear();
-            state.renderedPosts.clear();
+            state.renderedPosts.clear(); // Limpar posts renderizados
             
             if (state.countdownInterval) {
                 clearInterval(state.countdownInterval);
@@ -1500,15 +1245,13 @@
                 
                 document.getElementById('back-to-global-feed').addEventListener('click', () => {
                     state.currentCommunity = { id: null, name: null };
-                    // Ativar filtro de comunidade específica
-                    activateFilter('all');
                     navigateTo('feed');
                 });
             } else {
                 ui.feedHeaderContainer.classList.add('hidden');
             }
             
-            // Subscribe to posts
+            // Subscribe to posts - MODIFICADO para evitar duplicação
             const sub = state.gun.get('posts').map().on((post, id) => {
                 if (!post) return;
                 
@@ -1516,12 +1259,12 @@
                 if (state.renderedPosts.has(id)) return;
                 
                 if (post.content && post.lastActivityAt) {
-                    // Aplicar filtros
-                    if (shouldShowPost(post)) {
-                        state.postsData.set(id, { ...post, id });
-                        state.renderedPosts.add(id);
-                    } else {
+                    // Check if post belongs to current community
+                    if (state.currentCommunity.id && post.communityId !== state.currentCommunity.id) {
                         state.postsData.delete(id);
+                    } else {
+                        state.postsData.set(id, { ...post, id });
+                        state.renderedPosts.add(id); // Marcar como processado
                     }
                 } else {
                     state.postsData.delete(id);
@@ -1534,128 +1277,6 @@
             
             // Update countdowns every minute
             state.countdownInterval = setInterval(updateAllCountdowns, 60000);
-        };
-        
-        // Função para determinar se um post deve ser mostrado com base nos filtros ativos
-        const shouldShowPost = (post) => {
-            const now = Date.now();
-            // Verificar se o post expirou
-            if (now - post.lastActivityAt >= CONFIG.POST_EXPIRATION_MS) {
-                return false;
-            }
-            
-            // Se estamos visualizando uma comunidade específica
-            if (state.activeFilters.community && state.currentCommunity.id) {
-                return post.communityId === state.currentCommunity.id;
-            }
-            
-            // Se estamos visualizando um usuário específico
-            if (state.activeFilters.user && state.currentUserFilter.id) {
-                return post.authorPub === state.currentUserFilter.id;
-            }
-            
-            // Se estamos visualizando posts de conexões
-            if (state.activeFilters.connections) {
-                return state.userConnections.has(post.authorPub);
-            }
-            
-            // Se estamos visualizando posts de comunidades
-            if (state.activeFilters.communities) {
-                return post.communityId && state.userCommunities.has(post.communityId);
-            }
-            
-            // Feed principal (all) - mostrar tudo exceto posts de comunidades específicas
-            // a menos que o usuário seja membro da comunidade
-            if (state.activeFilters.all) {
-                if (post.communityId) {
-                    return state.userCommunities.has(post.communityId);
-                }
-                return true;
-            }
-            
-            return true;
-        };
-        
-        // Função para ativar um filtro
-        const activateFilter = (filterType, id = null, name = null) => {
-            // Resetar todos os filtros
-            Object.keys(state.activeFilters).forEach(key => {
-                state.activeFilters[key] = false;
-            });
-            
-            // Ativar o filtro selecionado
-            state.activeFilters[filterType] = true;
-            
-            // Atualizar UI dos botões
-            ui.filterButtons.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.filter === filterType) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            // Configurar filtros específicos
-            if (filterType === 'community' && id && name) {
-                state.currentCommunity = { id, name };
-                ui.specificCommunityFilter.classList.remove('hidden');
-                ui.currentCommunityName.textContent = name;
-            } else {
-                ui.specificCommunityFilter.classList.add('hidden');
-                state.currentCommunity = { id: null, name: null };
-            }
-            
-            if (filterType === 'user' && id && name) {
-                state.currentUserFilter = { id, name };
-                ui.specificUserFilter.classList.remove('hidden');
-                ui.currentUserName.textContent = name;
-            } else {
-                ui.specificUserFilter.classList.add('hidden');
-                state.currentUserFilter = { id: null, name: null };
-            }
-            
-            // Atualizar texto informativo
-            updateFilterInfo();
-            
-            // Recarregar feed com novos filtros
-            state.postsData.clear();
-            state.renderedPosts.clear();
-            loadFeed();
-        };
-        
-        const updateFilterInfo = () => {
-            let infoText = 'Mostrando: ';
-            
-            if (state.activeFilters.all) infoText += 'Feed Principal';
-            else if (state.activeFilters.connections) infoText += 'Conexões';
-            else if (state.activeFilters.communities) infoText += 'Minhas Comunidades';
-            else if (state.activeFilters.community) infoText += `Comunidade "${state.currentCommunity.name}"`;
-            else if (state.activeFilters.user) infoText += `Usuário "${state.currentUserFilter.name}"`;
-            
-            ui.activeFiltersInfo.textContent = infoText;
-        };
-        
-        // Carregar conexões do usuário
-        const loadUserConnections = () => {
-            if (!state.user?.is) return;
-            
-            state.userConnections.clear();
-            state.gun.user().get('connections').map().once((val, pub) => {
-                if (val) {
-                    state.userConnections.add(pub);
-                }
-            });
-        };
-        
-        // Carregar comunidades do usuário
-        const loadUserCommunities = () => {
-            if (!state.user?.is) return;
-            
-            state.userCommunities.clear();
-            state.gun.user().get('communities').map().once((val, id) => {
-                if (val) {
-                    state.userCommunities.add(id);
-                }
-            });
         };
         
         const renderSortedFeed = () => {
@@ -2128,6 +1749,7 @@
             
             let hasCommunities = false;
             
+            // MODIFICADO: Corrigir o carregamento de comunidades
             const sub = state.gun.get('communities').map().on((community, id) => {
                 if (community?.name) {
                     if (!hasCommunities) {
@@ -2184,8 +1806,7 @@
             `;
             
             cardEl.addEventListener('click', () => {
-                // Ativar filtro de comunidade específica
-                activateFilter('community', id, community.name);
+                state.currentCommunity = { id, name: community.name };
                 navigateTo('feed');
             });
             
@@ -2221,7 +1842,7 @@
             document.getElementById('community-desc').value = '';
         };
         
-        // Connections functionality - COMPLETAMENTE REFEITA
+        // Connections functionality
         const loadConnectionsPage = () => {
             if (!state.user?.is) {
                 const msg = `
@@ -2257,22 +1878,20 @@
             container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando solicitações...</div></div>';
             
             let hasRequests = false;
-            
-            // Buscar solicitações pendentes
-            state.gun.get(`~${state.user.is.pub}`).get('requests').map().on(async (request, senderPub) => {
-                if (request && request.status === 'pending') {
+            const sub = state.gun.get(`~${state.user.is.pub}`).get('requests').map().on(async (request, senderPub) => {
+                const cardEl = document.getElementById(`req-${senderPub}`);
+                
+                if (request?.status === 'pending') {
                     if (!hasRequests) {
                         container.innerHTML = '';
                         hasRequests = true;
                     }
                     
-                    // Evitar duplicatas
-                    if (document.getElementById(`req-${senderPub}`)) return;
+                    if (cardEl) return;
                     
-                    // Buscar informações do remetente
                     const senderProfile = await new Promise(resolve => {
                         state.gun.get(`~${senderPub}`).once(profile => {
-                            resolve(profile || { alias: 'Usuário Desconhecido' });
+                            resolve(profile || { alias: 'Usuário' });
                         });
                     });
                     
@@ -2287,26 +1906,21 @@
                         </div>
                         <div class="user-card-actions">
                             <button class="btn btn-success btn-sm" data-pub="${senderPub}" data-action="accept">
-                                <i class="fas fa-check"></i> Aceitar
+                                <i class="fas fa-check"></i>
                             </button>
                             <button class="btn btn-danger btn-sm" data-pub="${senderPub}" data-action="decline">
-                                <i class="fas fa-times"></i> Recusar
+                                <i class="fas fa-times"></i>
                             </button>
                         </div>
                     `;
                     
                     container.prepend(newCard);
-                    
-                    // Adicionar event listeners
-                    newCard.querySelector('[data-action="accept"]').addEventListener('click', () => {
-                        acceptRequest(senderPub);
-                    });
-                    
-                    newCard.querySelector('[data-action="decline"]').addEventListener('click', () => {
-                        declineRequest(senderPub);
-                    });
+                } else if (cardEl) {
+                    cardEl.remove();
                 }
             });
+            
+            state.activeSubscriptions.set('pending-requests', sub);
             
             setTimeout(() => {
                 if (!hasRequests) {
@@ -2327,35 +1941,24 @@
             const myPub = state.user.is.pub;
             let hasUsers = false;
             
-            // Buscar todos os usuários registrados
-            state.gun.get('allUsers').map().on(async (user, pub) => {
-                if (!user || !user.alias || pub === myPub) return;
+            // MODIFICADO: Buscar usuários de forma mais eficiente
+            state.allUsers.clear();
+            
+            const sub = state.gun.get('users').map().on(async (user, pub) => {
+                if (!user?.alias || pub === myPub) return;
+                
+                // Armazenar usuário
+                state.allUsers.set(pub, user);
                 
                 if (!hasUsers) {
                     container.innerHTML = '';
                     hasUsers = true;
                 }
                 
-                // Verificar se já existe
-                if (document.getElementById(`user-${pub}`)) return;
-                
-                // Verificar status de conexão
-                const isConnected = await new Promise(resolve => {
-                    state.gun.user().get('connections').get(pub).once(val => resolve(!!val));
-                });
-                
-                const hasSentRequest = await new Promise(resolve => {
-                    state.gun.user().get('sentRequests').get(pub).once(val => resolve(!!val));
-                });
-                
-                const hasPendingRequest = await new Promise(resolve => {
-                    state.gun.get(`~${pub}`).get('requests').get(myPub).once(val => 
-                        resolve(val && val.status === 'pending')
-                    );
-                });
-                
-                renderUserCard(user, pub, isConnected, hasSentRequest, hasPendingRequest);
+                renderUserCard(user, pub);
             });
+            
+            state.activeSubscriptions.set('all-users', sub);
             
             setTimeout(() => {
                 if (!hasUsers) {
@@ -2369,35 +1972,35 @@
             }, 3000);
         };
         
-        const renderUserCard = (user, pub, isConnected, hasSentRequest, hasPendingRequest) => {
-            const cardEl = document.createElement('div');
-            cardEl.className = 'user-card fade-in';
-            cardEl.id = `user-${pub}`;
-            cardEl.dataset.alias = user.alias.toLowerCase();
+        const renderUserCard = async (user, pub) => {
+            let cardEl = document.getElementById(`user-${pub}`);
+            
+            if (!cardEl) {
+                cardEl = document.createElement('div');
+                cardEl.className = 'user-card fade-in';
+                cardEl.id = `user-${pub}`;
+                cardEl.dataset.alias = user.alias.toLowerCase();
+                ui.allUsersContainer.appendChild(cardEl);
+            }
+            
+            // Check connection status
+            const connectionStatus = await new Promise(resolve => {
+                state.gun.user().get('connections').get(pub).once(val => resolve(!!val));
+            });
+            
+            const sentRequestStatus = await new Promise(resolve => {
+                state.gun.user().get('sentRequests').get(pub).once(val => resolve(!!val));
+            });
             
             let buttonHTML = '';
-            if (isConnected) {
-                buttonHTML = `
-                    <button class="btn btn-outline btn-sm" data-pub="${pub}" data-action="chat">
-                        <i class="fas fa-comment"></i> Conversar
-                    </button>
-                    <button class="btn btn-danger btn-sm" data-pub="${pub}" data-action="remove">
-                        <i class="fas fa-user-times"></i> Remover
-                    </button>
-                `;
-            } else if (hasSentRequest) {
+            if (connectionStatus) {
+                buttonHTML = `<button class="btn btn-danger btn-sm" data-pub="${pub}" data-action="remove">
+                    <i class="fas fa-user-times"></i> Remover
+                </button>`;
+            } else if (sentRequestStatus) {
                 buttonHTML = `<button class="btn btn-outline btn-sm" disabled>
                     <i class="fas fa-clock"></i> Solicitado
                 </button>`;
-            } else if (hasPendingRequest) {
-                buttonHTML = `
-                    <button class="btn btn-success btn-sm" data-pub="${pub}" data-action="accept">
-                        <i class="fas fa-check"></i> Aceitar
-                    </button>
-                    <button class="btn btn-danger btn-sm" data-pub="${pub}" data-action="decline">
-                        <i class="fas fa-times"></i> Recusar
-                    </button>
-                `;
             } else {
                 buttonHTML = `<button class="btn btn-sm" data-pub="${pub}" data-action="request">
                     <i class="fas fa-user-plus"></i> Conectar
@@ -2413,152 +2016,41 @@
                     ${buttonHTML}
                 </div>
             `;
-            
-            ui.allUsersContainer.appendChild(cardEl);
-            
-            // Adicionar event listeners
-            const requestBtn = cardEl.querySelector('[data-action="request"]');
-            const removeBtn = cardEl.querySelector('[data-action="remove"]');
-            const chatBtn = cardEl.querySelector('[data-action="chat"]');
-            const acceptBtn = cardEl.querySelector('[data-action="accept"]');
-            const declineBtn = cardEl.querySelector('[data-action="decline"]');
-            
-            if (requestBtn) {
-                requestBtn.addEventListener('click', () => sendRequest(pub));
-            }
-            
-            if (removeBtn) {
-                removeBtn.addEventListener('click', () => removeConnection(pub));
-            }
-            
-            if (chatBtn) {
-                chatBtn.addEventListener('click', () => openChat(pub, user.alias));
-            }
-            
-            if (acceptBtn) {
-                acceptBtn.addEventListener('click', () => acceptRequest(pub));
-            }
-            
-            if (declineBtn) {
-                declineBtn.addEventListener('click', () => declineRequest(pub));
-            }
-        };
-        
-        const openChat = (targetPub, targetAlias) => {
-            state.currentChat.targetPub = targetPub;
-            state.currentChat.targetAlias = targetAlias;
-            
-            ui.chatWithUser.textContent = `Conversa com ${targetAlias}`;
-            navigateTo('chat');
-        };
-        
-        const loadChat = () => {
-            if (!state.user?.is || !state.currentChat.targetPub) {
-                navigateTo('connections');
-                return;
-            }
-            
-            ui.chatMessages.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando conversa...</div></div>';
-            
-            // Carregar mensagens
-            const chatId = [state.user.is.pub, state.currentChat.targetPub].sort().join('_');
-            const messages = state.gun.get('chats').get(chatId);
-            
-            messages.map().on((msg, id) => {
-                if (!msg || !msg.text) return;
-                
-                // Remover loading se existir
-                const loading = ui.chatMessages.querySelector('.loading');
-                if (loading) loading.remove();
-                
-                const messageEl = document.createElement('div');
-                messageEl.className = `chat-message ${msg.sender === state.user.is.pub ? 'sent' : 'received'}`;
-                messageEl.innerHTML = `
-                    <div>${sanitizeHTML(msg.text)}</div>
-                    <div style="font-size: 0.7rem; margin-top: 5px; opacity: 0.7;">
-                        ${formatTime(msg.timestamp)}
-                    </div>
-                `;
-                
-                ui.chatMessages.appendChild(messageEl);
-                ui.chatMessages.scrollTop = ui.chatMessages.scrollHeight;
-            });
-        };
-        
-        const sendChatMessage = () => {
-            const text = ui.chatInput.value.trim();
-            if (!text || !state.user?.is || !state.currentChat.targetPub) return;
-            
-            const chatId = [state.user.is.pub, state.currentChat.targetPub].sort().join('_');
-            const message = {
-                text: text,
-                sender: state.user.is.pub,
-                timestamp: Date.now()
-            };
-            
-            state.gun.get('chats').get(chatId).set(message);
-            ui.chatInput.value = '';
         };
         
         const sendRequest = (targetPub) => {
             const myPub = state.user.is.pub;
             
-            // Enviar solicitação
-            state.gun.get(`~${targetPub}`).get('requests').get(myPub).put({ 
-                status: 'pending',
-                timestamp: Date.now()
-            });
-            
-            // Marcar como solicitado
+            state.gun.get(`~${targetPub}`).get('requests').get(myPub).put({ status: 'pending' });
             state.gun.user().get('sentRequests').get(targetPub).put(true);
             
             showNotification('Solicitação enviada!');
-            
-            // Recarregar a página de conexões
-            loadConnectionsPage();
         };
         
         const acceptRequest = (senderPub) => {
             const myPub = state.user.is.pub;
             
-            // Adicionar como conexão
             state.gun.user().get('connections').get(senderPub).put(true);
             state.gun.get(`~${senderPub}`).get('connections').get(myPub).put(true);
             
-            // Remover solicitação
             state.gun.user().get('requests').get(senderPub).put(null);
             state.gun.get(`~${senderPub}`).get('sentRequests').get(myPub).put(null);
             
             showNotification('Conexão aceita!');
-            
-            // Recarregar a página de conexões
-            loadConnectionsPage();
         };
         
         const declineRequest = (senderPub) => {
-            const myPub = state.user.is.pub;
-            
-            // Remover solicitação
             state.gun.user().get('requests').get(senderPub).put(null);
-            state.gun.get(`~${senderPub}`).get('sentRequests').get(myPub).put(null);
-            
             showNotification('Solicitação recusada.');
-            
-            // Recarregar a página de conexões
-            loadConnectionsPage();
         };
         
         const removeConnection = (friendPub) => {
             const myPub = state.user.is.pub;
             
-            // Remover conexão
             state.gun.user().get('connections').get(friendPub).put(null);
             state.gun.get(`~${friendPub}`).get('connections').get(myPub).put(null);
             
             showNotification('Conexão removida.');
-            
-            // Recarregar a página de conexões
-            loadConnectionsPage();
         };
         
         // Event Listeners
@@ -2602,14 +2094,6 @@
                 }
             });
             
-            // Filtros do feed
-            ui.filterButtons.forEach(btn => {
-                btn.addEventListener('click', e => {
-                    const filterType = e.currentTarget.dataset.filter;
-                    activateFilter(filterType);
-                });
-            });
-            
             // Communities
             ui.showCommunityModalBtn.addEventListener('click', () => {
                 ui.communityModal.classList.add('active');
@@ -2621,16 +2105,19 @@
             ui.avatarInput.addEventListener('change', handleAvatarUpload);
             ui.saveAvatarBtn.addEventListener('click', saveAvatar);
             
-            // Chat
-            ui.chatSendBtn.addEventListener('click', sendChatMessage);
-            ui.chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendChatMessage();
+            // Connections
+            document.getElementById('connections-page').addEventListener('click', e => {
+                const action = e.target.closest('[data-action]')?.dataset.action;
+                const pub = e.target.closest('[data-pub]')?.dataset.pub;
+                
+                if (!action || !pub) return;
+                
+                switch(action) {
+                    case 'accept': acceptRequest(pub); break;
+                    case 'decline': declineRequest(pub); break;
+                    case 'remove': removeConnection(pub); break;
+                    case 'request': sendRequest(pub); break;
                 }
-            });
-            
-            ui.backToConnections.addEventListener('click', () => {
-                navigateTo('connections');
             });
             
             // User search
@@ -2656,12 +2143,7 @@
         // Initialize the application
         const init = () => {
             setupEventListeners();
-            
-            // Verificar sessão com um pequeno delay para garantir que o Gun esteja pronto
-            setTimeout(() => {
-                checkUserSession();
-            }, 100);
-            
+            checkUserSession();
             navigateTo('feed');
         };
         
