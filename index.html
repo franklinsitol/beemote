@@ -96,10 +96,7 @@
         #image-preview { max-width: 100px; max-height: 100px; border-radius: 8px; }
         #audio-preview { width: 100%; }
         .remove-media-btn { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 20px; height: 20px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-        .btn.recording { background-color: var(--danger); }
-        .btn.recording:hover { background-color: #c82333; }
-
-        /* Estilos do Canvas de Desenho */
+        .btn.recording { background-color: var(--danger); } .btn.recording:hover { background-color: #c82333; }
         #drawing-canvas { border: 1px solid var(--gray-light); cursor: crosshair; touch-action: none; background-color: white; }
         .drawing-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--gray-light); }
         .color-palette { display: flex; gap: 5px; }
@@ -108,13 +105,19 @@
         #brush-size { width: 100px; }
         #drawing-modal .modal-content { max-width: 95%; width: auto; }
         @media (min-width: 768px) { #drawing-modal .modal-content { max-width: 700px; } }
-
+        #connection-status { width: 12px; height: 12px; border-radius: 50%; background-color: var(--danger); transition: background-color 0.5s ease; }
+        #connection-status.connected { background-color: var(--success); }
     </style>
 </head>
 <body>
     <header>
         <div class="logo"><i class="fas fa-bee"></i> Beemote</div>
-        <div id="auth-status"><span id="user-alias"></span><button id="logout-btn" class="btn btn-outline btn-sm hidden"><i class="fas fa-sign-out-alt"></i> Sair</button><button id="login-btn" class="btn btn-sm"><i class="fas fa-sign-in-alt"></i> Entrar</button></div>
+        <div id="auth-status">
+            <span id="user-alias"></span>
+            <div id="connection-status" title="Status da Conexão"></div>
+            <button id="logout-btn" class="btn btn-outline btn-sm hidden"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            <button id="login-btn" class="btn btn-sm"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+        </div>
     </header>
     
     <main>
@@ -152,9 +155,9 @@
             <div class="modal-header"><h2 class="modal-title">Desenhar</h2><button class="close-btn">&times;</button></div>
             <div class="drawing-tools">
                 <div class="color-palette" id="color-palette"></div>
-                <input type="range" id="brush-size" min="1" max="50" value="5">
-                <button id="eraser-btn" class="btn btn-outline btn-sm"><i class="fas fa-eraser"></i></button>
-                <button id="clear-canvas-btn" class="btn btn-outline btn-sm"><i class="fas fa-trash"></i></button>
+                <input type="range" id="brush-size" min="1" max="50" value="5" title="Tamanho do Pincel">
+                <button id="eraser-btn" class="btn btn-outline btn-sm" title="Borracha"><i class="fas fa-eraser"></i></button>
+                <button id="clear-canvas-btn" class="btn btn-outline btn-sm" title="Limpar Tudo"><i class="fas fa-trash"></i></button>
             </div>
             <canvas id="drawing-canvas"></canvas>
             <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:15px;">
@@ -177,9 +180,7 @@
         
         const CONFIG = { GUN_PEERS: ['https://gun-manhattan.herokuapp.com/gun'], POST_EXPIRATION_MS: 24*60*60*1000, MAX_POST_LENGTH: 500, MAX_BIO_LENGTH: 200, AVATAR_MAX_SIZE: 2*1024*1024, REMEMBER_ME_KEY: 'beemote_remember_me', IMAGE_COMPRESSION_QUALITY: 0.7, IMAGE_MAX_WIDTH: 800 };
         const FEED_FILTERS = { MAIN: 'main', COMMUNITIES: 'communities', COMMUNITY: 'community', CONNECTIONS: 'connections', USER_CHAT: 'user_chat' };
-        
         const state = { gun: Gun({ peers: CONFIG.GUN_PEERS, localStorage: false, radisk: true }), user: null, currentPage: 'feed', activeSubscriptions: new Map(), tempAvatarFile: null, currentCommunity: { id: null, name: null }, postsData: new Map(), countdownInterval: null, usersCache: new Map(), currentUserProfile: null, currentFeedFilter: FEED_FILTERS.MAIN, currentChatUser: null, mutualConnections: new Set(), tempPostImage: null, tempPostAudio: null, mediaRecorder: null, audioChunks: [], isRecording: false };
-        
         const ui = {
             pages: document.querySelectorAll('.page'), navItems: document.querySelectorAll('.nav-item'),
             loginBtn: document.getElementById('login-btn'), logoutBtn: document.getElementById('logout-btn'),
@@ -432,94 +433,33 @@
         const resetAudioSelection = () => { state.tempPostAudio=null; ui.audioPreviewContainer.classList.add('hidden'); };
 
         const setupDrawingCanvas = () => {
-            const modal = ui.drawingModal;
-            const canvas = modal.querySelector('#drawing-canvas');
-            const ctx = canvas.getContext('2d');
-            const tools = {
-                palette: modal.querySelector('#color-palette'),
-                brushSize: modal.querySelector('#brush-size'),
-                eraserBtn: modal.querySelector('#eraser-btn'),
-                clearBtn: modal.querySelector('#clear-canvas-btn'),
-                saveBtn: modal.querySelector('#save-drawing-btn')
-            };
+            const modal = ui.drawingModal, canvas = modal.querySelector('#drawing-canvas'), ctx = canvas.getContext('2d'), tools = { palette: modal.querySelector('#color-palette'), brushSize: modal.querySelector('#brush-size'), eraserBtn: modal.querySelector('#eraser-btn'), clearBtn: modal.querySelector('#clear-canvas-btn'), saveBtn: modal.querySelector('#save-drawing-btn') };
             const colors = ['#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
             let isDrawing = false, lastX = 0, lastY = 0;
 
-            tools.palette.innerHTML = colors.map((color, i) => `<div class="color-box ${i === 0 ? 'active' : ''}" style="background-color:${color}" data-color="${color}"></div>`).join('');
-            ctx.strokeStyle = colors[0];
-            ctx.lineWidth = tools.brushSize.value;
-            ctx.lineJoin = 'round';
-            ctx.lineCap = 'round';
+            tools.palette.innerHTML = colors.map((c, i) => `<div class="color-box ${i === 0 ? 'active' : ''}" style="background-color:${c}" data-color="${c}"></div>`).join('');
+            ctx.strokeStyle = colors[0]; ctx.lineWidth = tools.brushSize.value; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
 
-            const resizeCanvas = () => {
-                const container = canvas.parentElement;
-                canvas.width = container.clientWidth;
-                canvas.height = Math.min(window.innerHeight * 0.5, 400);
-                ctx.fillStyle = "white";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            };
+            const resizeCanvas = () => { const container = canvas.parentElement; canvas.width = container.clientWidth; canvas.height = Math.min(window.innerHeight * 0.5, 400); ctx.fillStyle="white"; ctx.fillRect(0,0,canvas.width,canvas.height); };
+            const getPos = (e) => { const rect = canvas.getBoundingClientRect(), evt = e.touches ? e.touches[0] : e; return [evt.clientX - rect.left, evt.clientY - rect.top]; };
+            const start = (e) => { isDrawing = true; [lastX, lastY] = getPos(e); };
+            const draw = (e) => { if (!isDrawing) return; e.preventDefault(); const [x, y] = getPos(e); ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke(); [lastX, lastY] = [x, y]; };
+            const stop = () => isDrawing = false;
             
-            const getPos = (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const evt = e.touches ? e.touches[0] : e;
-                return [evt.clientX - rect.left, evt.clientY - rect.top];
-            };
+            ['mousedown', 'touchstart'].forEach(evt => canvas.addEventListener(evt, start));
+            ['mousemove', 'touchmove'].forEach(evt => canvas.addEventListener(evt, draw));
+            ['mouseup', 'mouseout', 'touchend'].forEach(evt => canvas.addEventListener(evt, stop));
 
-            const startDrawing = (e) => { isDrawing = true; [lastX, lastY] = getPos(e); };
-            const draw = (e) => {
-                if (!isDrawing) return;
-                e.preventDefault();
-                const [currentX, currentY] = getPos(e);
-                ctx.beginPath();
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(currentX, currentY);
-                ctx.stroke();
-                [lastX, lastY] = [currentX, currentY];
-            };
-            const stopDrawing = () => isDrawing = false;
-            
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
-            canvas.addEventListener('touchstart', startDrawing);
-            canvas.addEventListener('touchmove', draw);
-            canvas.addEventListener('touchend', stopDrawing);
-
-            tools.palette.addEventListener('click', e => {
-                if (e.target.classList.contains('color-box')) {
-                    ctx.strokeStyle = e.target.dataset.color;
-                    tools.palette.querySelector('.active')?.classList.remove('active');
-                    e.target.classList.add('active');
-                }
-            });
+            tools.palette.addEventListener('click', e => { if (e.target.classList.contains('color-box')) { ctx.strokeStyle = e.target.dataset.color; tools.palette.querySelector('.active')?.classList.remove('active'); e.target.classList.add('active'); }});
             tools.brushSize.addEventListener('input', e => ctx.lineWidth = e.target.value);
-            tools.eraserBtn.addEventListener('click', () => ctx.strokeStyle = '#FFFFFF');
-            tools.clearBtn.addEventListener('click', () => ctx.fillRect(0, 0, canvas.width, canvas.height));
-            tools.saveBtn.addEventListener('click', () => {
-                const dataURL = canvas.toDataURL('image/png');
-                resetAudioSelection();
-                state.tempPostImage = dataURL;
-                ui.imagePreview.src = dataURL;
-                ui.imagePreviewContainer.classList.remove('hidden');
-                modal.classList.remove('active');
-            });
+            tools.eraserBtn.addEventListener('click', () => { ctx.strokeStyle = '#FFFFFF'; tools.palette.querySelector('.active')?.classList.remove('active'); });
+            tools.clearBtn.addEventListener('click', () => { ctx.fillStyle="white"; ctx.fillRect(0, 0, canvas.width, canvas.height); });
+            tools.saveBtn.addEventListener('click', () => { const dataURL = canvas.toDataURL('image/png'); resetAudioSelection(); state.tempPostImage = dataURL; ui.imagePreview.src = dataURL; ui.imagePreviewContainer.classList.remove('hidden'); modal.classList.remove('active'); });
             
-            resizeCanvas();
-            window.addEventListener('resize', debounce(resizeCanvas, 250));
+            new ResizeObserver(debounce(resizeCanvas, 100)).observe(modal);
         };
 
-        const loadProfile = () => {
-            if (!state.user?.is) { ui.profileContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver seu perfil</p><button id="profile-login-btn" class="btn">Login</button></div>`; document.getElementById('profile-login-btn').addEventListener('click', ()=>ui.authModal.classList.add('active')); return; }
-            ui.profileContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
-            state.gun.get(`~${state.user.is.pub}`).once(p => {
-                p = p || {alias: state.user.is.alias, bio: ''}; state.currentUserProfile = p;
-                ui.profileContainer.innerHTML = `<div class="card"><div class="profile-header"><div class="profile-avatar" style="${p.avatar ? `background-image:url('${p.avatar}')` : ''}">${!p.avatar?(p.alias?p.alias.charAt(0).toUpperCase():'?'):''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1>${sanitizeHTML(p.alias)}</h1><p class="profile-bio">${sanitizeHTML(p.bio||'Sem bio.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div></div></div><div class="card"><h3>Editar Perfil</h3><div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" class="form-control" rows="3">${sanitizeHTML(p.bio||'')}</textarea></div><button id="save-profile-btn" class="btn">Salvar</button></div>`;
-                document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
-                document.querySelector('.profile-avatar').addEventListener('click', ()=>{ ui.avatarPreview.style.backgroundImage = p.avatar ? `url('${p.avatar}')` : ''; ui.avatarPreview.innerHTML = !p.avatar ? (p.alias?p.alias.charAt(0).toUpperCase():'?'):''; ui.avatarModal.classList.add('active'); });
-                loadProfileStats();
-            });
-        };
+        const loadProfile = () => { if (!state.user?.is) { ui.profileContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver seu perfil</p><button id="profile-login-btn" class="btn">Login</button></div>`; document.getElementById('profile-login-btn').addEventListener('click', ()=>ui.authModal.classList.add('active')); return; } ui.profileContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`; state.gun.get(`~${state.user.is.pub}`).once(p => { p = p || {alias: state.user.is.alias, bio: ''}; state.currentUserProfile = p; ui.profileContainer.innerHTML = `<div class="card"><div class="profile-header"><div class="profile-avatar" style="${p.avatar ? `background-image:url('${p.avatar}')` : ''}">${!p.avatar?(p.alias?p.alias.charAt(0).toUpperCase():'?'):''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1>${sanitizeHTML(p.alias)}</h1><p class="profile-bio">${sanitizeHTML(p.bio||'Sem bio.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div></div></div><div class="card"><h3>Editar Perfil</h3><div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" class="form-control" rows="3">${sanitizeHTML(p.bio||'')}</textarea></div><button id="save-profile-btn" class="btn">Salvar</button></div>`; document.getElementById('save-profile-btn').addEventListener('click', saveProfile); document.querySelector('.profile-avatar').addEventListener('click', ()=>{ ui.avatarPreview.style.backgroundImage = p.avatar ? `url('${p.avatar}')` : ''; ui.avatarPreview.innerHTML = !p.avatar ? (p.alias?p.alias.charAt(0).toUpperCase():'?'):''; ui.avatarModal.classList.add('active'); }); loadProfileStats(); }); };
         const saveProfile = () => { if(!state.user?.is)return; const bio = document.getElementById('edit-bio').value.trim(); state.gun.get(`~${state.user.is.pub}`).get('bio').put(bio); showNotification('Bio atualizada!', 'success'); document.querySelector('.profile-bio').textContent=bio; };
         const handleAvatarUpload = (e) => { const f=e.target.files[0]; if(!f||f.size>CONFIG.AVATAR_MAX_SIZE||!f.type.startsWith('image/')) return; const r=new FileReader(); r.onload=e=>{ ui.avatarPreview.style.backgroundImage=`url('${e.target.result}')`; ui.avatarPreview.innerHTML=''; state.tempAvatarFile=e.target.result; }; r.readAsDataURL(f); };
         const saveAvatar = () => { if(!state.user?.is||!state.tempAvatarFile)return; state.gun.get(`~${state.user.is.pub}`).get('avatar').put(state.tempAvatarFile); showNotification('Avatar salvo!', 'success'); ui.avatarModal.classList.remove('active'); state.tempAvatarFile=null; loadProfile(); };
@@ -554,7 +494,8 @@
             ui.attachDrawingBtn.addEventListener('click', () => ui.drawingModal.classList.add('active'));
         };
         
-        const init = () => { setupEventListeners(); setupDrawingCanvas(); checkUserSession(); navigateTo('feed'); };
+        const init = () => { setupEventListeners(); setupDrawingCanvas(); checkUserSession(); navigateTo('feed'); setInterval(updateConnectionStatus, 3000); updateConnectionStatus(); };
+        const updateConnectionStatus = () => { const s = document.getElementById('connection-status'); const p = state.gun.back('opt.peers'); let c=false; if(p)for(const k in p)if(p[k].wire?.readyState===p[k].wire.OPEN){c=true;break;} s.classList.toggle('connected',c); s.title=c?'Conectado':'Desconectado'; };
         init();
     })();
     </script>
