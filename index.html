@@ -1011,7 +1011,8 @@
             currentFeedFilter: FEED_FILTERS.MAIN,
             currentChatUser: null,
             userConnections: new Set(),
-            userSearchIndex: new Map() // Para busca de usuários
+            userSearchIndex: new Map(),
+            connectionRequests: new Map() // Para armazenar solicitações de conexão
         };
         
         // UI elements
@@ -2138,17 +2139,27 @@
             container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando solicitações...</div></div>';
             
             let hasRequests = false;
-            const sub = state.gun.get(`~${state.user.is.pub}`).get('requests').map().on(async (request, senderPub) => {
-                const cardEl = document.getElementById(`req-${senderPub}`);
+            
+            // Clear previous requests
+            state.connectionRequests.clear();
+            
+            // Listen for connection requests
+            const sub = state.gun.get(`~${state.user.is.pub}`).get('connectionRequests').map().on(async (request, senderPub) => {
+                console.log('Connection request received:', request, 'from', senderPub);
                 
-                if (request?.status === 'pending') {
+                if (request && request.status === 'pending') {
                     if (!hasRequests) {
                         container.innerHTML = '';
                         hasRequests = true;
                     }
                     
-                    if (cardEl) return;
+                    // Check if we've already rendered this request
+                    if (document.getElementById(`req-${senderPub}`)) return;
                     
+                    // Store the request
+                    state.connectionRequests.set(senderPub, request);
+                    
+                    // Get sender profile
                     const senderProfile = await new Promise(resolve => {
                         state.gun.get(`~${senderPub}`).once(profile => {
                             resolve(profile || { alias: 'Usuário' });
@@ -2166,22 +2177,28 @@
                         </div>
                         <div class="user-card-actions">
                             <button class="btn btn-success btn-sm" data-pub="${senderPub}" data-action="accept">
-                                <i class="fas fa-check"></i>
+                                <i class="fas fa-check"></i> Aceitar
                             </button>
                             <button class="btn btn-danger btn-sm" data-pub="${senderPub}" data-action="decline">
-                                <i class="fas fa-times"></i>
+                                <i class="fas fa-times"></i> Recusar
                             </button>
                         </div>
                     `;
                     
                     container.prepend(newCard);
-                } else if (cardEl) {
-                    cardEl.remove();
+                } else {
+                    // Remove request if it's no longer pending
+                    const cardEl = document.getElementById(`req-${senderPub}`);
+                    if (cardEl) {
+                        cardEl.remove();
+                        state.connectionRequests.delete(senderPub);
+                    }
                 }
             });
             
             state.activeSubscriptions.set('pending-requests', sub);
             
+            // Show message if no requests after 3 seconds
             setTimeout(() => {
                 if (!hasRequests) {
                     container.innerHTML = `
@@ -2321,7 +2338,13 @@
         const sendRequest = (targetPub) => {
             const myPub = state.user.is.pub;
             
-            state.gun.get(`~${targetPub}`).get('requests').get(myPub).put({ status: 'pending' });
+            // Send connection request
+            state.gun.get(`~${targetPub}`).get('connectionRequests').get(myPub).put({ 
+                status: 'pending',
+                timestamp: Date.now()
+            });
+            
+            // Track sent request
             state.gun.user().get('sentRequests').get(targetPub).put(true);
             
             showNotification('Solicitação enviada!');
@@ -2330,23 +2353,39 @@
         const acceptRequest = (senderPub) => {
             const myPub = state.user.is.pub;
             
+            // Add to connections
             state.gun.user().get('connections').get(senderPub).put(true);
             state.gun.get(`~${senderPub}`).get('connections').get(myPub).put(true);
             
-            state.gun.user().get('requests').get(senderPub).put(null);
+            // Remove the request
+            state.gun.user().get('connectionRequests').get(senderPub).put(null);
             state.gun.get(`~${senderPub}`).get('sentRequests').get(myPub).put(null);
+            
+            // Update UI
+            const cardEl = document.getElementById(`req-${senderPub}`);
+            if (cardEl) cardEl.remove();
             
             showNotification('Conexão aceita!');
         };
         
         const declineRequest = (senderPub) => {
-            state.gun.user().get('requests').get(senderPub).put(null);
+            const myPub = state.user.is.pub;
+            
+            // Remove the request
+            state.gun.user().get('connectionRequests').get(senderPub).put(null);
+            state.gun.get(`~${senderPub}`).get('sentRequests').get(myPub).put(null);
+            
+            // Update UI
+            const cardEl = document.getElementById(`req-${senderPub}`);
+            if (cardEl) cardEl.remove();
+            
             showNotification('Solicitação recusada.');
         };
         
         const removeConnection = (friendPub) => {
             const myPub = state.user.is.pub;
             
+            // Remove connection
             state.gun.user().get('connections').get(friendPub).put(null);
             state.gun.get(`~${friendPub}`).get('connections').get(myPub).put(null);
             
@@ -2419,8 +2458,11 @@
             
             // Connections
             document.getElementById('connections-page').addEventListener('click', e => {
-                const action = e.target.closest('[data-action]')?.dataset.action;
-                const pub = e.target.closest('[data-pub]')?.dataset.pub;
+                const actionBtn = e.target.closest('[data-action]');
+                if (!actionBtn) return;
+                
+                const action = actionBtn.dataset.action;
+                const pub = actionBtn.dataset.pub;
                 
                 if (!action || !pub) return;
                 
