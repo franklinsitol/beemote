@@ -248,6 +248,10 @@
             margin-top: 15px;
             gap: 10px;
         }
+        
+        .comment-input {
+            flex-grow: 1;
+        }
 
         .comment {
             font-size: 0.95rem;
@@ -261,6 +265,7 @@
             font-weight: 600;
             margin-bottom: 5px;
             display: block;
+            color: var(--primary);
         }
 
         /* Buttons */
@@ -307,21 +312,13 @@
             font-size: 0.85rem;
         }
 
-        .btn-success {
-            background-color: var(--success);
-        }
+        .btn-success { background-color: var(--success); }
         .btn-success:hover { background-color: #218838; }
 
-
-        .btn-danger {
-            background-color: var(--danger);
-        }
+        .btn-danger { background-color: var(--danger); }
         .btn-danger:hover { background-color: #c82333; }
 
-        .btn-warning {
-            background-color: var(--warning);
-            color: var(--dark);
-        }
+        .btn-warning { background-color: var(--warning); color: var(--dark); }
         .btn-warning:hover { background-color: #e0a800; }
 
         /* Forms */
@@ -474,216 +471,43 @@
             top: 90px;
         }
 
-        .notification.success {
-            background-color: var(--success);
-        }
-
-        .notification.error {
-            background-color: var(--danger);
-        }
-
-        .notification.warning {
-            background-color: var(--warning);
-            color: var(--dark);
-        }
+        .notification.success { background-color: var(--success); }
+        .notification.error { background-color: var(--danger); }
+        .notification.warning { background-color: var(--warning); color: var(--dark); }
 
         /* Profile Styles */
-        .profile-header {
-            text-align: center;
-            margin-bottom: 25px;
-            position: relative;
-        }
+        .profile-header { text-align: center; margin-bottom: 25px; position: relative; }
+        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px; cursor: pointer; position: relative; border: 3px solid var(--primary-light); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; color: white; background-color: var(--primary); }
+        .profile-avatar-edit { position: absolute; bottom: 0; right: 0; background-color: var(--primary); color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 1rem; box-shadow: var(--shadow); }
+        .profile-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 5px; }
+        .profile-bio { color: var(--gray); margin: 15px 0; white-space: pre-wrap; line-height: 1.6; max-width: 500px; margin-left: auto; margin-right: auto; }
+        .profile-stats { display: flex; justify-content: space-around; margin: 25px 0; padding: 15px 0; border-top: 1px solid var(--gray-light); border-bottom: 1px solid var(--gray-light); }
+        .stat-item { text-align: center; padding: 0 15px; min-width: 80px; }
+        .stat-number { font-weight: 700; font-size: 1.5rem; color: var(--primary); }
+        .stat-label { font-size: 0.85rem; color: var(--gray); margin-top: 5px; }
 
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            cursor: pointer;
-            position: relative;
-            border: 3px solid var(--primary-light);
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: white;
-            background-color: var(--primary);
-        }
+        /* User/Community Cards */
+        .user-card, .community-card { display: flex; align-items: center; padding: 15px; margin-bottom: 15px; border-radius: var(--border-radius); background-color: white; box-shadow: var(--shadow); transition: var(--transition); }
+        .community-card { cursor: pointer; }
+        .user-card:hover, .community-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+        .user-card { justify-content: space-between; }
+        .user-card-info, .community-info-details { flex: 1; display: flex; align-items: center; gap: 15px; }
+        .community-info { flex-grow: 1; }
+        .user-card-alias, .community-name { font-weight: 600; }
+        .user-card-actions { display: flex; gap: 8px; }
 
-        .profile-avatar-edit {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background-color: var(--primary);
-            color: white;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            box-shadow: var(--shadow);
-        }
+        /* Feed Header/Filters */
+        .feed-header { background: linear-gradient(135deg, var(--primary-light) 0%, #e9e8ff 100%); padding: 15px 20px; border-radius: var(--border-radius); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--primary); }
+        .feed-filters { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-btn { padding: 8px 15px; border-radius: 20px; background-color: var(--gray-light); color: var(--dark); border: none; cursor: pointer; font-size: 0.85rem; white-space: nowrap; transition: var(--transition); flex-shrink: 0; }
+        .filter-btn.active { background-color: var(--primary); color: white; }
+        .filter-btn:hover { background-color: var(--primary-light); }
 
-        .profile-name {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .profile-bio {
-            color: var(--gray);
-            margin: 15px 0;
-            white-space: pre-wrap;
-            line-height: 1.6;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .profile-stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 25px 0;
-            padding: 15px 0;
-            border-top: 1px solid var(--gray-light);
-            border-bottom: 1px solid var(--gray-light);
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 0 15px;
-            min-width: 80px;
-        }
-
-        .stat-number {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--primary);
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--gray);
-            margin-top: 5px;
-        }
-
-        /* Cards for users and communities */
-        .user-card, .community-card {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: var(--border-radius);
-            background-color: white;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-        
-        .community-card {
-            cursor: pointer;
-        }
-
-        .user-card:hover, .community-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-        }
-
-        .user-card {
-            justify-content: space-between;
-        }
-
-        .user-card-info, .community-info-details {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .community-info {
-            flex-grow: 1;
-        }
-
-        .user-card-alias, .community-name {
-            font-weight: 600;
-        }
-
-        .user-card-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* Feed Header */
-        .feed-header {
-            background: linear-gradient(135deg, var(--primary-light) 0%, #e9e8ff 100%);
-            padding: 15px 20px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid var(--primary);
-        }
-
-        /* Feed Filters */
-        .feed-filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            overflow-x: auto;
-            padding-bottom: 5px;
-        }
-
-        .filter-btn {
-            padding: 8px 15px;
-            border-radius: 20px;
-            background-color: var(--gray-light);
-            color: var(--dark);
-            border: none;
-            cursor: pointer;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            transition: var(--transition);
-            flex-shrink: 0;
-        }
-
-        .filter-btn.active {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .filter-btn:hover {
-            background-color: var(--primary-light);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            main { padding: 15px; }
-            .card { padding: 15px; }
-            .profile-stats { flex-wrap: wrap; gap: 15px; }
-            .stat-item { flex: 1; min-width: 80px; }
-            .post-actions { flex-wrap: wrap; gap: 10px; }
-            .post-action { margin-right: 10px; }
-            .modal-content { padding: 20px 15px; }
-        }
-
-        @media (max-width: 480px) {
-            header { padding: 10px 15px; }
-            .logo { font-size: 1.5rem; }
-            #user-alias { max-width: 80px; }
-            .btn { padding: 8px 12px; font-size: 0.9rem; }
-            .profile-avatar { width: 80px; height: 80px; font-size: 2rem; }
-            .profile-name { font-size: 1.5rem; }
-            .feed-header { flex-direction: column; gap: 10px; align-items: flex-start; }
-        }
-
+        /* Responsive */
+        @media (max-width: 768px) { main { padding: 15px; } .card { padding: 15px; } .profile-stats { flex-wrap: wrap; gap: 15px; } .stat-item { flex: 1; min-width: 80px; } .post-actions { flex-wrap: wrap; gap: 10px; } .post-action { margin-right: 10px; } .modal-content { padding: 20px 15px; } }
+        @media (max-width: 480px) { header { padding: 10px 15px; } .logo { font-size: 1.5rem; } #user-alias { max-width: 80px; } .btn { padding: 8px 12px; font-size: 0.9rem; } .profile-avatar { width: 80px; height: 80px; font-size: 2rem; } .profile-name { font-size: 1.5rem; } .feed-header { flex-direction: column; gap: 10px; align-items: flex-start; } }
         .fade-in { animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
     </style>
 </head>
 <body>
@@ -735,7 +559,7 @@
         </div>
     </main>
     
-    <!-- Auth Modal -->
+    <!-- Modals -->
     <div id="auth-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -744,25 +568,18 @@
             </div>
             <div class="form-group">
                 <label for="auth-alias">Nome de usuário</label>
-                <input type="text" id="auth-alias" class="form-control" placeholder="Seu nome na plataforma">
+                <input type="text" id="auth-alias" class="form-control">
             </div>
             <div class="form-group">
                 <label for="auth-pass">Senha</label>
-                <input type="password" id="auth-pass" class="form-control" placeholder="Sua senha">
+                <input type="password" id="auth-pass" class="form-control">
             </div>
             <div class="form-group">
-                <label>
-                    <input type="checkbox" id="remember-me" checked> 
-                    Manter-me conectado
-                </label>
+                <label><input type="checkbox" id="remember-me" checked> Manter-me conectado</label>
             </div>
-            <button id="auth-submit-btn" class="btn" style="width: 100%;">
-                <i class="fas fa-check"></i> Continuar
-            </button>
+            <button id="auth-submit-btn" class="btn" style="width: 100%;">Continuar</button>
         </div>
     </div>
-    
-    <!-- Avatar Modal -->
     <div id="avatar-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -774,7 +591,7 @@
                     <div id="avatar-preview" class="avatar" style="width: 120px; height: 120px; font-size: 3rem;"></div>
                 </label>
                 <input type="file" id="avatar-input" accept="image/*" style="display: none;">
-                <p style="margin-top: 15px; color: var(--gray);">Clique na imagem para selecionar um arquivo.</p>
+                <p style="margin-top: 15px; color: var(--gray);">Clique na imagem para selecionar.</p>
             </div>
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-outline close-btn">Cancelar</button>
@@ -782,46 +599,26 @@
             </div>
         </div>
     </div>
-    
-    <!-- Community Modal -->
     <div id="community-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title"><i class="fas fa-users"></i> Criar Nova Comunidade</h2>
+                <h2 class="modal-title"><i class="fas fa-users"></i> Criar Comunidade</h2>
                 <button class="close-btn">&times;</button>
             </div>
-            <div class="form-group">
-                <label for="community-name">Nome da Comunidade</label>
-                <input type="text" id="community-name" class="form-control" placeholder="Ex: Tecnologia, Arte, Música...">
-            </div>
-            <div class="form-group">
-                <label for="community-desc">Descrição</label>
-                <textarea id="community-desc" class="form-control" rows="3" placeholder="Descreva o propósito desta comunidade..."></textarea>
-            </div>
+            <div class="form-group"><label for="community-name">Nome</label><input type="text" id="community-name" class="form-control"></div>
+            <div class="form-group"><label for="community-desc">Descrição</label><textarea id="community-desc" class="form-control" rows="3"></textarea></div>
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-outline close-btn">Cancelar</button>
-                <button id="create-community-submit-btn" class="btn">Criar Comunidade</button>
+                <button id="create-community-submit-btn" class="btn">Criar</button>
             </div>
         </div>
     </div>
     
     <nav>
-        <a href="#" class="nav-item active" data-page="feed">
-            <i class="fas fa-home"></i>
-            <span>Feed</span>
-        </a>
-        <a href="#" class="nav-item" data-page="communities">
-            <i class="fas fa-users"></i>
-            <span>Comunidades</span>
-        </a>
-        <a href="#" class="nav-item" data-page="connections">
-            <i class="fas fa-link"></i>
-            <span>Conexões</span>
-        </a>
-        <a href="#" class="nav-item" data-page="profile">
-            <i class="fas fa-user"></i>
-            <span>Perfil</span>
-        </a>
+        <a href="#" class="nav-item active" data-page="feed"><i class="fas fa-home"></i><span>Feed</span></a>
+        <a href="#" class="nav-item" data-page="communities"><i class="fas fa-users"></i><span>Comunidades</span></a>
+        <a href="#" class="nav-item" data-page="connections"><i class="fas fa-link"></i><span>Conexões</span></a>
+        <a href="#" class="nav-item" data-page="profile"><i class="fas fa-user"></i><span>Perfil</span></a>
     </nav>
 
     <script>
@@ -831,127 +628,55 @@
         const CONFIG = {
             GUN_PEERS: ['https://gun-manhattan.herokuapp.com/gun'],
             POST_EXPIRATION_MS: 24 * 60 * 60 * 1000,
-            MAX_POST_LENGTH: 500,
-            MAX_BIO_LENGTH: 200,
+            MAX_POST_LENGTH: 500, MAX_BIO_LENGTH: 200,
             AVATAR_MAX_SIZE: 2 * 1024 * 1024,
             REMEMBER_ME_KEY: 'beemote_remember_me'
         };
-        
-        const FEED_FILTERS = {
-            MAIN: 'main',
-            COMMUNITIES: 'communities',
-            COMMUNITY: 'community',
-            CONNECTIONS: 'connections',
-            USER_CHAT: 'user_chat'
-        };
+        const FEED_FILTERS = { MAIN: 'main', COMMUNITIES: 'communities', COMMUNITY: 'community', CONNECTIONS: 'connections', USER_CHAT: 'user_chat' };
         
         const state = {
             gun: Gun({ peers: CONFIG.GUN_PEERS, localStorage: false, radisk: true }),
-            user: null,
-            currentPage: 'feed',
-            activeSubscriptions: new Map(),
-            tempAvatarFile: null,
-            currentCommunity: { id: null, name: null },
-            postsData: new Map(),
-            countdownInterval: null,
-            usersCache: new Map(),
-            currentUserProfile: null,
-            currentFeedFilter: FEED_FILTERS.MAIN,
-            currentChatUser: null,
-            mutualConnections: new Set()
+            user: null, currentPage: 'feed',
+            activeSubscriptions: new Map(), tempAvatarFile: null,
+            currentCommunity: { id: null, name: null }, postsData: new Map(),
+            countdownInterval: null, usersCache: new Map(),
+            currentUserProfile: null, currentFeedFilter: FEED_FILTERS.MAIN,
+            currentChatUser: null, mutualConnections: new Set()
         };
         
         const ui = {
-            pages: document.querySelectorAll('.page'),
-            navItems: document.querySelectorAll('.nav-item'),
-            loginBtn: document.getElementById('login-btn'),
-            logoutBtn: document.getElementById('logout-btn'),
-            userAlias: document.getElementById('user-alias'),
-            authModal: document.getElementById('auth-modal'),
-            authAlias: document.getElementById('auth-alias'),
-            authPass: document.getElementById('auth-pass'),
-            authSubmitBtn: document.getElementById('auth-submit-btn'),
-            postContent: document.getElementById('post-content'),
-            createPostBtn: document.getElementById('create-post-btn'),
-            postsContainer: document.getElementById('posts-container'),
-            profileContainer: document.getElementById('profile-container'),
-            notificationBar: document.getElementById('notification-bar'),
-            closeModalBtns: document.querySelectorAll('.close-modal-btn, .close-btn'),
-            avatarModal: document.getElementById('avatar-modal'),
-            avatarPreview: document.getElementById('avatar-preview'),
-            avatarInput: document.getElementById('avatar-input'),
-            saveAvatarBtn: document.getElementById('save-avatar-btn'),
-            communitiesContainer: document.getElementById('communities-container'),
-            communityModal: document.getElementById('community-modal'),
-            showCommunityModalBtn: document.getElementById('show-community-modal-btn'),
-            createCommunitySubmitBtn: document.getElementById('create-community-submit-btn'),
-            feedHeaderContainer: document.getElementById('feed-header-container'),
-            feedFiltersContainer: document.getElementById('feed-filters-container'),
-            allUsersContainer: document.getElementById('all-users-container'),
-            userSearchInput: document.getElementById('user-search-input'),
+            pages: document.querySelectorAll('.page'), navItems: document.querySelectorAll('.nav-item'),
+            loginBtn: document.getElementById('login-btn'), logoutBtn: document.getElementById('logout-btn'),
+            userAlias: document.getElementById('user-alias'), authModal: document.getElementById('auth-modal'),
+            authAlias: document.getElementById('auth-alias'), authPass: document.getElementById('auth-pass'),
+            authSubmitBtn: document.getElementById('auth-submit-btn'), postContent: document.getElementById('post-content'),
+            createPostBtn: document.getElementById('create-post-btn'), postsContainer: document.getElementById('posts-container'),
+            profileContainer: document.getElementById('profile-container'), notificationBar: document.getElementById('notification-bar'),
+            avatarModal: document.getElementById('avatar-modal'), avatarPreview: document.getElementById('avatar-preview'),
+            avatarInput: document.getElementById('avatar-input'), saveAvatarBtn: document.getElementById('save-avatar-btn'),
+            communitiesContainer: document.getElementById('communities-container'), communityModal: document.getElementById('community-modal'),
+            showCommunityModalBtn: document.getElementById('show-community-modal-btn'), createCommunitySubmitBtn: document.getElementById('create-community-submit-btn'),
+            feedHeaderContainer: document.getElementById('feed-header-container'), feedFiltersContainer: document.getElementById('feed-filters-container'),
+            allUsersContainer: document.getElementById('all-users-container'), userSearchInput: document.getElementById('user-search-input'),
             rememberMe: document.getElementById('remember-me')
         };
         
-        const sanitizeHTML = (str) => {
-            if (!str) return '';
-            const temp = document.createElement('div');
-            temp.textContent = str;
-            return temp.innerHTML;
-        };
-        
-        const showNotification = (message, type = 'success') => {
-            ui.notificationBar.textContent = message;
-            ui.notificationBar.className = `notification ${type} show`;
-            setTimeout(() => ui.notificationBar.classList.remove('show'), 3000);
-        };
-        
-        const renderAvatar = (profile, customClass = 'avatar', size = '') => {
-            const style = profile?.avatar ? `background-image: url('${profile.avatar}')` : '';
-            const letter = !profile?.avatar ? (profile?.alias ? profile.alias.charAt(0).toUpperCase() : '?') : '';
-            return `<div class="${customClass}" style="${style}; ${size}">${letter}</div>`;
-        };
-        
-        const formatTime = (timestamp) => {
-            const now = Date.now();
-            const diff = now - timestamp;
-            if (diff < 60000) return 'Agora mesmo';
-            if (diff < 3600000) return `${Math.floor(diff / 60000)} min atrás`;
-            if (diff < 86400000) return `${Math.floor(diff / 3600000)} h atrás`;
-            return new Date(timestamp).toLocaleDateString('pt-BR');
-        };
-        
-        const formatCountdown = (timestamp) => {
-            const msLeft = (timestamp + CONFIG.POST_EXPIRATION_MS) - Date.now();
-            if (msLeft <= 0) return "Expirado";
-            const hours = Math.floor(msLeft / 3600000);
-            const minutes = Math.floor((msLeft % 3600000) / 60000);
-            return `Expira em ${hours}h ${minutes}m`;
-        };
-        
-        const debounce = (func, wait) => {
-            let timeout;
-            return (...args) => {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
-            };
-        };
-        
-        const clearSubscriptions = () => {
-            state.activeSubscriptions.forEach(sub => sub.off());
-            state.activeSubscriptions.clear();
-            if (state.countdownInterval) clearInterval(state.countdownInterval);
-        };
+        const sanitizeHTML = (str) => { const t = document.createElement('div'); t.textContent = str || ''; return t.innerHTML; };
+        const showNotification = (message, type = 'success') => { ui.notificationBar.textContent = message; ui.notificationBar.className = `notification ${type} show`; setTimeout(() => ui.notificationBar.classList.remove('show'), 3000); };
+        const renderAvatar = (p, c = 'avatar', s = '') => `<div class="${c}" style="${p?.avatar ? `background-image: url('${p.avatar}')` : ''}; ${s}">${!p?.avatar ? (p?.alias ? p.alias.charAt(0).toUpperCase() : '?') : ''}</div>`;
+        const formatTime = (ts) => { const d = Date.now() - ts; if (d < 60000) return 'Agora'; if (d < 3600000) return `${Math.floor(d/60000)}m atrás`; if (d < 86400000) return `${Math.floor(d/3600000)}h atrás`; return new Date(ts).toLocaleDateString('pt-BR'); };
+        const formatCountdown = (ts) => { const l = (ts + CONFIG.POST_EXPIRATION_MS) - Date.now(); if (l <= 0) return "Expirado"; return `Expira em ${Math.floor(l/3600000)}h ${Math.floor((l%3600000)/60000)}m`; };
+        const debounce = (func, wait) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; };
+        const clearSubscriptions = () => { state.activeSubscriptions.forEach(s => s.off()); state.activeSubscriptions.clear(); if(state.countdownInterval) clearInterval(state.countdownInterval); };
         
         const shouldShowPost = (post) => {
             if (!post || !post.content || !state.user?.is) return false;
             if (Date.now() - post.lastActivityAt > CONFIG.POST_EXPIRATION_MS) return false;
-
             if (state.currentFeedFilter === FEED_FILTERS.USER_CHAT && state.currentChatUser) {
-                const isFromMeToThem = (post.authorPub === state.user.is.pub && post.connectionChat === state.currentChatUser.pub);
-                const isFromThemToMe = (post.authorPub === state.currentChatUser.pub && post.connectionChat === state.user.is.pub);
-                return isFromMeToThem || isFromThemToMe;
+                const isFromMe = (post.authorPub === state.user.is.pub && post.connectionChat === state.currentChatUser.pub);
+                const isToMe = (post.authorPub === state.currentChatUser.pub && post.connectionChat === state.user.is.pub);
+                return isFromMe || isToMe;
             }
-
             if (state.currentChatUser) return false;
             if (state.currentFeedFilter === FEED_FILTERS.MAIN) return !post.communityId && !post.connectionChat;
             if (state.currentFeedFilter === FEED_FILTERS.COMMUNITIES) return !!post.communityId;
@@ -963,20 +688,13 @@
         const loadUserConnections = () => new Promise(resolve => {
             if (!state.user?.is) return resolve();
             state.mutualConnections.clear();
-            state.gun.user().get('mutualConnections').map().once((val, pub) => {
-                if (val) state.mutualConnections.add(pub);
-            });
+            state.gun.user().get('mutualConnections').map().once((val, pub) => { if (val) state.mutualConnections.add(pub); });
             setTimeout(resolve, 500);
         });
         
         const navigateTo = (page) => {
-            clearSubscriptions();
-            state.currentPage = page;
-            if (page !== 'feed') {
-                state.currentFeedFilter = FEED_FILTERS.MAIN;
-                state.currentCommunity = { id: null, name: null };
-                state.currentChatUser = null;
-            }
+            clearSubscriptions(); state.currentPage = page;
+            if (page !== 'feed') { state.currentFeedFilter = FEED_FILTERS.MAIN; state.currentCommunity = { id: null, name: null }; state.currentChatUser = null; }
             ui.pages.forEach(p => p.classList.add('hidden'));
             document.getElementById(`${page}-page`).classList.remove('hidden');
             ui.navItems.forEach(item => item.classList.toggle('active', item.dataset.page === page));
@@ -984,142 +702,64 @@
         };
         
         const loadPageContent = (page) => {
-            switch (page) {
-                case 'feed': loadFeed(); break;
-                case 'profile': loadProfile(); break;
-                case 'connections': loadConnectionsPage(); break;
-                case 'communities': loadCommunities(); break;
-            }
+            const actions = { feed: loadFeed, profile: loadProfile, connections: loadConnectionsPage, communities: loadCommunities };
+            if (actions[page]) actions[page]();
         };
         
         const renderFeedUI = () => {
-            ui.feedHeaderContainer.classList.add('hidden');
-            ui.feedHeaderContainer.innerHTML = '';
-            
-            const createHeader = (title, buttonText) => {
-                ui.feedHeaderContainer.innerHTML = `<div class="feed-header"><span>${title}</span><button id="back-to-global-feed" class="btn btn-outline btn-sm">${buttonText}</button></div>`;
-                document.getElementById('back-to-global-feed').addEventListener('click', () => {
-                    state.currentCommunity = { id: null, name: null };
-                    state.currentChatUser = null;
-                    state.currentFeedFilter = FEED_FILTERS.MAIN;
-                    navigateTo('feed');
-                });
+            ui.feedHeaderContainer.classList.add('hidden'); ui.feedHeaderContainer.innerHTML = '';
+            const createHeader = (title, btnText) => {
+                ui.feedHeaderContainer.innerHTML = `<div class="feed-header"><span>${title}</span><button id="back-to-global-feed" class="btn btn-outline btn-sm">${btnText}</button></div>`;
+                document.getElementById('back-to-global-feed').addEventListener('click', () => { state.currentCommunity = { id: null, name: null }; state.currentChatUser = null; state.currentFeedFilter = FEED_FILTERS.MAIN; navigateTo('feed'); });
                 ui.feedHeaderContainer.classList.remove('hidden');
             };
-
-            if (state.currentCommunity.id) createHeader(`Comunidade: <strong>${sanitizeHTML(state.currentCommunity.name)}</strong>`, 'Voltar ao Feed');
-            else if (state.currentChatUser) createHeader(`Conversa com: <strong>${sanitizeHTML(state.currentChatUser.alias)}</strong>`, 'Sair da Conversa');
-
+            if (state.currentCommunity.id) createHeader(`Comunidade: <strong>${sanitizeHTML(state.currentCommunity.name)}</strong>`, 'Voltar');
+            else if (state.currentChatUser) createHeader(`Conversa com: <strong>${sanitizeHTML(state.currentChatUser.alias)}</strong>`, 'Sair');
+            
             ui.feedFiltersContainer.innerHTML = '';
             if (state.currentChatUser || state.currentCommunity.id) return;
-            
             const createFilter = (type, icon, text) => `<button class="filter-btn ${state.currentFeedFilter === type ? 'active' : ''}" data-filter="${type}"><i class="fas fa-${icon}"></i> ${text}</button>`;
             let filtersHTML = createFilter(FEED_FILTERS.MAIN, 'home', 'Principal') + createFilter(FEED_FILTERS.COMMUNITIES, 'users', 'Comunidades');
             if (state.mutualConnections.size > 0) filtersHTML += createFilter(FEED_FILTERS.CONNECTIONS, 'link', 'Conexões');
-            
             ui.feedFiltersContainer.innerHTML = filtersHTML;
-            ui.feedFiltersContainer.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => {
-                state.currentFeedFilter = btn.dataset.filter;
-                loadFeed();
-            }));
+            ui.feedFiltersContainer.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => { state.currentFeedFilter = btn.dataset.filter; loadFeed(); }));
         };
         
         const checkUserSession = () => {
-            const rememberMe = localStorage.getItem(CONFIG.REMEMBER_ME_KEY);
-            if (rememberMe) {
-                try {
-                    const { alias, pub } = JSON.parse(rememberMe);
-                    state.gun.user().auth(alias, null, ack => {
-                        if (ack && ack.pub) onAuthSuccess(ack.pub, alias, true);
-                        else state.gun.user().recall({ sessionStorage: true }, r => { if (r && r.pub) onAuthSuccess(r.pub, r.alias, false) });
-                    });
-                } catch (e) { localStorage.removeItem(CONFIG.REMEMBER_ME_KEY); }
-            } else {
-                state.gun.user().recall({ sessionStorage: true }, ack => { if (ack && ack.pub) onAuthSuccess(ack.pub, ack.alias, false) });
-            }
+            const r = localStorage.getItem(CONFIG.REMEMBER_ME_KEY);
+            if(r) try { const {alias,pub} = JSON.parse(r); state.gun.user().auth(alias,null,ack => { if(ack&&ack.pub) onAuthSuccess(ack.pub,alias,true); else state.gun.user().recall({sessionStorage:true}, r=>{if(r&&r.pub)onAuthSuccess(r.pub,r.alias,false)})}); } catch(e){}
+            else state.gun.user().recall({sessionStorage:true}, ack => { if(ack&&ack.pub) onAuthSuccess(ack.pub,ack.alias,false); });
         };
         
         const handleAuth = () => {
-            const alias = ui.authAlias.value.trim();
-            const pass = ui.authPass.value.trim();
+            const alias = ui.authAlias.value.trim(); const pass = ui.authPass.value.trim();
             if (!alias || !pass) return showNotification('Preencha todos os campos.', 'error');
-            
-            ui.authSubmitBtn.disabled = true;
-            ui.authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
-
+            ui.authSubmitBtn.disabled = true; ui.authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             state.gun.user().auth(alias, pass, ack => {
-                if (ack.err) {
-                    state.gun.user().create(alias, pass, createAck => {
-                        if (createAck.err) {
-                            ui.authSubmitBtn.disabled = false;
-                            ui.authSubmitBtn.innerHTML = 'Continuar';
-                            return showNotification('Credenciais inválidas ou usuário já existe.', 'error');
-                        }
-                        state.gun.user().auth(alias, pass, finalAck => {
-                            if (finalAck.err) {
-                                ui.authSubmitBtn.disabled = false;
-                                ui.authSubmitBtn.innerHTML = 'Continuar';
-                                return showNotification(finalAck.err, 'error');
-                            }
-                            onAuthSuccess(finalAck.pub, alias, ui.rememberMe.checked);
-                        });
-                    });
-                } else {
-                    onAuthSuccess(ack.pub, alias, ui.rememberMe.checked);
-                }
+                if (ack.err) state.gun.user().create(alias, pass, cAck => { if(cAck.err) { ui.authSubmitBtn.disabled=false; ui.authSubmitBtn.innerHTML='Continuar'; return showNotification('Credenciais inválidas ou usuário existe.', 'error'); } state.gun.user().auth(alias,pass,fAck => onAuthSuccess(fAck.pub, alias, ui.rememberMe.checked)); });
+                else onAuthSuccess(ack.pub, alias, ui.rememberMe.checked);
             });
         };
         
-        const onAuthSuccess = (pub, alias, rememberMe) => {
+        const onAuthSuccess = (pub, alias, remember) => {
             state.user = state.gun.user();
-            if (rememberMe) localStorage.setItem(CONFIG.REMEMBER_ME_KEY, JSON.stringify({ alias, pub }));
-            else localStorage.removeItem(CONFIG.REMEMBER_ME_KEY);
-            
-            state.gun.get(`~${pub}`).once(profile => {
-                if (!profile) state.gun.get(`~${pub}`).put({ alias, bio: '' });
-                state.currentUserProfile = profile || { alias };
-            });
-            state.gun.get('users').get(pub).put({ alias, lastSeen: Date.now() });
-            
-            updateUIForUser();
-            ui.authModal.classList.remove('active');
-            ui.authSubmitBtn.disabled = false;
-            ui.authSubmitBtn.innerHTML = 'Continuar';
+            if(remember) localStorage.setItem(CONFIG.REMEMBER_ME_KEY, JSON.stringify({alias, pub})); else localStorage.removeItem(CONFIG.REMEMBER_ME_KEY);
+            state.gun.get(`~${pub}`).once(p => { if(!p) state.gun.get(`~${pub}`).put({alias, bio:''}); state.currentUserProfile = p || {alias}; });
+            state.gun.get('users').get(pub).put({alias, lastSeen: Date.now()});
+            updateUIForUser(); ui.authModal.classList.remove('active'); ui.authSubmitBtn.disabled = false; ui.authSubmitBtn.innerHTML='Continuar';
             showNotification('Login bem-sucedido!', 'success');
             if (state.currentPage === 'feed') loadFeed();
         };
         
-        const logout = () => {
-            state.gun.user().leave();
-            state.user = null;
-            localStorage.removeItem(CONFIG.REMEMBER_ME_KEY);
-            updateUIForUser();
-            navigateTo('feed');
-            showNotification('Você saiu da sua conta.', 'warning');
-        };
-        
-        const updateUIForUser = () => {
-            if (state.user?.is) {
-                ui.userAlias.textContent = state.user.is.alias;
-                ui.loginBtn.classList.add('hidden');
-                ui.logoutBtn.classList.remove('hidden');
-            } else {
-                ui.userAlias.textContent = '';
-                ui.loginBtn.classList.remove('hidden');
-                ui.logoutBtn.classList.add('hidden');
-            }
-        };
+        const logout = () => { state.gun.user().leave(); state.user = null; localStorage.removeItem(CONFIG.REMEMBER_ME_KEY); updateUIForUser(); navigateTo('feed'); showNotification('Você saiu.', 'warning'); };
+        const updateUIForUser = () => { ui.userAlias.textContent = state.user?.is?.alias || ''; ui.loginBtn.classList.toggle('hidden', !!state.user?.is); ui.logoutBtn.classList.toggle('hidden', !state.user?.is); };
         
         const loadFeed = () => {
-            renderFeedUI();
-            ui.postsContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div><div>Carregando...</div></div>`;
-            state.postsData.clear();
-            if (state.countdownInterval) clearInterval(state.countdownInterval);
-            
+            renderFeedUI(); ui.postsContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
+            state.postsData.clear(); if(state.countdownInterval) clearInterval(state.countdownInterval);
             loadUserConnections().then(() => {
                 const sub = state.gun.get('posts').map().on((post, id) => {
-                    if (shouldShowPost(post)) state.postsData.set(id, { ...post, id });
-                    else state.postsData.delete(id);
+                    if (shouldShowPost(post)) state.postsData.set(id, {...post, id}); else state.postsData.delete(id);
                     renderSortedFeed();
                 });
                 state.activeSubscriptions.set('feed', sub);
@@ -1128,102 +768,82 @@
         };
         
         const renderSortedFeed = debounce(() => {
-            const validPosts = Array.from(state.postsData.values()).sort((a, b) => b.lastActivityAt - a.lastActivityAt);
-            if (validPosts.length === 0) {
-                ui.postsContainer.innerHTML = `<div class="card" style="text-align: center; color: var(--gray);"><i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px;"></i><p>Nenhum post ativo aqui.</p></div>`;
-                return;
-            }
-            ui.postsContainer.innerHTML = '';
-            validPosts.forEach(post => renderPost(post));
+            const posts = Array.from(state.postsData.values()).sort((a,b) => b.lastActivityAt - a.lastActivityAt);
+            if(posts.length === 0) { ui.postsContainer.innerHTML = `<div class="card" style="text-align:center;color:var(--gray);"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;"></i><p>Nenhum post aqui.</p></div>`; return; }
+            ui.postsContainer.innerHTML = ''; posts.forEach(p => renderPost(p));
         }, 100);
         
         const renderPost = async (post) => {
-            if (document.getElementById(`post-${post.id}`)) return updatePost(post);
-            const postEl = document.createElement('div');
-            postEl.className = 'card fade-in';
-            postEl.id = `post-${post.id}`;
-            
-            let authorProfile = state.usersCache.get(post.authorPub);
-            if (!authorProfile) {
-                authorProfile = await new Promise(r => state.gun.get(`~${post.authorPub}`).once(p => r(p || {alias: '...'})));
-                state.usersCache.set(post.authorPub, authorProfile);
-            }
-            
-            postEl.innerHTML = `
-                <div class="post-header">
-                    <div class="post-author-info">${renderAvatar(authorProfile)}<div><div class="post-author">${sanitizeHTML(authorProfile.alias)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div></div>
-                    <div class="post-countdown" data-timestamp="${post.lastActivityAt}">${formatCountdown(post.lastActivityAt)}</div>
-                </div>
-                <div class="post-content">${sanitizeHTML(post.content)}</div>
-                <div class="post-actions">
-                    <div class="post-action" data-action="like"><i class="far fa-heart"></i> <span class="like-count">0</span></div>
-                    <div class="post-action" data-action="comment"><i class="far fa-comment"></i> <span>Comentar</span></div>
-                </div>
-                <div class="comments-section"></div>`;
-            
-            ui.postsContainer.appendChild(postEl);
-            postEl.querySelector('[data-action="like"]').addEventListener('click', () => handlePostInteraction(post.id, 'like'));
-            postEl.querySelector('[data-action="comment"]').addEventListener('click', e => {
-                const comments = e.currentTarget.parentElement.nextElementSibling;
-                const isVisible = comments.style.display === 'block';
-                comments.style.display = isVisible ? 'none' : 'block';
-                if (!isVisible) renderComments(post.id, comments);
+            if(document.getElementById(`post-${post.id}`)) return updatePost(post);
+            const el = document.createElement('div'); el.className='card fade-in'; el.id=`post-${post.id}`;
+            let author = state.usersCache.get(post.authorPub);
+            if(!author) { author = await new Promise(r => state.gun.get(`~${post.authorPub}`).once(p => r(p || {alias:'...'}))); state.usersCache.set(post.authorPub, author); }
+            el.innerHTML = `<div class="post-header"><div class="post-author-info">${renderAvatar(author)}<div><div class="post-author">${sanitizeHTML(author.alias)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div></div><div class="post-countdown" data-timestamp="${post.lastActivityAt}">${formatCountdown(post.lastActivityAt)}</div></div><div class="post-content">${sanitizeHTML(post.content)}</div><div class="post-actions"><div class="post-action" data-action="like"><i class="far fa-heart"></i> <span class="like-count">0</span></div><div class="post-action" data-action="comment"><i class="far fa-comment"></i> <span>Comentar</span></div></div><div class="comments-section"></div>`;
+            ui.postsContainer.appendChild(el);
+            el.querySelector('[data-action="like"]').addEventListener('click',()=>handlePostInteraction(post.id, 'like'));
+            el.querySelector('[data-action="comment"]').addEventListener('click', e => {
+                const c = e.currentTarget.parentElement.nextElementSibling; c.style.display = c.style.display === 'block' ? 'none' : 'block';
+                if(c.style.display === 'block') renderComments(post.id, c);
             });
-            updateLikes(post.id, postEl);
+            updateLikes(post.id, el);
         };
         
-        const updatePost = (post) => {
-            const el = document.querySelector(`#post-${post.id} .post-countdown`);
-            if (el) el.textContent = formatCountdown(post.lastActivityAt);
-        };
+        const updatePost = (post) => { const el = document.querySelector(`#post-${post.id} .post-countdown`); if(el) el.textContent = formatCountdown(post.lastActivityAt); };
         
         const createPost = () => {
             const content = ui.postContent.value.trim();
-            if (!content) return showNotification('Escreva algo para publicar.', 'error');
-            if (!state.user?.is) return showNotification('Faça login para publicar.', 'error');
-            
-            const postData = { authorPub: state.user.is.pub, content, createdAt: Date.now(), lastActivityAt: Date.now() };
-            if (state.currentCommunity.id) postData.communityId = state.currentCommunity.id;
-            else if (state.currentChatUser) postData.connectionChat = state.currentChatUser.pub;
-            
-            state.gun.get('posts').set(postData);
-            ui.postContent.value = '';
-            showNotification('Post publicado com sucesso!', 'success');
+            if(!content || !state.user?.is) return;
+            const postData = {authorPub:state.user.is.pub, content, createdAt:Date.now(), lastActivityAt:Date.now()};
+            if(state.currentCommunity.id) postData.communityId = state.currentCommunity.id;
+            else if(state.currentChatUser) postData.connectionChat = state.currentChatUser.pub;
+            state.gun.get('posts').set(postData); ui.postContent.value=''; showNotification('Publicado!', 'success');
         };
         
         const handlePostInteraction = (postId, type) => {
             if (!state.user?.is) return showNotification('Faça login para interagir.', 'error');
             state.gun.get('posts').get(postId).get('lastActivityAt').put(Date.now());
-            if (type === 'like') {
-                const ref = state.gun.get('posts').get(postId).get('likes').get(state.user.is.pub);
-                ref.once(val => ref.put(!val));
-            }
+            if (type === 'like') { const ref = state.gun.get('posts').get(postId).get('likes').get(state.user.is.pub); ref.once(v => ref.put(!v)); }
         };
         
         const updateLikes = (postId, postEl) => {
             const likesRef = state.gun.get('posts').get(postId).get('likes');
             const sub = likesRef.map().on(() => {
-                let count = 0;
-                likesRef.map().once(val => { if (val) count++; });
-                if (state.user?.is) {
-                    likesRef.get(state.user.is.pub).once(val => {
-                        const actionEl = postEl.querySelector('[data-action="like"]');
-                        if (actionEl) {
-                            actionEl.classList.toggle('liked', !!val);
-                            actionEl.querySelector('i').className = val ? 'fas fa-heart' : 'far fa-heart';
-                        }
-                    });
-                }
-                setTimeout(() => {
-                    const countEl = postEl.querySelector('.like-count');
-                    if(countEl) countEl.textContent = count;
-                }, 50);
+                let count = 0; likesRef.map().once(v => { if(v) count++; });
+                if(state.user?.is) likesRef.get(state.user.is.pub).once(v => {
+                    const a = postEl.querySelector('[data-action="like"]'); if(a) { a.classList.toggle('liked',!!v); a.querySelector('i').className = v ? 'fas fa-heart':'far fa-heart'; }
+                });
+                setTimeout(() => { const c = postEl.querySelector('.like-count'); if(c) c.textContent=count; }, 50);
             });
             state.activeSubscriptions.set(`likes-${postId}`, sub);
         };
         
-        const renderComments = (postId, container) => { /* Omitido por ser idêntico */ };
-        const createComment = (postId, container) => { /* Omitido por ser idêntico */ };
+        const renderComments = (postId, container) => {
+            container.innerHTML = `<div class="comments-list"></div><div class="comment-form"><input type="text" class="form-control comment-input" placeholder="Seu comentário..."><button class="btn btn-sm comment-submit-btn"><i class="fas fa-paper-plane"></i></button></div>`;
+            container.querySelector('.comment-submit-btn').addEventListener('click', () => createComment(postId, container));
+            container.querySelector('.comment-input').addEventListener('keypress', e => { if (e.key === 'Enter') createComment(postId, container); });
+            const listEl = container.querySelector('.comments-list');
+            const sub = state.gun.get('posts').get(postId).get('comments').map().on(async (comment, id) => {
+                if (!comment?.content || document.getElementById(id)) return;
+                let author = state.usersCache.get(comment.authorPub);
+                if (!author) { author = await new Promise(r => state.gun.get(`~${comment.authorPub}`).once(p => r(p || {alias:'...'}))); state.usersCache.set(comment.authorPub, author); }
+                const commentEl = document.createElement('div'); commentEl.className = 'comment fade-in'; commentEl.id = id;
+                commentEl.innerHTML = `<span class="comment-author">${sanitizeHTML(author.alias)}</span><div>${sanitizeHTML(comment.content)}</div><div style="font-size:0.8rem;color:var(--gray);margin-top:5px;">${formatTime(comment.createdAt)}</div>`;
+                listEl.prepend(commentEl);
+            });
+            state.activeSubscriptions.set(`comments-${postId}`, sub);
+        };
+
+        const createComment = (postId, container) => {
+            const input = container.querySelector('.comment-input');
+            const content = input.value.trim();
+            if (!content) return showNotification('Escreva um comentário.', 'error');
+            if (!state.user?.is) return showNotification('Faça login para comentar.', 'error');
+            handlePostInteraction(postId, 'comment'); // <-- ESSA LINHA RENOVA O POST
+            const commentData = { authorPub: state.user.is.pub, content, createdAt: Date.now() };
+            state.gun.get('posts').get(postId).get('comments').set(commentData);
+            input.value = '';
+        };
+
         const updateAllCountdowns = () => document.querySelectorAll('.post-countdown').forEach(el => {
             const ts = parseInt(el.dataset.timestamp, 10);
             if (ts && Date.now() - ts > CONFIG.POST_EXPIRATION_MS) el.closest('.card')?.remove();
@@ -1231,224 +851,73 @@
         });
         
         const loadProfile = () => {
-            if (!state.user?.is) {
-                ui.profileContainer.innerHTML = `<div class="card" style="text-align: center;"><i class="fas fa-user-lock" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i><h3>Faça login para ver seu perfil</h3><button id="profile-login-btn" class="btn" style="margin-top: 15px;"><i class="fas fa-sign-in-alt"></i> Fazer Login</button></div>`;
-                document.getElementById('profile-login-btn').addEventListener('click', () => ui.authModal.classList.add('active'));
-                return;
-            }
+            if (!state.user?.is) { ui.profileContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver seu perfil</p><button id="profile-login-btn" class="btn">Login</button></div>`; document.getElementById('profile-login-btn').addEventListener('click', ()=>ui.authModal.classList.add('active')); return; }
             ui.profileContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
-            state.gun.get(`~${state.user.is.pub}`).once(profile => {
-                profile = profile || { alias: state.user.is.alias, bio: '' };
-                ui.profileContainer.innerHTML = `
-                    <div class="card"><div class="profile-header"><div class="profile-avatar" style="${profile.avatar ? `background-image: url('${profile.avatar}')` : ''}">${!profile.avatar ? profile.alias.charAt(0).toUpperCase() : ''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1 class="profile-name">${sanitizeHTML(profile.alias)}</h1><p class="profile-bio">${sanitizeHTML(profile.bio || 'Sem biografia.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div></div></div>
-                    <div class="card"><h3><i class="fas fa-edit"></i> Editar Perfil</h3><div class="form-group"><label for="edit-bio">Biografia</label><textarea id="edit-bio" class="form-control" rows="3" maxlength="${CONFIG.MAX_BIO_LENGTH}">${sanitizeHTML(profile.bio || '')}</textarea><div style="text-align: right; font-size: 0.8rem; color: var(--gray);"><span id="bio-char-count">${(profile.bio || '').length}</span>/${CONFIG.MAX_BIO_LENGTH}</div></div><button id="save-profile-btn" class="btn"><i class="fas fa-save"></i> Salvar</button></div>`;
-                
+            state.gun.get(`~${state.user.is.pub}`).once(p => {
+                p = p || {alias: state.user.is.alias, bio: ''};
+                ui.profileContainer.innerHTML = `<div class="card"><div class="profile-header"><div class="profile-avatar" style="${p.avatar ? `background-image:url('${p.avatar}')` : ''}">${!p.avatar?p.alias.charAt(0).toUpperCase():''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1>${sanitizeHTML(p.alias)}</h1><p class="profile-bio">${sanitizeHTML(p.bio||'Sem bio.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div>Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div>Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div>Conexões</div></div></div></div><div class="card"><h3>Editar Perfil</h3><div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" class="form-control" rows="3">${sanitizeHTML(p.bio||'')}</textarea></div><button id="save-profile-btn" class="btn">Salvar</button></div>`;
                 document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
-                document.querySelector('.profile-avatar').addEventListener('click', () => {
-                    ui.avatarPreview.style.backgroundImage = profile.avatar ? `url('${profile.avatar}')` : '';
-                    ui.avatarPreview.innerHTML = !profile.avatar ? profile.alias.charAt(0).toUpperCase() : '';
-                    ui.avatarModal.classList.add('active');
-                });
-                const bio = document.getElementById('edit-bio');
-                bio.addEventListener('input', () => document.getElementById('bio-char-count').textContent = bio.value.length);
+                document.querySelector('.profile-avatar').addEventListener('click', ()=>{ ui.avatarPreview.style.backgroundImage = p.avatar ? `url('${p.avatar}')` : ''; ui.avatarPreview.innerHTML = !p.avatar ? p.alias.charAt(0).toUpperCase():''; ui.avatarModal.classList.add('active'); });
                 loadProfileStats();
             });
         };
-
-        const saveProfile = () => {
-            if (!state.user?.is) return;
-            const bio = document.getElementById('edit-bio').value.trim();
-            state.gun.get(`~${state.user.is.pub}`).get('bio').put(bio);
-            showNotification('Biografia atualizada!', 'success');
-            document.querySelector('.profile-bio').textContent = bio;
-        };
-
-        const handleAvatarUpload = (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (file.size > CONFIG.AVATAR_MAX_SIZE || !file.type.startsWith('image/')) return showNotification('Arquivo inválido (imagem < 2MB).', 'error');
-            const reader = new FileReader();
-            reader.onload = e => {
-                ui.avatarPreview.style.backgroundImage = `url('${e.target.result}')`;
-                ui.avatarPreview.innerHTML = '';
-                state.tempAvatarFile = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        };
-
-        const saveAvatar = () => {
-            if (!state.user?.is || !state.tempAvatarFile) return;
-            state.gun.get(`~${state.user.is.pub}`).get('avatar').put(state.tempAvatarFile);
-            showNotification('Avatar salvo!', 'success');
-            ui.avatarModal.classList.remove('active');
-            state.tempAvatarFile = null;
-            loadProfile();
-        };
-
-        const loadProfileStats = () => {
-            let p=0, c=0, n=0;
-            const user = state.gun.user();
-            user.get('posts').map().once(() => document.getElementById('post-count').textContent = ++p);
-            user.get('communities').map().once(() => document.getElementById('community-count').textContent = ++c);
-            user.get('mutualConnections').map().once(v => { if(v) document.getElementById('connection-count').textContent = ++n; });
-        };
-
+        const saveProfile = () => { if(!state.user?.is)return; const bio = document.getElementById('edit-bio').value.trim(); state.gun.get(`~${state.user.is.pub}`).get('bio').put(bio); showNotification('Bio atualizada!', 'success'); document.querySelector('.profile-bio').textContent=bio; };
+        const handleAvatarUpload = (e) => { const f=e.target.files[0]; if(!f||f.size>CONFIG.AVATAR_MAX_SIZE||!f.type.startsWith('image/')) return; const r=new FileReader(); r.onload=e=>{ ui.avatarPreview.style.backgroundImage=`url('${e.target.result}')`; ui.avatarPreview.innerHTML=''; state.tempAvatarFile=e.target.result; }; r.readAsDataURL(f); };
+        const saveAvatar = () => { if(!state.user?.is||!state.tempAvatarFile)return; state.gun.get(`~${state.user.is.pub}`).get('avatar').put(state.tempAvatarFile); showNotification('Avatar salvo!', 'success'); ui.avatarModal.classList.remove('active'); state.tempAvatarFile=null; loadProfile(); };
+        const loadProfileStats = () => { let p=0,c=0,n=0; const u=state.gun.user(); u.get('posts').map().once(()=>document.getElementById('post-count').textContent=++p); u.get('communities').map().once(()=>document.getElementById('community-count').textContent=++c); u.get('mutualConnections').map().once(v=>{if(v)document.getElementById('connection-count').textContent=++n;}); };
+        
         const loadCommunities = () => {
             ui.communitiesContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
-            let hasCommunities = false;
-            state.gun.get('communities').map().on((community, id) => {
-                if (community?.name) {
-                    if (!hasCommunities) ui.communitiesContainer.innerHTML = ''; hasCommunities = true;
-                    if (document.getElementById(`comm-${id}`)) return;
-                    renderCommunity(community, id);
-                }
-            });
-            setTimeout(() => { if (!hasCommunities) ui.communitiesContainer.innerHTML = `<div class="card" style="text-align: center; color: var(--gray);">Nenhuma comunidade.</div>`; }, 3000);
+            let has=false; state.gun.get('communities').map().on((comm, id)=>{ if(comm?.name){ if(!has)ui.communitiesContainer.innerHTML=''; has=true; if(document.getElementById(`comm-${id}`))return; renderCommunity(comm,id); } });
+            setTimeout(() => { if(!has) ui.communitiesContainer.innerHTML=`<div class="card" style="text-align:center;color:var(--gray);">Nenhuma comunidade.</div>`; }, 3000);
         };
-
-        const renderCommunity = (community, id) => {
-            const el = document.createElement('div');
-            el.className = 'community-card fade-in';
-            el.id = `comm-${id}`;
-            el.innerHTML = `<div class="community-info-details">${renderAvatar({alias: community.name})}<div class="community-info"><div class="community-name">${sanitizeHTML(community.name)}</div><div style="color: var(--gray); font-size: 0.9rem;">${sanitizeHTML(community.description) || ''}</div></div></div><i class="fas fa-chevron-right" style="color: var(--gray);"></i>`;
-            el.addEventListener('click', () => {
-                state.currentCommunity = { id, name: community.name };
-                state.currentFeedFilter = FEED_FILTERS.COMMUNITY;
-                navigateTo('feed');
-            });
-            ui.communitiesContainer.prepend(el);
-        };
-
-        const createCommunity = () => {
-            if (!state.user?.is) return;
-            const name = document.getElementById('community-name').value.trim();
-            if (!name) return showNotification('O nome é obrigatório.', 'error');
-            const desc = document.getElementById('community-desc').value.trim();
-            state.gun.get('communities').set({ name, description: desc, creatorPub: state.user.is.pub, createdAt: Date.now() });
-            ui.communityModal.classList.remove('active');
-            showNotification('Comunidade criada!', 'success');
-            document.getElementById('community-name').value = '';
-            document.getElementById('community-desc').value = '';
-        };
-
+        const renderCommunity = (comm, id) => { const el=document.createElement('div'); el.className='community-card fade-in'; el.id=`comm-${id}`; el.innerHTML=`<div class="community-info-details">${renderAvatar({alias:comm.name})}<div class="community-info"><div class="community-name">${sanitizeHTML(comm.name)}</div></div></div><i class="fas fa-chevron-right"></i>`; el.addEventListener('click', ()=>{ state.currentCommunity={id, name:comm.name}; state.currentFeedFilter=FEED_FILTERS.COMMUNITY; navigateTo('feed'); }); ui.communitiesContainer.prepend(el); };
+        const createCommunity = () => { if(!state.user?.is)return; const name=document.getElementById('community-name').value.trim(); if(!name)return showNotification('Nome é obrigatório.', 'error'); state.gun.get('communities').set({name, description:document.getElementById('community-desc').value.trim(), creatorPub:state.user.is.pub}); ui.communityModal.classList.remove('active'); showNotification('Comunidade criada!', 'success'); };
+        
         const loadConnectionsPage = () => {
-            if (!state.user?.is) {
-                ui.allUsersContainer.innerHTML = `<div class="card" style="text-align: center;"><i class="fas fa-user-lock"></i><p>Faça login para ver outros usuários</p><button class="btn" onclick="document.getElementById('auth-modal').classList.add('active')">Login</button></div>`;
-                return;
-            }
+            if (!state.user?.is) { ui.allUsersContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver usuários</p><button class="btn" onclick="document.getElementById('auth-modal').classList.add('active')">Login</button></div>`; return; }
             loadAllUsers();
         };
-
         const loadAllUsers = () => {
-            const container = ui.allUsersContainer;
-            container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><div>Buscando usuários...</div></div>`;
-            const myPub = state.user.is.pub;
-            let hasUsers = false;
-            const processedPubs = new Set([myPub]);
-
-            const renderUserIfNeeded = async (user, pub) => {
-                if (!user || !user.alias || processedPubs.has(pub)) return;
-                processedPubs.add(pub);
-                if (!hasUsers) { container.innerHTML = ''; hasUsers = true; }
-                if (!document.getElementById(`user-${pub}`)) await renderUserCard(user, pub);
-            };
-
-            state.gun.get('users').map().once((user, pub) => renderUserIfNeeded(user, pub));
-            state.gun.get('posts').map().once(post => {
-                if (post?.authorPub && !processedPubs.has(post.authorPub)) {
-                    state.gun.get(`~${post.authorPub}`).once(profile => renderUserIfNeeded(profile, post.authorPub));
-                }
-            });
-
-            setTimeout(() => { if (!hasUsers) container.innerHTML = `<div style="text-align: center; padding: 15px; color: var(--gray);"><i class="fas fa-ghost"></i><p>Nenhum outro usuário encontrado.</p></div>`; }, 3500);
+            ui.allUsersContainer.innerHTML=`<div class="loading"><div class="loading-spinner"></div></div>`; let has=false; const processed=new Set([state.user.is.pub]);
+            const renderIfNeeded=async(user,pub)=>{ if(!user||!user.alias||processed.has(pub))return; processed.add(pub); if(!has)ui.allUsersContainer.innerHTML=''; has=true; if(!document.getElementById(`user-${pub}`))await renderUserCard(user,pub); };
+            state.gun.get('users').map().once((user, pub)=>renderIfNeeded(user,pub));
+            state.gun.get('posts').map().once(post => { if(post?.authorPub && !processed.has(post.authorPub)) state.gun.get(`~${post.authorPub}`).once(p=>renderIfNeeded(p,post.authorPub)); });
+            setTimeout(() => { if(!has) ui.allUsersContainer.innerHTML=`<div style="text-align:center;padding:15px;color:var(--gray);">Nenhum usuário encontrado.</div>`; }, 3500);
         };
-        
         const renderUserCard = async (user, pub) => {
-            let cardEl = document.getElementById(`user-${pub}`);
-            if (!cardEl) {
-                cardEl = document.createElement('div');
-                cardEl.className = 'user-card fade-in';
-                cardEl.id = `user-${pub}`;
-                cardEl.dataset.alias = user.alias.toLowerCase();
-                ui.allUsersContainer.appendChild(cardEl);
-            }
-            
-            const isMutual = state.mutualConnections.has(pub);
-            const sentRequest = await new Promise(r => state.gun.user().get('sentConnections').get(pub).once(val => r(!!val)));
-            
-            let buttonHTML;
-            if (isMutual) buttonHTML = `<button class="btn btn-sm btn-success" data-pub="${pub}" data-action="chat"><i class="fas fa-comment"></i> Conversar</button>`;
-            else if (sentRequest) buttonHTML = `<button class="btn btn-sm btn-warning" disabled><i class="fas fa-clock"></i> Pendente</button>`;
-            else buttonHTML = `<button class="btn btn-sm" data-pub="${pub}" data-action="connect"><i class="fas fa-user-plus"></i> Conectar</button>`;
-            
-            cardEl.innerHTML = `<div class="user-card-info">${renderAvatar(user)}<span class="user-card-alias">${sanitizeHTML(user.alias)}</span></div><div class="user-card-actions">${buttonHTML}</div>`;
+            let el=document.getElementById(`user-${pub}`); if(!el){el=document.createElement('div'); el.className='user-card fade-in'; el.id=`user-${pub}`; el.dataset.alias=user.alias.toLowerCase(); ui.allUsersContainer.appendChild(el);}
+            const isMutual=state.mutualConnections.has(pub); const sent=await new Promise(r=>state.gun.user().get('sentConnections').get(pub).once(v=>r(!!v)));
+            let btn; if(isMutual)btn=`<button class="btn btn-sm btn-success" data-pub="${pub}" data-action="chat"><i class="fas fa-comment"></i> Conversar</button>`;
+            else if(sent)btn=`<button class="btn btn-sm btn-warning" disabled><i class="fas fa-clock"></i> Pendente</button>`;
+            else btn=`<button class="btn btn-sm" data-pub="${pub}" data-action="connect"><i class="fas fa-user-plus"></i> Conectar</button>`;
+            el.innerHTML = `<div class="user-card-info">${renderAvatar(user)}<span>${sanitizeHTML(user.alias)}</span></div><div class="user-card-actions">${btn}</div>`;
         };
-        
         const connectUser = async (targetPub) => {
-            const myPub = state.user.is.pub;
             state.gun.user().get('sentConnections').get(targetPub).put(true);
-            const targetSentRequest = await new Promise(r => state.gun.get(`~${targetPub}`).get('sentConnections').get(myPub).once(val => r(!!val)));
-            
-            if (targetSentRequest) {
-                state.gun.user().get('mutualConnections').get(targetPub).put(true);
-                state.gun.get(`~${targetPub}`).get('mutualConnections').get(myPub).put(true);
-                state.gun.user().get('sentConnections').get(targetPub).put(null);
-                state.gun.get(`~${targetPub}`).get('sentConnections').get(myPub).put(null);
-                showNotification('Conexão estabelecida!', 'success');
-                state.mutualConnections.add(targetPub);
-            } else {
-                showNotification('Solicitação de conexão enviada!', 'info');
-            }
-            const userCard = document.getElementById(`user-${targetPub}`);
-            if (userCard) renderUserCard({ alias: userCard.dataset.alias }, targetPub);
+            const targetSent = await new Promise(r=>state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).once(v=>r(!!v)));
+            if(targetSent){ state.gun.user().get('mutualConnections').get(targetPub).put(true); state.gun.get(`~${targetPub}`).get('mutualConnections').get(state.user.is.pub).put(true); state.gun.user().get('sentConnections').get(targetPub).put(null); state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).put(null); showNotification('Conexão estabelecida!', 'success'); state.mutualConnections.add(targetPub); }
+            else showNotification('Solicitação enviada!', 'info');
+            const card = document.getElementById(`user-${targetPub}`); if(card) renderUserCard({alias:card.dataset.alias}, targetPub);
         };
-        
-        const startChat = async (userPub) => {
-            const userProfile = await new Promise(r => state.gun.get(`~${userPub}`).once(p => r(p || { alias: '?', pub: userPub })));
-            state.currentChatUser = { ...userProfile, pub: userPub };
-            state.currentFeedFilter = FEED_FILTERS.USER_CHAT;
-            navigateTo('feed');
-        };
+        const startChat = async (userPub) => { const p = await new Promise(r=>state.gun.get(`~${userPub}`).once(p=>r(p||{alias:'?',pub:userPub}))); state.currentChatUser={...p,pub:userPub}; state.currentFeedFilter=FEED_FILTERS.USER_CHAT; navigateTo('feed'); };
         
         const setupEventListeners = () => {
             document.body.addEventListener('click', e => {
-                const navItem = e.target.closest('.nav-item');
-                const actionBtn = e.target.closest('[data-action]');
-                const closeModalBtn = e.target.closest('.close-btn, .close-modal-btn');
-                const overlay = e.target.closest('.modal-overlay');
-
-                if (navItem) { e.preventDefault(); navigateTo(navItem.dataset.page); }
-                if (actionBtn) {
-                    const { action, pub } = actionBtn.dataset;
-                    if (action === 'connect') connectUser(pub);
-                    if (action === 'chat') startChat(pub);
-                }
-                if (closeModalBtn) closeModalBtn.closest('.modal-overlay').classList.remove('active');
-                if (overlay && e.target === overlay) overlay.classList.remove('active');
+                const navItem=e.target.closest('.nav-item'), actionBtn=e.target.closest('[data-action]'), closeModal=e.target.closest('.close-btn'), overlay=e.target.closest('.modal-overlay');
+                if(navItem){e.preventDefault(); navigateTo(navItem.dataset.page);}
+                if(actionBtn){ const{action,pub}=actionBtn.dataset; if(action==='connect')connectUser(pub); if(action==='chat')startChat(pub); }
+                if(closeModal)closeModal.closest('.modal-overlay').classList.remove('active');
+                if(overlay && e.target === overlay)overlay.classList.remove('active');
             });
-            ui.loginBtn.addEventListener('click', () => ui.authModal.classList.add('active'));
-            ui.logoutBtn.addEventListener('click', logout);
-            ui.authSubmitBtn.addEventListener('click', handleAuth);
-            ui.authPass.addEventListener('keypress', e => { if (e.key === 'Enter') handleAuth(); });
-            ui.createPostBtn.addEventListener('click', createPost);
-            ui.showCommunityModalBtn.addEventListener('click', () => ui.communityModal.classList.add('active'));
-            ui.createCommunitySubmitBtn.addEventListener('click', createCommunity);
-            ui.avatarInput.addEventListener('change', handleAvatarUpload);
-            ui.saveAvatarBtn.addEventListener('click', saveAvatar);
-            ui.userSearchInput.addEventListener('input', debounce(e => {
-                const term = e.target.value.toLowerCase();
-                document.querySelectorAll('#all-users-container .user-card').forEach(card => {
-                    card.style.display = card.dataset.alias.includes(term) ? 'flex' : 'none';
-                });
-            }, 300));
+            ui.loginBtn.addEventListener('click',()=>ui.authModal.classList.add('active')); ui.logoutBtn.addEventListener('click',logout);
+            ui.authSubmitBtn.addEventListener('click',handleAuth); ui.authPass.addEventListener('keypress',e=>{if(e.key==='Enter')handleAuth();});
+            ui.createPostBtn.addEventListener('click',createPost); ui.showCommunityModalBtn.addEventListener('click',()=>ui.communityModal.classList.add('active'));
+            ui.createCommunitySubmitBtn.addEventListener('click',createCommunity); ui.avatarInput.addEventListener('change',handleAvatarUpload);
+            ui.saveAvatarBtn.addEventListener('click',saveAvatar); ui.userSearchInput.addEventListener('input',debounce(e=>{const t=e.target.value.toLowerCase();document.querySelectorAll('#all-users-container .user-card').forEach(c=>c.style.display=c.dataset.alias.includes(t)?'flex':'none');},300));
         };
         
-        const init = () => {
-            setupEventListeners();
-            checkUserSession();
-            navigateTo('feed');
-        };
-        
+        const init = () => { setupEventListeners(); checkUserSession(); navigateTo('feed'); };
         init();
     })();
     </script>
