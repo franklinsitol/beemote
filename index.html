@@ -12,13 +12,962 @@
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
     <style>
-        /* Mantenha todos os estilos anteriores aqui */
-        /* ... (todo o código CSS anterior) ... */
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #564fcc;
+            --primary-light: #e9e8ff;
+            --secondary: #f8f9fa;
+            --dark: #343a40;
+            --light: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7f9;
+            color: #333;
+            padding-top: 70px;
+            padding-bottom: 70px;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--light);
+            box-shadow: var(--shadow);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            height: 70px;
+        }
+
+        .logo {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        #auth-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #user-alias {
+            font-weight: 600;
+            color: var(--dark);
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--light);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
+            height: 70px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+        }
+
+        .nav-item i {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+            border: 1px solid var(--gray-light);
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        /* Post Styles */
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .post-author-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+
+        .post-author {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .post-time, .post-countdown {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.5;
+            font-size: 1.05rem;
+        }
+
+        .post-actions {
+            display: flex;
+            border-top: 1px solid var(--gray-light);
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 6px 10px;
+            border-radius: var(--border-radius);
+        }
+
+        .post-action:hover {
+            background-color: var(--gray-light);
+            color: var(--dark);
+        }
+
+        .post-action.liked {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .post-action i {
+            margin-right: 6px;
+            font-size: 1.1rem;
+        }
+
+        /* Comments */
+        .comments-section {
+            margin-top: 15px;
+            border-top: 1px solid var(--gray-light);
+            padding-top: 15px;
+            display: none;
+        }
+
+        .comment-form {
+            display: flex;
+            margin-top: 15px;
+            gap: 10px;
+        }
+
+        .comment {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            background-color: var(--gray-light);
+            padding: 12px;
+            border-radius: var(--border-radius);
+        }
+
+        .comment-author {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+
+        /* Forms */
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            color: var(--danger);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            color: white;
+            z-index: 3000;
+            opacity: 0;
+            transition: opacity 0.5s, top 0.5s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .notification.show {
+            opacity: 1;
+            top: 90px;
+        }
+
+        .notification.success {
+            background-color: var(--success);
+        }
+
+        .notification.error {
+            background-color: var(--danger);
+        }
+
+        .notification.warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+
+        /* Profile Styles */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            cursor: pointer;
+            position: relative;
+            border: 3px solid var(--primary-light);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            background-color: var(--primary);
+        }
+
+        .profile-avatar-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            color: var(--gray);
+            margin: 15px 0;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 25px 0;
+            padding: 15px 0;
+            border-top: 1px solid var(--gray-light);
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 0 15px;
+            min-width: 80px;
+        }
+
+        .stat-number {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        /* Tabs */
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .tab-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tab:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Cards for users and communities */
+        .item-card, .user-card, .community-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: var(--border-radius);
+            background-color: white;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .community-card {
+            cursor: pointer;
+        }
+
+        .item-card:hover, .user-card:hover, .community-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .user-card {
+            justify-content: space-between;
+        }
+
+        .user-card-info, .community-info-details {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .community-info {
+            flex-grow: 1;
+        }
+
+        .user-card-alias, .community-name {
+            font-weight: 600;
+        }
+
+        .user-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Feed Header */
+        .feed-header {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e9e8ff 100%);
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Feed Filters */
+        .feed-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: var(--gray-light);
+            color: var(--dark);
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            main {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .profile-stats {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .stat-item {
+                flex: 1;
+                min-width: 80px;
+            }
+            
+            .post-actions {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .post-action {
+                margin-right: 10px;
+            }
+            
+            .modal-content {
+                padding: 20px 15px;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 10px 15px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            #user-alias {
+                max-width: 80px;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+            
+            .profile-name {
+                font-size: 1.5rem;
+            }
+            
+            .feed-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+
+        /* Animation for new content */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
     </style>
 </head>
 <body>
-    <!-- Mantenha toda a estrutura HTML anterior aqui -->
-    <!-- ... (todo o código HTML anterior) ... -->
+    <header>
+        <div class="logo"><i class="fas fa-bee"></i> Beemote</div>
+        <div id="auth-status">
+            <span id="user-alias"></span>
+            <button id="logout-btn" class="btn btn-outline btn-sm hidden"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            <button id="login-btn" class="btn btn-sm"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+        </div>
+    </header>
+    
+    <main>
+        <div id="notification-bar" class="notification"></div>
+        
+        <div id="feed-page" class="page">
+            <div id="feed-header-container" class="hidden"></div>
+            <div id="feed-filters-container" class="feed-filters"></div>
+            <div class="card">
+                <textarea id="post-content" class="form-control" placeholder="O que você está pensando? (Posts duram 24h)" rows="3"></textarea>
+                <button id="create-post-btn" class="btn" style="margin-top: 15px;">
+                    <i class="fas fa-paper-plane"></i> Publicar
+                </button>
+            </div>
+            <div id="posts-container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Carregando posts...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="communities-page" class="page hidden">
+            <div class="card">
+                <h2><i class="fas fa-users"></i> Comunidades</h2>
+                <p style="margin: 10px 0; color: var(--gray);">Participe de comunidades com interesses em comum</p>
+                <button id="show-community-modal-btn" class="btn">
+                    <i class="fas fa-plus"></i> Criar Comunidade
+                </button>
+            </div>
+            <div id="communities-container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Carregando comunidades...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="connections-page" class="page hidden">
+            <div class="card">
+                <h3><i class="fas fa-search"></i> Buscar Usuários</h3>
+                <input type="text" id="user-search-input" class="form-control" placeholder="Digite o nome de um usuário...">
+                <div id="all-users-container" style="margin-top: 15px;">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <div>Carregando usuários...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="profile-page" class="page hidden">
+            <div id="profile-container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Carregando perfil...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-user"></i> Entrar / Cadastrar</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="auth-alias">Nome de usuário</label>
+                <input type="text" id="auth-alias" class="form-control" placeholder="Seu nome na plataforma">
+            </div>
+            <div class="form-group">
+                <label for="auth-pass">Senha</label>
+                <input type="password" id="auth-pass" class="form-control" placeholder="Sua senha">
+            </div>
+            <div id="auth-2fa-section" class="form-group hidden">
+                <label for="auth-2fa">Código de autenticação</label>
+                <input type="text" id="auth-2fa" class="form-control" placeholder="Digite o código de 6 dígitos">
+                <p style="font-size: 0.85rem; color: var(--gray); margin-top: 5px;">
+                    Verifique seu aplicativo autenticador para obter o código
+                </p>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="remember-me" checked> 
+                    Manter-me conectado
+                </label>
+            </div>
+            <button id="auth-submit-btn" class="btn" style="width: 100%;">
+                <i class="fas fa-check"></i> Continuar
+            </button>
+            <p style="margin-top: 20px; text-align: center; color: var(--gray); font-size: 0.9rem;">
+                Sua privacidade é importante. Todos os dados são criptografados.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Avatar Modal -->
+    <div id="avatar-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-camera"></i> Alterar Foto de Perfil</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="avatar-upload" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
+                <label for="avatar-input" style="cursor: pointer;">
+                    <div id="avatar-preview" class="avatar" style="width: 120px; height: 120px; font-size: 3rem;"></div>
+                </label>
+                <input type="file" id="avatar-input" class="file-input" accept="image/*" style="display: none;">
+                <p style="margin-top: 15px; color: var(--gray);">Clique na imagem para selecionar um arquivo.</p>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline close-modal-btn">Cancelar</button>
+                <button id="save-avatar-btn" class="btn">Salvar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Community Modal -->
+    <div id="community-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-users"></i> Criar Nova Comunidade</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="community-name">Nome da Comunidade</label>
+                <input type="text" id="community-name" class="form-control" placeholder="Ex: Tecnologia, Arte, Música...">
+            </div>
+            <div class="form-group">
+                <label for="community-desc">Descrição</label>
+                <textarea id="community-desc" class="form-control" rows="3" placeholder="Descreva o propósito desta comunidade..."></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline close-modal-btn">Cancelar</button>
+                <button id="create-community-submit-btn" class="btn">Criar Comunidade</button>
+            </div>
+        </div>
+    </div>
+    
+    <nav>
+        <a href="#" class="nav-item active" data-page="feed">
+            <i class="fas fa-home"></i>
+            <span>Feed</span>
+        </a>
+        <a href="#" class="nav-item" data-page="communities">
+            <i class="fas fa-users"></i>
+            <span>Comunidades</span>
+        </a>
+        <a href="#" class="nav-item" data-page="connections">
+            <i class="fas fa-link"></i>
+            <span>Conexões</span>
+        </a>
+        <a href="#" class="nav-item" data-page="profile">
+            <i class="fas fa-user"></i>
+            <span>Perfil</span>
+        </a>
+    </nav>
 
     <script>
     (function() {
@@ -169,10 +1118,23 @@
         
         // Determine if a post should be shown based on current filters
         const shouldShowPost = (post) => {
-            if (!post || !post.content) return false;
+            if (!post || !post.content || !state.user?.is) return false;
             
             const now = Date.now();
             if (now - post.lastActivityAt > CONFIG.POST_EXPIRATION_MS) return false;
+            
+            // Filtro de chat com usuário específico (CORRIGIDO)
+            if (state.currentFeedFilter === FEED_FILTERS.USER_CHAT && state.currentChatUser) {
+                // Cenário 1: A mensagem foi enviada por mim para o meu parceiro de chat.
+                const isFromMeToThem = (post.authorPub === state.user.is.pub && post.connectionChat === state.currentChatUser.pub);
+                // Cenário 2: A mensagem foi enviada pelo meu parceiro de chat para mim.
+                const isFromThemToMe = (post.authorPub === state.currentChatUser.pub && post.connectionChat === state.user.is.pub);
+                
+                return isFromMeToThem || isFromThemToMe;
+            }
+
+            // Se estiver em modo de chat, não mostrar mais nada.
+            if (state.currentChatUser) return false;
             
             // Filtro principal: apenas posts sem contexto específico
             if (state.currentFeedFilter === FEED_FILTERS.MAIN) {
@@ -189,22 +1151,9 @@
                 return post.communityId === state.currentCommunity.id;
             }
             
-            // Filtro de conexões: posts de usuários conectados
+            // Filtro de conexões: posts de usuários conectados (que não sejam DMs)
             if (state.currentFeedFilter === FEED_FILTERS.CONNECTIONS) {
-                return state.mutualConnections.has(post.authorPub);
-            }
-            
-            // Filtro de chat com usuário específico - CORREÇÃO AQUI
-            if (state.currentFeedFilter === FEED_FILTERS.USER_CHAT && state.currentChatUser) {
-                // Mostrar posts onde:
-                // 1. O post é de um chat entre os dois usuários
-                // 2. O autor é o usuário atual e o connectionChat é o usuário alvo, OU
-                // 3. O autor é o usuário alvo e o connectionChat é o usuário atual
-                const isChatBetweenUsers = 
-                    (post.authorPub === state.user.is.pub && post.connectionChat === state.currentChatUser.pub) ||
-                    (post.authorPub === state.currentChatUser.pub && post.connectionChat === state.user.is.pub);
-                
-                return isChatBetweenUsers;
+                return state.mutualConnections.has(post.authorPub) && !post.connectionChat;
             }
             
             return false;
@@ -225,7 +1174,6 @@
                     }
                 });
                 
-                // Give time to load connections
                 setTimeout(resolve, 500);
             });
         };
@@ -237,7 +1185,6 @@
             state.postsData.clear();
             state.renderedPosts.clear();
             
-            // Reset feed filters when navigating away from feed
             if (page !== 'feed') {
                 state.currentFeedFilter = FEED_FILTERS.MAIN;
                 state.currentCommunity = { id: null, name: null };
@@ -251,7 +1198,6 @@
                 item.classList.toggle('active', item.dataset.page === page);
             });
             
-            // Load user connections before loading page content
             loadUserConnections().then(() => {
                 loadPageContent(page);
             });
@@ -261,7 +1207,6 @@
             switch (page) {
                 case 'feed': 
                     loadFeed(); 
-                    renderFeedFilters();
                     break;
                 case 'profile': loadProfile(); break;
                 case 'connections': loadConnectionsPage(); break;
@@ -269,138 +1214,103 @@
             }
         };
         
-        // Render feed filters
-        const renderFeedFilters = () => {
-            let filtersHTML = '';
-            
-            // Always show main filter
-            filtersHTML += `<button class="filter-btn ${state.currentFeedFilter === FEED_FILTERS.MAIN ? 'active' : ''}" data-filter="${FEED_FILTERS.MAIN}">
-                <i class="fas fa-home"></i> Principal
-            </button>`;
-            
-            // Show communities filter
-            filtersHTML += `<button class="filter-btn ${state.currentFeedFilter === FEED_FILTERS.COMMUNITIES ? 'active' : ''}" data-filter="${FEED_FILTERS.COMMUNITIES}">
-                <i class="fas fa-users"></i> Comunidades
-            </button>`;
-            
-            // Show connections filter only if user has connections
-            if (state.mutualConnections.size > 0) {
-                filtersHTML += `<button class="filter-btn ${state.currentFeedFilter === FEED_FILTERS.CONNECTIONS ? 'active' : ''}" data-filter="${FEED_FILTERS.CONNECTIONS}">
-                    <i class="fas fa-link"></i> Conexões
-                </button>`;
-            }
-            
-            // Show current community if in community view
-            if (state.currentCommunity.id) {
-                filtersHTML += `<button class="filter-btn active" data-filter="${FEED_FILTERS.COMMUNITY}">
-                    <i class="fas fa-users"></i> ${sanitizeHTML(state.currentCommunity.name)}
-                </button>`;
-            }
-            
-            // Show current chat user if in chat view
-            if (state.currentChatUser) {
-                filtersHTML += `<button class="filter-btn active" data-filter="${FEED_FILTERS.USER_CHAT}">
-                    <i class="fas fa-user"></i> ${sanitizeHTML(state.currentChatUser.alias)}
-                </button>`;
-                
-                // Add back button for chat view
+        // Render feed filters and headers
+        const renderFeedUI = () => {
+            renderFeedFilters();
+            renderFeedHeader();
+        };
+
+        const renderFeedHeader = () => {
+            ui.feedHeaderContainer.classList.add('hidden');
+            ui.feedHeaderContainer.innerHTML = '';
+
+            const createHeader = (title, buttonText, buttonId, iconClass) => {
                 ui.feedHeaderContainer.innerHTML = `
                     <div class="feed-header">
-                        <span>Conversa com: <strong>${sanitizeHTML(state.currentChatUser.alias)}</strong></span>
-                        <button id="back-to-global-feed" class="btn btn-outline btn-sm">
-                            <i class="fas fa-arrow-left"></i> Voltar para Feed Global
+                        <span>${title}</span>
+                        <button id="${buttonId}" class="btn btn-outline btn-sm">
+                            <i class="${iconClass}"></i> ${buttonText}
                         </button>
                     </div>
                 `;
-                ui.feedHeaderContainer.classList.remove('hidden');
-                
-                document.getElementById('back-to-global-feed').addEventListener('click', () => {
+                document.getElementById(buttonId).addEventListener('click', () => {
+                    state.currentCommunity = { id: null, name: null };
                     state.currentChatUser = null;
                     state.currentFeedFilter = FEED_FILTERS.MAIN;
-                    loadFeed();
-                    renderFeedFilters();
+                    navigateTo('feed');
                 });
-            } else {
-                ui.feedHeaderContainer.classList.add('hidden');
+                ui.feedHeaderContainer.classList.remove('hidden');
+            };
+
+            if (state.currentCommunity.id) {
+                createHeader(
+                    `Comunidade: <strong>${sanitizeHTML(state.currentCommunity.name)}</strong>`,
+                    'Voltar ao Feed', 'back-to-global-feed', 'fas fa-arrow-left'
+                );
+            } else if (state.currentChatUser) {
+                createHeader(
+                    `Conversa com: <strong>${sanitizeHTML(state.currentChatUser.alias)}</strong>`,
+                    'Sair da Conversa', 'back-to-global-feed', 'fas fa-times'
+                );
+            }
+        };
+
+        const renderFeedFilters = () => {
+            let filtersHTML = '';
+            
+            const createFilter = (filterType, iconClass, text, isActive) => {
+                return `<button class="filter-btn ${isActive ? 'active' : ''}" data-filter="${filterType}">
+                            <i class="${iconClass}"></i> ${text}
+                        </button>`;
+            };
+
+            if (state.currentChatUser || state.currentCommunity.id) {
+                // Do not show filters when in a specific context like chat or community
+                ui.feedFiltersContainer.innerHTML = '';
+                return;
+            }
+
+            filtersHTML += createFilter(FEED_FILTERS.MAIN, 'fas fa-home', 'Principal', state.currentFeedFilter === FEED_FILTERS.MAIN);
+            filtersHTML += createFilter(FEED_FILTERS.COMMUNITIES, 'fas fa-users', 'Comunidades', state.currentFeedFilter === FEED_FILTERS.COMMUNITIES);
+
+            if (state.mutualConnections.size > 0) {
+                filtersHTML += createFilter(FEED_FILTERS.CONNECTIONS, 'fas fa-link', 'Conexões', state.currentFeedFilter === FEED_FILTERS.CONNECTIONS);
             }
             
             ui.feedFiltersContainer.innerHTML = filtersHTML;
             
-            // Add event listeners to filter buttons
-            document.querySelectorAll('.filter-btn').forEach(btn => {
+            document.querySelectorAll('#feed-filters-container .filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const filter = btn.dataset.filter;
-                    if (filter === FEED_FILTERS.MAIN) {
-                        state.currentFeedFilter = FEED_FILTERS.MAIN;
-                        state.currentCommunity = { id: null, name: null };
-                        state.currentChatUser = null;
-                        loadFeed();
-                    } else if (filter === FEED_FILTERS.COMMUNITIES) {
-                        state.currentFeedFilter = FEED_FILTERS.COMMUNITIES;
-                        state.currentCommunity = { id: null, name: null };
-                        state.currentChatUser = null;
-                        loadFeed();
-                    } else if (filter === FEED_FILTERS.CONNECTIONS) {
-                        state.currentFeedFilter = FEED_FILTERS.CONNECTIONS;
-                        state.currentCommunity = { id: null, name: null };
-                        state.currentChatUser = null;
-                        loadFeed();
-                    }
-                    renderFeedFilters();
+                    state.currentFeedFilter = filter;
+                    state.currentCommunity = { id: null, name: null };
+                    state.currentChatUser = null;
+                    loadFeed();
                 });
             });
         };
         
         // Authentication
         const checkUserSession = () => {
-            // Check if we should remember the user
             const rememberMe = localStorage.getItem(CONFIG.REMEMBER_ME_KEY);
             if (rememberMe) {
                 try {
                     const { alias, pub } = JSON.parse(rememberMe);
                     state.gun.user().auth(alias, null, ack => {
                         if (ack && ack.pub) {
-                            state.user = state.gun.user();
-                            updateUIForUser();
-                            // Load user profile
-                            state.gun.get(`~${ack.pub}`).once(profile => {
-                                state.currentUserProfile = profile;
-                            });
+                            onAuthSuccess(ack.pub, alias, true); 
                         } else {
-                            // Fallback to session storage
-                            state.gun.user().recall({ sessionStorage: true }, ack => {
-                                if (ack && ack.pub) {
-                                    state.user = state.gun.user();
-                                    updateUIForUser();
-                                    state.gun.get(`~${ack.pub}`).once(profile => {
-                                        state.currentUserProfile = profile;
-                                    });
-                                }
+                            state.gun.user().recall({ sessionStorage: true }, recallAck => {
+                                if (recallAck && recallAck.pub) onAuthSuccess(recallAck.pub, recallAck.alias, false);
                             });
                         }
                     });
                 } catch (e) {
-                    console.error('Error parsing remember me data', e);
                     localStorage.removeItem(CONFIG.REMEMBER_ME_KEY);
-                    state.gun.user().recall({ sessionStorage: true }, ack => {
-                        if (ack && ack.pub) {
-                            state.user = state.gun.user();
-                            updateUIForUser();
-                            state.gun.get(`~${ack.pub}`).once(profile => {
-                                state.currentUserProfile = profile;
-                            });
-                        }
-                    });
                 }
             } else {
                 state.gun.user().recall({ sessionStorage: true }, ack => {
-                    if (ack && ack.pub) {
-                        state.user = state.gun.user();
-                        updateUIForUser();
-                        state.gun.get(`~${ack.pub}`).once(profile => {
-                            state.currentUserProfile = profile;
-                        });
-                    }
+                    if (ack && ack.pub) onAuthSuccess(ack.pub, ack.alias, false);
                 });
             }
         };
@@ -410,118 +1320,58 @@
             const pass = ui.authPass.value.trim();
             const rememberMe = ui.rememberMe.checked;
             
-            if (!alias || !pass) {
-                return showNotification('Preencha todos os campos.', 'error');
-            }
+            if (!alias || !pass) return showNotification('Preencha todos os campos.', 'error');
             
             ui.authSubmitBtn.disabled = true;
-            
-            if (state.authState === 'initial') {
-                // First step: try to authenticate
-                ui.authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
-                
-                state.gun.user().auth(alias, pass, ack => {
-                    if (ack.err) {
-                        // User doesn't exist, try to create
-                        state.gun.user().create(alias, pass, createAck => {
-                            if (createAck.err) {
-                                if (createAck.err.includes("already exists")) {
-                                    // User exists, try auth again with provided credentials
-                                    state.gun.user().auth(alias, pass, finalAck => {
-                                        if (finalAck.err) {
-                                            ui.authSubmitBtn.disabled = false;
-                                            ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
-                                            return showNotification('Credenciais inválidas. Tente novamente.', 'error');
-                                        }
-                                        onAuthSuccess(finalAck.pub, alias, rememberMe);
-                                    });
-                                } else {
-                                    ui.authSubmitBtn.disabled = false;
-                                    ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
-                                    return showNotification(createAck.err, 'error');
-                                }
-                            } else {
-                                // User created, now auth
-                                state.gun.user().auth(alias, pass, finalAck => {
-                                    if (finalAck.err) {
-                                        ui.authSubmitBtn.disabled = false;
-                                        ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
-                                        return showNotification(finalAck.err, 'error');
-                                    }
-                                    onAuthSuccess(finalAck.pub, alias, rememberMe);
-                                });
-                            }
-                        });
-                    } else {
-                        // Check if 2FA is needed
-                        if (ack.wait) {
-                            state.authState = 'needs2fa';
-                            ui.auth2faSection.classList.remove('hidden');
-                            ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Verificar Código';
-                            showNotification('Verifique seu aplicativo autenticador para o código', 'warning');
-                        } else {
-                            onAuthSuccess(ack.pub, alias, rememberMe);
-                        }
-                    }
-                });
-            } else if (state.authState === 'needs2fa') {
-                // Second step: verify 2FA code
-                const code = ui.auth2fa.value.trim();
-                if (!code || code.length !== 6) {
-                    ui.authSubmitBtn.disabled = false;
-                    return showNotification('Digite um código de autenticação válido (6 dígitos)', 'error');
-                }
-                
-                ui.authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando código...';
-                
-                // In a real app, you would verify the 2FA code here
-                // For demo purposes, we'll simulate a successful verification
-                setTimeout(() => {
-                    state.gun.user().auth(alias, pass, ack => {
-                        if (ack.err) {
+            ui.authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+
+            state.gun.user().auth(alias, pass, ack => {
+                if (ack.err) {
+                    state.gun.user().create(alias, pass, createAck => {
+                        if (createAck.err) {
                             ui.authSubmitBtn.disabled = false;
-                            ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Verificar Código';
-                            return showNotification('Código inválido. Tente novamente.', 'error');
+                            ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
+                            return showNotification('Credenciais inválidas ou usuário já existe.', 'error');
                         }
-                        onAuthSuccess(ack.pub, alias, rememberMe);
+                        state.gun.user().auth(alias, pass, finalAck => {
+                            if (finalAck.err) {
+                                ui.authSubmitBtn.disabled = false;
+                                ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
+                                return showNotification(finalAck.err, 'error');
+                            }
+                            onAuthSuccess(finalAck.pub, alias, rememberMe);
+                        });
                     });
-                }, 1000);
-            }
+                } else {
+                    onAuthSuccess(ack.pub, alias, rememberMe);
+                }
+            });
         };
         
         const onAuthSuccess = (pub, alias, rememberMe) => {
             state.user = state.gun.user();
             
-            // Save remember me preference
             if (rememberMe) {
                 localStorage.setItem(CONFIG.REMEMBER_ME_KEY, JSON.stringify({ alias, pub }));
             } else {
                 localStorage.removeItem(CONFIG.REMEMBER_ME_KEY);
             }
             
-            // Initialize user profile if it doesn't exist
             state.gun.get(`~${pub}`).once(profile => {
                 if (!profile) {
                     state.gun.get(`~${pub}`).put({ alias, bio: '' });
                 }
+                state.currentUserProfile = profile || { alias };
             });
             
-            // Add user to global users list
             state.gun.get('users').get(pub).put({ alias, lastSeen: Date.now() });
             
             updateUIForUser();
             ui.authModal.classList.remove('active');
             ui.authSubmitBtn.disabled = false;
             ui.authSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Continuar';
-            ui.auth2faSection.classList.add('hidden');
-            ui.auth2fa.value = '';
-            state.authState = 'initial';
             showNotification('Login bem-sucedido!', 'success');
-            
-            // Load user profile
-            state.gun.get(`~${pub}`).once(profile => {
-                state.currentUserProfile = profile;
-            });
+            if (state.currentPage === 'feed') loadFeed();
         };
         
         const logout = () => {
@@ -548,6 +1398,8 @@
         
         // Feed functionality
         const loadFeed = () => {
+            renderFeedUI();
+
             ui.postsContainer.innerHTML = `
                 <div class="loading">
                     <div class="loading-spinner"></div>
@@ -558,61 +1410,33 @@
             state.postsData.clear();
             state.renderedPosts.clear();
             
-            if (state.countdownInterval) {
-                clearInterval(state.countdownInterval);
-            }
+            if (state.countdownInterval) clearInterval(state.countdownInterval);
             
-            // Community header if in community view
-            if (state.currentCommunity.id) {
-                ui.feedHeaderContainer.innerHTML = `
-                    <div class="feed-header">
-                        <span>Comunidade: <strong>${sanitizeHTML(state.currentCommunity.name)}</strong></span>
-                        <button id="back-to-global-feed" class="btn btn-outline btn-sm">
-                            <i class="fas fa-arrow-left"></i> Voltar para Feed Global
-                        </button>
-                    </div>
-                `;
-                ui.feedHeaderContainer.classList.remove('hidden');
-                
-                document.getElementById('back-to-global-feed').addEventListener('click', () => {
-                    state.currentCommunity = { id: null, name: null };
-                    state.currentFeedFilter = FEED_FILTERS.MAIN;
-                    navigateTo('feed');
-                });
-            } else {
-                ui.feedHeaderContainer.classList.add('hidden');
-            }
-            
-            // Load user connections first
             loadUserConnections().then(() => {
-                // Subscribe to posts with appropriate filtering
                 const sub = state.gun.get('posts').map().on((post, id) => {
-                    if (!post) return;
-                    
-                    if (state.renderedPosts.has(id)) return;
-                    
-                    if (post.content && post.lastActivityAt) {
-                        if (shouldShowPost(post)) {
-                            state.postsData.set(id, { ...post, id });
-                            state.renderedPosts.add(id);
-                        } else {
-                            state.postsData.delete(id);
+                    if (!post || !post.content || !post.lastActivityAt) {
+                        if (state.postsData.has(id)) {
+                             state.postsData.delete(id);
+                             renderSortedFeed();
                         }
-                        
-                        renderSortedFeed();
+                        return;
+                    };
+                    
+                    if (shouldShowPost(post)) {
+                        state.postsData.set(id, { ...post, id });
                     } else {
                         state.postsData.delete(id);
                     }
+                    renderSortedFeed();
                 });
                 
                 state.activeSubscriptions.set('feed', sub);
             });
             
-            // Update countdowns every minute
             state.countdownInterval = setInterval(updateAllCountdowns, 60000);
         };
         
-        const renderSortedFeed = () => {
+        const renderSortedFeed = debounce(() => {
             const now = Date.now();
             const validPosts = Array.from(state.postsData.values())
                 .filter(p => (now - p.lastActivityAt < CONFIG.POST_EXPIRATION_MS))
@@ -623,23 +1447,18 @@
                     <div class="card">
                         <div style="text-align: center; padding: 30px; color: var(--gray);">
                             <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                            <h3>Nenhum post ativo no momento</h3>
-                            <p>Seja o primeiro a compartilhar algo!</p>
+                            <h3>Nenhum post ativo aqui</h3>
+                            <p>Tente outro filtro ou crie uma nova publicação.</p>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
             
             ui.postsContainer.innerHTML = '';
-            
-            validPosts.forEach(post => {
-                renderPost(post);
-            });
-        };
+            validPosts.forEach(post => renderPost(post));
+        }, 100);
         
         const renderPost = async (post) => {
-            // Check if post already exists to avoid duplication
             if (document.getElementById(`post-${post.id}`)) {
                 updatePost(post);
                 return;
@@ -649,7 +1468,6 @@
             postEl.className = 'card fade-in';
             postEl.id = `post-${post.id}`;
             
-            // Get author profile from cache if available
             let authorProfile = state.usersCache.get(post.authorPub);
             if (!authorProfile) {
                 authorProfile = await new Promise(resolve => {
@@ -677,31 +1495,24 @@
                 <div class="post-content">${sanitizeHTML(post.content)}</div>
                 <div class="post-actions">
                     <div class="post-action" data-action="like">
-                        <i class="fas fa-heart"></i> 
+                        <i class="far fa-heart"></i> 
                         <span class="like-count">0</span>
                     </div>
                     <div class="post-action" data-action="comment">
-                        <i class="fas fa-comment"></i> 
+                        <i class="far fa-comment"></i> 
                         <span>Comentar</span>
                     </div>
                 </div>
-                <div class="comments-section"></div>
-            `;
+                <div class="comments-section"></div>`;
             
             ui.postsContainer.appendChild(postEl);
             
-            // Add event listeners
-            postEl.querySelector('[data-action="like"]').addEventListener('click', () => 
-                handlePostInteraction(post.id, 'like'));
-                
+            postEl.querySelector('[data-action="like"]').addEventListener('click', () => handlePostInteraction(post.id, 'like'));
             postEl.querySelector('[data-action="comment"]').addEventListener('click', () => {
                 const commentsSection = postEl.querySelector('.comments-section');
                 const isVisible = commentsSection.style.display === 'block';
                 commentsSection.style.display = isVisible ? 'none' : 'block';
-                
-                if (!isVisible) {
-                    renderComments(post.id, commentsSection);
-                }
+                if (!isVisible) renderComments(post.id, commentsSection);
             });
             
             updateLikes(post.id, postEl);
@@ -710,27 +1521,15 @@
         const updatePost = (post) => {
             const postEl = document.getElementById(`post-${post.id}`);
             if (!postEl) return;
-            
             const countdownEl = postEl.querySelector('.post-countdown');
-            if (countdownEl) {
-                countdownEl.textContent = formatCountdown(post.lastActivityAt);
-            }
+            if (countdownEl) countdownEl.textContent = formatCountdown(post.lastActivityAt);
         };
         
         const createPost = () => {
             const content = ui.postContent.value.trim();
-            
-            if (!content) {
-                return showNotification('Escreva algo para publicar.', 'error');
-            }
-            
-            if (content.length > CONFIG.MAX_POST_LENGTH) {
-                return showNotification(`O post deve ter no máximo ${CONFIG.MAX_POST_LENGTH} caracteres.`, 'error');
-            }
-            
-            if (!state.user?.is) {
-                return showNotification('Faça login para publicar.', 'error');
-            }
+            if (!content) return showNotification('Escreva algo para publicar.', 'error');
+            if (content.length > CONFIG.MAX_POST_LENGTH) return showNotification(`O post deve ter no máximo ${CONFIG.MAX_POST_LENGTH} caracteres.`, 'error');
+            if (!state.user?.is) return showNotification('Faça login para publicar.', 'error');
             
             const now = Date.now();
             const postData = {
@@ -740,7 +1539,6 @@
                 lastActivityAt: now
             };
             
-            // Add context based on current view
             if (state.currentCommunity.id) {
                 postData.communityId = state.currentCommunity.id;
             } else if (state.currentChatUser) {
@@ -751,22 +1549,17 @@
             state.gun.user().get('posts').set(postRef);
             
             ui.postContent.value = '';
-            showNotification('Post publicado com sucesso!');
+            showNotification('Post publicado com sucesso!', 'success');
         };
         
         const handlePostInteraction = (postId, type) => {
-            if (!state.user?.is) {
-                return showNotification('Faça login para interagir.', 'error');
-            }
+            if (!state.user?.is) return showNotification('Faça login para interagir.', 'error');
             
-            // Update last activity
             state.gun.get('posts').get(postId).get('lastActivityAt').put(Date.now());
             
             if (type === 'like') {
                 const likeRef = state.gun.get('posts').get(postId).get('likes').get(state.user.is.pub);
-                likeRef.once(currentVal => {
-                    likeRef.put(!currentVal);
-                });
+                likeRef.once(currentVal => likeRef.put(!currentVal));
             }
         };
         
@@ -784,12 +1577,11 @@
                 if (state.user?.is) {
                     likesRef.get(state.user.is.pub).once(val => {
                         likeActionEl.classList.toggle('liked', !!val);
+                        likeActionEl.querySelector('i').className = val ? 'fas fa-heart' : 'far fa-heart';
                     });
                 }
                 
-                setTimeout(() => {
-                    if (likeCountEl) likeCountEl.textContent = count;
-                }, 50);
+                if (likeCountEl) likeCountEl.textContent = count;
             });
             
             state.activeSubscriptions.set(`likes-${postId}`, sub);
@@ -803,16 +1595,11 @@
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
-                <div class="comments-list"></div>
-            `;
+                <div class="comments-list"></div>`;
             
-            container.querySelector('.comment-submit-btn').addEventListener('click', () => 
-                createComment(postId, container));
-                
+            container.querySelector('.comment-submit-btn').addEventListener('click', () => createComment(postId, container));
             container.querySelector('.comment-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    createComment(postId, container);
-                }
+                if (e.key === 'Enter') createComment(postId, container);
             });
             
             const listEl = container.querySelector('.comments-list');
@@ -832,7 +1619,6 @@
                     listEl.prepend(commentEl);
                 }
                 
-                // Get author profile
                 let author = state.usersCache.get(comment.authorPub);
                 if (!author) {
                     author = await new Promise(resolve => {
@@ -845,31 +1631,24 @@
                 }
                 
                 commentEl.innerHTML = `
-                    <span class="comment-author">${sanitizeHTML(author.alias)}:</span> 
+                    <span class="comment-author">${sanitizeHTML(author.alias)}</span> 
                     ${sanitizeHTML(comment.content)}
                     <div style="font-size: 0.8rem; color: var(--gray); margin-top: 5px;">
                         ${formatTime(comment.createdAt)}
-                    </div>
-                `;
+                    </div>`;
                 
-                // Update post activity when a comment is made
                 state.gun.get('posts').get(postId).get('lastActivityAt').put(Date.now());
             });
             
             state.activeSubscriptions.set(`comments-${postId}`, sub);
         };
-        
+
         const createComment = (postId, container) => {
             const input = container.querySelector('.comment-input');
             const content = input.value.trim();
             
-            if (!content) {
-                return showNotification('Escreva um comentário.', 'error');
-            }
-            
-            if (!state.user?.is) {
-                return showNotification('Faça login para comentar.', 'error');
-            }
+            if (!content) return showNotification('Escreva um comentário.', 'error');
+            if (!state.user?.is) return showNotification('Faça login para comentar.', 'error');
             
             handlePostInteraction(postId, 'comment');
             
@@ -886,56 +1665,33 @@
         const updateAllCountdowns = () => {
             document.querySelectorAll('.post-countdown').forEach(el => {
                 const timestamp = parseInt(el.dataset.timestamp, 10);
-                if (timestamp) {
+                if (timestamp && Date.now() - timestamp > CONFIG.POST_EXPIRATION_MS) {
+                    const postCard = el.closest('.card');
+                    if(postCard) postCard.remove();
+                } else if (timestamp) {
                     el.textContent = formatCountdown(timestamp);
-                    
-                    // Remove expired posts from view
-                    if (Date.now() - timestamp > CONFIG.POST_EXPIRATION_MS) {
-                        const postId = el.closest('.card')?.id.replace('post-', '');
-                        if (postId) {
-                            state.postsData.delete(postId);
-                            renderSortedFeed();
-                        }
-                    }
                 }
             });
         };
         
-        // Profile functionality
         const loadProfile = () => {
             if (!state.user?.is) {
                 ui.profileContainer.innerHTML = `
-                    <div class="card">
-                        <div style="text-align: center; padding: 30px;">
-                            <i class="fas fa-user-lock" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
-                            <h3>Faça login para ver seu perfil</h3>
-                            <button id="profile-login-btn" class="btn" style="margin-top: 15px;">
-                                <i class="fas fa-sign-in-alt"></i> Fazer Login
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('profile-login-btn').addEventListener('click', () => {
-                    ui.authModal.classList.add('active');
-                });
-                
+                    <div class="card" style="text-align: center;">
+                        <i class="fas fa-user-lock" style="font-size: 3rem; color: var(--gray); margin-bottom: 15px;"></i>
+                        <h3>Faça login para ver seu perfil</h3>
+                        <button id="profile-login-btn" class="btn" style="margin-top: 15px;">
+                            <i class="fas fa-sign-in-alt"></i> Fazer Login
+                        </button>
+                    </div>`;
+                document.getElementById('profile-login-btn').addEventListener('click', () => ui.authModal.classList.add('active'));
                 return;
             }
             
-            ui.profileContainer.innerHTML = `
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <div>Carregando perfil...</div>
-                </div>
-            `;
+            ui.profileContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div><div>Carregando perfil...</div></div>`;
             
             state.gun.get(`~${state.user.is.pub}`).once(profile => {
-                if (!profile) {
-                    profile = { alias: state.user.is.alias, bio: '' };
-                    state.gun.get(`~${state.user.is.pub}`).put(profile);
-                }
-                
+                profile = profile || { alias: state.user.is.alias, bio: '' };
                 state.currentUserProfile = profile;
                 
                 ui.profileContainer.innerHTML = `
@@ -943,57 +1699,38 @@
                         <div class="profile-header">
                             <div class="profile-avatar" style="${profile.avatar ? `background-image: url('${profile.avatar}')` : ''}">
                                 ${!profile.avatar ? profile.alias.charAt(0).toUpperCase() : ''}
-                                <div class="profile-avatar-edit">
-                                    <i class="fas fa-camera"></i>
-                                </div>
+                                <div class="profile-avatar-edit"><i class="fas fa-camera"></i></div>
                             </div>
-                            <h1 class="profile-name">${sanitizeHTML(profile.alias || 'Usuário')}</h1>
-                            <div class="profile-bio">${sanitizeHTML(profile.bio || 'Sem biografia. Clique em Editar Perfil para adicionar uma.')}</div>
-                            
-                            <div class="profile-stats">
-                                <div class="stat-item">
-                                    <div id="post-count" class="stat-number">0</div>
-                                    <div class="stat-label">Posts</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div id="community-count" class="stat-number">0</div>
-                                    <div class="stat-label">Comunidades</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div id="connection-count" class="stat-number">0</div>
-                                    <div class="stat-label">Conexões</div>
-                                </div>
-                            </div>
+                            <h1 class="profile-name">${sanitizeHTML(profile.alias)}</h1>
+                            <p class="profile-bio">${sanitizeHTML(profile.bio || 'Sem biografia. Edite seu perfil para adicionar uma.')}</p>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div>
+                            <div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div>
+                            <div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div>
                         </div>
                     </div>
-                    
                     <div class="card">
                         <h3><i class="fas fa-edit"></i> Editar Perfil</h3>
                         <div class="form-group">
                             <label for="edit-bio">Biografia</label>
-                            <textarea id="edit-bio" class="form-control" rows="3" placeholder="Fale um pouco sobre você..." maxlength="${CONFIG.MAX_BIO_LENGTH}">${sanitizeHTML(profile.bio || '')}</textarea>
+                            <textarea id="edit-bio" class="form-control" rows="3" placeholder="Fale sobre você..." maxlength="${CONFIG.MAX_BIO_LENGTH}">${sanitizeHTML(profile.bio || '')}</textarea>
                             <div style="text-align: right; font-size: 0.8rem; color: var(--gray); margin-top: 5px;">
-                                <span id="bio-char-count">${(profile.bio || '').length}</span>/${CONFIG.MAX_BIO_LENGTH} caracteres
+                                <span id="bio-char-count">${(profile.bio || '').length}</span>/${CONFIG.MAX_BIO_LENGTH}
                             </div>
                         </div>
-                        <button id="save-profile-btn" class="btn">
-                            <i class="fas fa-save"></i> Salvar Alterações
-                        </button>
-                    </div>
-                `;
+                        <button id="save-profile-btn" class="btn"><i class="fas fa-save"></i> Salvar Alterações</button>
+                    </div>`;
                 
-                // Add event listeners
                 document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
                 document.querySelector('.profile-avatar').addEventListener('click', () => {
                     ui.avatarPreview.style.backgroundImage = profile.avatar ? `url('${profile.avatar}')` : '';
-                    ui.avatarPreview.innerHTML = profile.avatar ? '' : profile.alias.charAt(0).toUpperCase();
+                    ui.avatarPreview.innerHTML = !profile.avatar ? profile.alias.charAt(0).toUpperCase() : '';
                     ui.avatarModal.classList.add('active');
                 });
                 
-                // Bio character count
                 const bioTextarea = document.getElementById('edit-bio');
                 const charCount = document.getElementById('bio-char-count');
-                
                 bioTextarea.addEventListener('input', () => {
                     charCount.textContent = bioTextarea.value.length;
                 });
@@ -1001,32 +1738,20 @@
                 loadProfileStats();
             });
         };
-        
+
         const saveProfile = () => {
             if (!state.user?.is) return;
-            
             const bio = document.getElementById('edit-bio').value.trim();
             state.gun.get(`~${state.user.is.pub}`).get('bio').put(bio);
-            
-            showNotification('Biografia atualizada!');
-            document.querySelector('.profile-bio').textContent = bio || 'Sem biografia. Clique em Editar Perfil para adicionar uma.';
+            showNotification('Biografia atualizada!', 'success');
+            document.querySelector('.profile-bio').textContent = bio || 'Sem biografia.';
         };
-        
+
         const handleAvatarUpload = (event) => {
             const file = event.target.files[0];
             if (!file) return;
-            
-            // Check file size
-            if (file.size > CONFIG.AVATAR_MAX_SIZE) {
-                showNotification('A imagem deve ter menos de 2MB.', 'error');
-                return;
-            }
-            
-            // Check file type
-            if (!file.type.match('image.*')) {
-                showNotification('Selecione uma imagem válida.', 'error');
-                return;
-            }
+            if (file.size > CONFIG.AVATAR_MAX_SIZE) return showNotification('A imagem deve ter menos de 2MB.', 'error');
+            if (!file.type.startsWith('image/')) return showNotification('Selecione uma imagem válida.', 'error');
             
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -1036,52 +1761,39 @@
             };
             reader.readAsDataURL(file);
         };
-        
+
         const saveAvatar = () => {
-            if (!state.user?.is || !state.tempAvatarFile) {
-                return showNotification('Selecione uma imagem primeiro.', 'error');
-            }
+            if (!state.user?.is || !state.tempAvatarFile) return showNotification('Selecione uma imagem primeiro.', 'error');
             
             state.gun.get(`~${state.user.is.pub}`).get('avatar').put(state.tempAvatarFile);
-            showNotification('Avatar salvo!');
+            showNotification('Avatar salvo!', 'success');
             ui.avatarModal.classList.remove('active');
             state.tempAvatarFile = null;
-            
-            // Update profile view
-            if (state.currentPage === 'profile') {
-                loadProfile();
-            }
+            if (state.currentPage === 'profile') loadProfile();
         };
-        
+
         const loadProfileStats = () => {
             let postCount = 0, commCount = 0, connCount = 0;
             const userRef = state.gun.user();
             
-            // Count posts
             userRef.get('posts').map().once(() => {
                 postCount++;
-                document.getElementById('post-count').textContent = postCount;
+                if(document.getElementById('post-count')) document.getElementById('post-count').textContent = postCount;
             });
-            
-            // Count communities
             userRef.get('communities').map().once(() => {
                 commCount++;
-                document.getElementById('community-count').textContent = commCount;
+                if(document.getElementById('community-count')) document.getElementById('community-count').textContent = commCount;
             });
-            
-            // Count connections
             userRef.get('mutualConnections').map().once((val) => {
                 if (val) {
                     connCount++;
-                    document.getElementById('connection-count').textContent = connCount;
+                    if(document.getElementById('connection-count')) document.getElementById('connection-count').textContent = connCount;
                 }
             });
         };
-        
-        // Communities functionality
+
         const loadCommunities = () => {
-            ui.communitiesContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando comunidades...</div></div>';
-            
+            ui.communitiesContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando...</div></div>';
             let hasCommunities = false;
             
             const sub = state.gun.get('communities').map().on((community, id) => {
@@ -1090,10 +1802,7 @@
                         ui.communitiesContainer.innerHTML = '';
                         hasCommunities = true;
                     }
-                    
-                    // Verificar se a comunidade já foi renderizada
                     if (document.getElementById(`comm-${id}`)) return;
-                    
                     renderCommunity(community, id);
                 }
             });
@@ -1102,42 +1811,25 @@
             
             setTimeout(() => {
                 if (!hasCommunities) {
-                    ui.communitiesContainer.innerHTML = `
-                        <div class="card">
-                            <div style="text-align: center; padding: 30px; color: var(--gray);">
-                                <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                                <h3>Nenhuma comunidade encontrada</h3>
-                                <p>Seja o primeiro a criar uma comunidade!</p>
-                            </div>
-                        </div>
-                    `;
+                    ui.communitiesContainer.innerHTML = `<div class="card" style="text-align: center; color: var(--gray);">Nenhuma comunidade encontrada.</div>`;
                 }
             }, 3000);
         };
-        
+
         const renderCommunity = (community, id) => {
-            let cardEl = document.getElementById(`comm-${id}`);
-            if (cardEl) {
-                cardEl.querySelector('.community-name').textContent = sanitizeHTML(community.name);
-                return;
-            }
-            
-            cardEl = document.createElement('div');
+            const cardEl = document.createElement('div');
             cardEl.className = 'community-card fade-in';
             cardEl.id = `comm-${id}`;
             
             cardEl.innerHTML = `
-                ${renderAvatar({alias: community.name})}
-                <div class="community-info">
-                    <div>
+                <div class="community-info-details">
+                    ${renderAvatar({alias: community.name})}
+                    <div class="community-info">
                         <div class="community-name">${sanitizeHTML(community.name)}</div>
-                        <div style="color: var(--gray); font-size: 0.9rem; margin-top: 5px;">
-                            ${community.description || 'Sem descrição'}
-                        </div>
+                        <div style="color: var(--gray); font-size: 0.9rem;">${sanitizeHTML(community.description) || 'Sem descrição'}</div>
                     </div>
                 </div>
-                <i class="fas fa-chevron-right" style="color: var(--gray);"></i>
-            `;
+                <i class="fas fa-chevron-right" style="color: var(--gray);"></i>`;
             
             cardEl.addEventListener('click', () => {
                 state.currentCommunity = { id, name: community.name };
@@ -1147,16 +1839,11 @@
             
             ui.communitiesContainer.prepend(cardEl);
         };
-        
+
         const createCommunity = () => {
-            if (!state.user?.is) {
-                return showNotification('Faça login para criar uma comunidade.', 'error');
-            }
-            
+            if (!state.user?.is) return showNotification('Faça login para criar uma comunidade.', 'error');
             const name = document.getElementById('community-name').value.trim();
-            if (!name) {
-                return showNotification('Nome é obrigatório.', 'error');
-            }
+            if (!name) return showNotification('O nome da comunidade é obrigatório.', 'error');
             
             const desc = document.getElementById('community-desc').value.trim();
             const communityData = {
@@ -1170,115 +1857,54 @@
             state.gun.user().get('communities').set(commRef);
             
             ui.communityModal.classList.remove('active');
-            showNotification('Comunidade criada!');
-            
-            // Clear form
+            showNotification('Comunidade criada!', 'success');
             document.getElementById('community-name').value = '';
             document.getElementById('community-desc').value = '';
         };
-        
-        // Connections functionality
+
         const loadConnectionsPage = () => {
             if (!state.user?.is) {
-                const msg = `
-                    <div class="card">
-                        <div style="text-align: center; padding: 20px;">
-                            <i class="fas fa-user-lock" style="font-size: 2rem; color: var(--gray); margin-bottom: 10px;"></i>
-                            <p>Faça login para ver outros usuários</p>
-                            <button class="btn" style="margin-top: 10px;">
-                                <i class="fas fa-sign-in-alt"></i> Fazer Login
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                ui.allUsersContainer.innerHTML = msg;
-                
-                document.querySelectorAll('#connections-page .btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        ui.authModal.classList.add('active');
-                    });
-                });
-                
+                ui.allUsersContainer.innerHTML = `
+                    <div class="card" style="text-align: center;">
+                        <i class="fas fa-user-lock" style="font-size: 2rem; color: var(--gray); margin-bottom: 10px;"></i>
+                        <p>Faça login para ver outros usuários</p>
+                        <button class="btn" style="margin-top: 10px;" onclick="document.getElementById('auth-modal').classList.add('active')">
+                            <i class="fas fa-sign-in-alt"></i> Fazer Login
+                        </button>
+                    </div>`;
                 return;
             }
-            
-            // Ensure connections are loaded before displaying
-            loadUserConnections().then(() => {
-                loadAllUsers();
-            });
+            loadAllUsers();
         };
-        
+
         const loadAllUsers = () => {
-            const container = ui.allUsersContainer;
-            container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando usuários...</div></div>';
-            
+            ui.allUsersContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando...</div></div>';
             const myPub = state.user.is.pub;
             let hasUsers = false;
             
-            // Clear previous users
             state.allUsers.clear();
             state.userSearchIndex.clear();
             
-            // First, load from 'users' node
             const sub = state.gun.get('users').map().on(async (user, pub) => {
                 if (!user || !user.alias || pub === myPub) return;
                 
-                // Store user
                 state.allUsers.set(pub, user);
                 state.userSearchIndex.set(user.alias.toLowerCase(), { pub, alias: user.alias });
                 
                 if (!hasUsers) {
-                    container.innerHTML = '';
+                    ui.allUsersContainer.innerHTML = '';
                     hasUsers = true;
                 }
                 
-                // Check if we've already rendered this user
                 if (document.getElementById(`user-${pub}`)) return;
-                
                 renderUserCard(user, pub);
             });
             
             state.activeSubscriptions.set('all-users', sub);
-            
-            // Fallback: also load users from posts (to find users who haven't been added to the users index)
-            state.gun.get('posts').map().once(async (post, id) => {
-                if (!post || !post.authorPub) return;
-                if (post.authorPub === myPub) return;
-                if (state.allUsers.has(post.authorPub)) return;
-                
-                // Check if we already have this user
-                let user = state.allUsers.get(post.authorPub);
-                if (!user) {
-                    user = await new Promise(resolve => {
-                        state.gun.get(`~${post.authorPub}`).once(profile => {
-                            resolve(profile);
-                        });
-                    });
-                }
-                
-                if (user && user.alias) {
-                    state.allUsers.set(post.authorPub, user);
-                    state.userSearchIndex.set(user.alias.toLowerCase(), { pub: post.authorPub, alias: user.alias });
-                    
-                    if (!hasUsers) {
-                        container.innerHTML = '';
-                        hasUsers = true;
-                    }
-                    if (!document.getElementById(`user-${post.authorPub}`)) {
-                        renderUserCard(user, post.authorPub);
-                    }
-                }
-            });
-            
+
             setTimeout(() => {
                 if (!hasUsers) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 15px; color: var(--gray);">
-                            <i class="fas fa-users" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
-                            <p>Nenhum outro usuário encontrado</p>
-                        </div>
-                    `;
+                    ui.allUsersContainer.innerHTML = `<div style="text-align: center; color: var(--gray);">Nenhum outro usuário encontrado.</div>`;
                 }
             }, 3000);
         };
@@ -1294,81 +1920,46 @@
                 ui.allUsersContainer.appendChild(cardEl);
             }
             
-            // Check connection status
-            const mutualConnectionStatus = await new Promise(resolve => {
-                state.gun.user().get('mutualConnections').get(pub).once(val => resolve(!!val));
-            });
+            const isMutual = await new Promise(resolve => state.gun.user().get('mutualConnections').get(pub).once(val => resolve(!!val)));
+            const sentRequest = await new Promise(resolve => state.gun.user().get('sentConnections').get(pub).once(val => resolve(!!val)));
             
-            const sentConnectionStatus = await new Promise(resolve => {
-                state.gun.user().get('sentConnections').get(pub).once(val => resolve(!!val));
-            });
-            
-            const receivedConnectionStatus = await new Promise(resolve => {
-                state.gun.get(`~${pub}`).get('sentConnections').get(state.user.is.pub).once(val => resolve(!!val));
-            });
-            
-            let buttonHTML = '';
-            if (mutualConnectionStatus) {
-                buttonHTML = `
-                    <button class="btn btn-sm" data-pub="${pub}" data-action="chat">
-                        <i class="fas fa-comment"></i> Conversar
-                    </button>`;
-            } else if (sentConnectionStatus) {
-                buttonHTML = `
-                    <button class="btn btn-sm" data-pub="${pub}" data-action="chat">
-                        <i class="fas fa-comment"></i> Conversar
-                    </button>`;
+            let buttonHTML;
+            if (isMutual) {
+                buttonHTML = `<button class="btn btn-sm btn-success" data-pub="${pub}" data-action="chat"><i class="fas fa-comment"></i> Conversar</button>`;
+            } else if (sentRequest) {
+                buttonHTML = `<button class="btn btn-sm btn-warning" disabled><i class="fas fa-clock"></i> Pendente</button>`;
             } else {
-                buttonHTML = `<button class="btn btn-sm" data-pub="${pub}" data-action="connect">
-                    <i class="fas fa-user-plus"></i> Conectar
-                </button>`;
+                buttonHTML = `<button class="btn btn-sm" data-pub="${pub}" data-action="connect"><i class="fas fa-user-plus"></i> Conectar</button>`;
             }
             
             cardEl.innerHTML = `
                 <div class="user-card-info">
-                    ${renderAvatar(user, 'avatar', 'width: 45px; height: 45px;')}
+                    ${renderAvatar(user)}
                     <span class="user-card-alias">${sanitizeHTML(user.alias)}</span>
                 </div>
-                <div class="user-card-actions">
-                    ${buttonHTML}
-                </div>
-            `;
+                <div class="user-card-actions">${buttonHTML}</div>`;
         };
         
         const connectUser = async (targetPub) => {
             const myPub = state.user.is.pub;
-            
-            // Add to sent connections
             state.gun.user().get('sentConnections').get(targetPub).put(true);
             
-            // Check if the target user has also sent a connection request
-            const targetSentConnection = await new Promise(resolve => {
-                state.gun.get(`~${targetPub}`).get('sentConnections').get(myPub).once(val => resolve(!!val));
-            });
+            const targetSentConnection = await new Promise(resolve => state.gun.get(`~${targetPub}`).get('sentConnections').get(myPub).once(val => resolve(!!val)));
             
             if (targetSentConnection) {
-                // Create mutual connection
                 state.gun.user().get('mutualConnections').get(targetPub).put(true);
                 state.gun.get(`~${targetPub}`).get('mutualConnections').get(myPub).put(true);
                 
-                // Remove from sent connections
                 state.gun.user().get('sentConnections').get(targetPub).put(null);
                 state.gun.get(`~${targetPub}`).get('sentConnections').get(myPub).put(null);
                 
-                showNotification('Conexão estabelecida! Agora vocês estão conectados.');
+                showNotification('Conexão estabelecida!', 'success');
             } else {
-                showNotification('Solicitação de conexão enviada! Quando o usuário também conectar, a conexão será estabelecida.');
+                showNotification('Solicitação de conexão enviada!', 'info');
             }
-            
-            // Update UI
+
             const userCard = document.getElementById(`user-${targetPub}`);
-            if (userCard) {
-                userCard.querySelector('.user-card-actions').innerHTML = `
-                    <button class="btn btn-sm" data-pub="${targetPub}" data-action="chat">
-                        <i class="fas fa-comment"></i> Conversar
-                    </button>
-                `;
-            }
+            if (userCard) renderUserCard({ alias: userCard.dataset.alias }, targetPub);
         };
         
         const startChat = async (userPub) => {
@@ -1380,14 +1971,11 @@
             
             state.currentChatUser = { ...userProfile, pub: userPub };
             state.currentFeedFilter = FEED_FILTERS.USER_CHAT;
-            
-            // Navegar para o feed e aplicar o filtro de conversa
             navigateTo('feed');
         };
         
         // Event Listeners
         const setupEventListeners = () => {
-            // Navigation
             ui.navItems.forEach(item => {
                 item.addEventListener('click', e => {
                     e.preventDefault();
@@ -1395,49 +1983,23 @@
                 });
             });
             
-            // Auth
-            ui.loginBtn.addEventListener('click', () => {
-                ui.authModal.classList.add('active');
-            });
-            
+            ui.loginBtn.addEventListener('click', () => ui.authModal.classList.add('active'));
             ui.logoutBtn.addEventListener('click', logout);
-            
             ui.authSubmitBtn.addEventListener('click', handleAuth);
+            ui.authPass.addEventListener('keypress', e => { if (e.key === 'Enter') handleAuth(); });
             
-            ui.authPass.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    handleAuth();
-                }
-            });
-            
-            // Modals
             ui.closeModalBtns.forEach(btn => {
-                btn.addEventListener('click', e => {
-                    e.currentTarget.closest('.modal-overlay').classList.remove('active');
-                });
+                btn.addEventListener('click', e => e.currentTarget.closest('.modal-overlay').classList.remove('active'));
             });
             
-            // Posts
             ui.createPostBtn.addEventListener('click', createPost);
             
-            ui.postContent.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && e.ctrlKey) {
-                    createPost();
-                }
-            });
-            
-            // Communities
-            ui.showCommunityModalBtn.addEventListener('click', () => {
-                ui.communityModal.classList.add('active');
-            });
-            
+            ui.showCommunityModalBtn.addEventListener('click', () => ui.communityModal.classList.add('active'));
             ui.createCommunitySubmitBtn.addEventListener('click', createCommunity);
             
-            // Avatar
             ui.avatarInput.addEventListener('change', handleAvatarUpload);
             ui.saveAvatarBtn.addEventListener('click', saveAvatar);
             
-            // Connections
             document.getElementById('connections-page').addEventListener('click', e => {
                 const actionBtn = e.target.closest('[data-action]');
                 if (!actionBtn) return;
@@ -1445,31 +2007,19 @@
                 const action = actionBtn.dataset.action;
                 const pub = actionBtn.dataset.pub;
                 
-                if (!action || !pub) return;
-                
-                switch(action) {
-                    case 'connect': connectUser(pub); break;
-                    case 'chat': startChat(pub); break;
-                }
+                if (action === 'connect') connectUser(pub);
+                if (action === 'chat') startChat(pub);
             });
             
-            // User search
             ui.userSearchInput.addEventListener('input', debounce(e => {
                 const term = e.target.value.toLowerCase();
-                
                 document.querySelectorAll('#all-users-container .user-card').forEach(card => {
-                    const alias = card.dataset.alias;
-                    if (alias.includes(term)) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
+                    card.style.display = card.dataset.alias.includes(term) ? 'flex' : 'none';
                 });
             }, 300));
-            
-            // Close modals on overlay click
+
             document.querySelectorAll('.modal-overlay').forEach(overlay => {
-                overlay.addEventListener('click', e => {
+                overlay.addEventListener('click', (e) => {
                     if (e.target === overlay) {
                         overlay.classList.remove('active');
                     }
@@ -1484,7 +2034,6 @@
             navigateTo('feed');
         };
         
-        // Start the app
         init();
     })();
     </script>
