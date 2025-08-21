@@ -37,8 +37,9 @@
         .post-author { font-weight: 600; }
         .post-time, .post-countdown { font-size: 0.8rem; color: var(--gray); }
         .post-content { margin-bottom: 15px; white-space: pre-wrap; word-wrap: break-word; line-height: 1.5; font-size: 1.05rem; }
-        .post-image-container { margin-bottom: 15px; }
+        .post-media-container { margin-bottom: 15px; }
         .post-image { max-width: 100%; border-radius: var(--border-radius); cursor: pointer; }
+        .post-audio { width: 100%; }
         .post-actions { display: flex; border-top: 1px solid var(--gray-light); padding-top: 15px; margin-top: 10px; }
         .post-action { display: flex; align-items: center; margin-right: 20px; color: var(--gray); cursor: pointer; transition: var(--transition); padding: 6px 10px; border-radius: var(--border-radius); }
         .post-action:hover { background-color: var(--gray-light); color: var(--dark); }
@@ -55,25 +56,17 @@
         .btn-outline { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background-color: var(--primary); color: white; }
         .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
-        .btn-success { background-color: var(--success); } .btn-success:hover { background-color: #218838; }
-        .btn-danger { background-color: var(--danger); } .btn-danger:hover { background-color: #c82333; }
-        .btn-warning { background-color: var(--warning); color: var(--dark); } .btn-warning:hover { background-color: #e0a800; }
         .form-control { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: var(--border-radius); font-size: 1rem; transition: var(--transition); }
-        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2); }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); }
         .hidden { display: none !important; }
         .loading { text-align: center; padding: 30px; color: var(--gray); display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .loading-spinner { width: 40px; height: 40px; border: 4px solid var(--gray-light); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-content { background-color: white; border-radius: var(--border-radius); padding: 25px; width: 100%; max-width: 500px; max-height: 90%; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: translateY(20px); transition: transform 0.3s ease; }
-        .modal-overlay.active .modal-content { transform: translateY(0); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--gray-light); }
-        .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--dark); }
-        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray); transition: var(--transition); }
-        .close-btn:hover { color: var(--danger); }
+        .modal-content { background-color: white; border-radius: var(--border-radius); padding: 25px; width: 100%; max-width: 500px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--gray-light); padding-bottom: 15px; }
+        .modal-title { font-size: 1.5rem; font-weight: 700; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray); }
         .notification { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: var(--border-radius); color: white; z-index: 3000; opacity: 0; transition: opacity 0.5s, top 0.5s; }
         .notification.show { opacity: 1; top: 90px; }
         .notification.success { background-color: var(--success); } .notification.error { background-color: var(--danger); }
@@ -84,8 +77,7 @@
         .profile-bio { color: var(--gray); margin: 15px 0; }
         .profile-stats { display: flex; justify-content: space-around; margin: 25px 0; padding: 15px 0; border-top: 1px solid var(--gray-light); border-bottom: 1px solid var(--gray-light); }
         .stat-item { text-align: center; } .stat-number { font-weight: 700; font-size: 1.5rem; color: var(--primary); } .stat-label { font-size: 0.85rem; color: var(--gray); }
-        .user-card, .community-card { display: flex; align-items: center; padding: 15px; margin-bottom: 15px; border-radius: var(--border-radius); background-color: white; box-shadow: var(--shadow); transition: var(--transition); }
-        .community-card { cursor: pointer; }
+        .user-card, .community-card { display: flex; align-items: center; padding: 15px; margin-bottom: 15px; border-radius: var(--border-radius); background-color: white; box-shadow: var(--shadow); transition: var(--transition); cursor: pointer; }
         .user-card:hover, .community-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
         .user-card { justify-content: space-between; }
         .user-card-info, .community-info-details { flex: 1; display: flex; align-items: center; gap: 15px; }
@@ -99,10 +91,14 @@
         .fade-in { animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         #post-creator-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
-        #image-preview-container { position: relative; margin-top: 10px; display: inline-block; }
+        #post-creator-media-buttons { display: flex; gap: 10px; }
+        .media-preview-container { position: relative; margin-top: 10px; display: inline-block; }
         #image-preview { max-width: 100px; max-height: 100px; border-radius: 8px; }
-        #remove-image-btn { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 20px; height: 20px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-        @media (max-width: 480px) { header { padding: 10px 15px; } .logo { font-size: 1.5rem; } #user-alias { max-width: 80px; } .btn { padding: 8px 12px; font-size: 0.9rem; } .profile-avatar { width: 80px; height: 80px; font-size: 2rem; } .profile-name { font-size: 1.5rem; } .feed-header { flex-direction: column; gap: 10px; align-items: flex-start; } }
+        #audio-preview { width: 100%; }
+        .remove-media-btn { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 20px; height: 20px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        .btn.recording { background-color: var(--danger); }
+        .btn.recording:hover { background-color: #c82333; }
+        @media (max-width: 480px) { .logo { font-size: 1.5rem; } #user-alias { max-width: 80px; } .btn { padding: 8px 12px; } .profile-avatar { width: 80px; height: 80px; } .profile-name { font-size: 1.5rem; } }
     </style>
 </head>
 <body>
@@ -122,31 +118,31 @@
             <div id="feed-filters-container" class="feed-filters"></div>
             <div class="card">
                 <textarea id="post-content" class="form-control" placeholder="O que você está pensando?" rows="3"></textarea>
-                <div id="image-preview-container" class="hidden">
+                <div id="image-preview-container" class="media-preview-container hidden">
                     <img id="image-preview" src="#" alt="Pré-visualização"/>
-                    <button id="remove-image-btn">&times;</button>
+                    <button id="remove-image-btn" class="remove-media-btn">&times;</button>
+                </div>
+                 <div id="audio-preview-container" class="media-preview-container hidden">
+                    <audio id="audio-preview" controls></audio>
+                    <button id="remove-audio-btn" class="remove-media-btn">&times;</button>
                 </div>
                 <div id="post-creator-actions">
-                    <input type="file" id="image-input" accept="image/*" style="display: none;">
-                    <button id="attach-image-btn" class="btn btn-outline btn-sm"><i class="fas fa-image"></i> Foto</button>
+                    <div id="post-creator-media-buttons">
+                        <input type="file" id="image-input" accept="image/*" style="display: none;">
+                        <button id="attach-image-btn" class="btn btn-outline btn-sm"><i class="fas fa-image"></i> Foto</button>
+                        <button id="attach-audio-btn" class="btn btn-outline btn-sm"><i class="fas fa-microphone"></i> Áudio</button>
+                    </div>
                     <button id="create-post-btn" class="btn"><i class="fas fa-paper-plane"></i> Publicar</button>
                 </div>
             </div>
             <div id="posts-container"></div>
         </div>
         <div id="communities-page" class="page hidden">
-            <div class="card">
-                <h2><i class="fas fa-users"></i> Comunidades</h2>
-                <button id="show-community-modal-btn" class="btn">Criar Comunidade</button>
-            </div>
+            <div class="card"><h2><i class="fas fa-users"></i> Comunidades</h2><button id="show-community-modal-btn" class="btn">Criar Comunidade</button></div>
             <div id="communities-container"></div>
         </div>
         <div id="connections-page" class="page hidden">
-            <div class="card">
-                <h3><i class="fas fa-search"></i> Encontrar Usuários</h3>
-                <input type="text" id="user-search-input" class="form-control" placeholder="Buscar usuário...">
-                <div id="all-users-container" style="margin-top: 15px;"></div>
-            </div>
+            <div class="card"><h3><i class="fas fa-search"></i> Encontrar Usuários</h3><input type="text" id="user-search-input" class="form-control" placeholder="Buscar usuário..."><div id="all-users-container" style="margin-top: 15px;"></div></div>
         </div>
         <div id="profile-page" class="page hidden">
             <div id="profile-container"></div>
@@ -154,15 +150,9 @@
     </main>
     
     <!-- Modals -->
-    <div id="auth-modal" class="modal-overlay">
-        <div class="modal-content"><div class="modal-header"><h2 class="modal-title">Entrar / Cadastrar</h2><button class="close-btn">&times;</button></div><div class="form-group"><label for="auth-alias">Usuário</label><input type="text" id="auth-alias" class="form-control"></div><div class="form-group"><label for="auth-pass">Senha</label><input type="password" id="auth-pass" class="form-control"></div><div class="form-group"><label><input type="checkbox" id="remember-me" checked> Manter-me conectado</label></div><button id="auth-submit-btn" class="btn" style="width: 100%;">Continuar</button></div>
-    </div>
-    <div id="avatar-modal" class="modal-overlay">
-        <div class="modal-content"><div class="modal-header"><h2 class="modal-title">Alterar Avatar</h2><button class="close-btn">&times;</button></div><div style="text-align:center;"><label for="avatar-input" style="cursor:pointer;"><div id="avatar-preview" class="avatar" style="width:120px;height:120px;font-size:3rem;margin:auto;"></div></label><input type="file" id="avatar-input" accept="image/*" style="display:none;"><p style="margin-top:15px;color:var(--gray);">Clique para selecionar</p></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;"><button class="btn btn-outline close-btn">Cancelar</button><button id="save-avatar-btn" class="btn">Salvar</button></div></div>
-    </div>
-    <div id="community-modal" class="modal-overlay">
-        <div class="modal-content"><div class="modal-header"><h2 class="modal-title">Criar Comunidade</h2><button class="close-btn">&times;</button></div><div class="form-group"><label for="community-name">Nome</label><input type="text" id="community-name" class="form-control"></div><div class="form-group"><label for="community-desc">Descrição</label><textarea id="community-desc" class="form-control" rows="3"></textarea></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-outline close-btn">Cancelar</button><button id="create-community-submit-btn" class="btn">Criar</button></div></div>
-    </div>
+    <div id="auth-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="modal-title">Entrar / Cadastrar</h2><button class="close-btn">&times;</button></div><div class="form-group"><label for="auth-alias">Usuário</label><input type="text" id="auth-alias" class="form-control"></div><div class="form-group"><label for="auth-pass">Senha</label><input type="password" id="auth-pass" class="form-control"></div><div class="form-group"><label><input type="checkbox" id="remember-me" checked> Manter-me conectado</label></div><button id="auth-submit-btn" class="btn" style="width: 100%;">Continuar</button></div></div>
+    <div id="avatar-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="modal-title">Alterar Avatar</h2><button class="close-btn">&times;</button></div><div style="text-align:center;"><label for="avatar-input" style="cursor:pointer;"><div id="avatar-preview" class="avatar" style="width:120px;height:120px;font-size:3rem;margin:auto;"></div></label><input type="file" id="avatar-input" accept="image/*" style="display:none;"><p style="margin-top:15px;color:var(--gray);">Clique para selecionar</p></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;"><button class="btn btn-outline close-btn">Cancelar</button><button id="save-avatar-btn" class="btn">Salvar</button></div></div></div>
+    <div id="community-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="modal-title">Criar Comunidade</h2><button class="close-btn">&times;</button></div><div class="form-group"><label for="community-name">Nome</label><input type="text" id="community-name" class="form-control"></div><div class="form-group"><label for="community-desc">Descrição</label><textarea id="community-desc" class="form-control" rows="3"></textarea></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-outline close-btn">Cancelar</button><button id="create-community-submit-btn" class="btn">Criar</button></div></div></div>
     
     <nav>
         <a href="#" class="nav-item active" data-page="feed"><i class="fas fa-home"></i><span>Feed</span></a>
@@ -178,7 +168,7 @@
         const CONFIG = { GUN_PEERS: ['https://gun-manhattan.herokuapp.com/gun'], POST_EXPIRATION_MS: 24*60*60*1000, MAX_POST_LENGTH: 500, MAX_BIO_LENGTH: 200, AVATAR_MAX_SIZE: 2*1024*1024, REMEMBER_ME_KEY: 'beemote_remember_me', IMAGE_COMPRESSION_QUALITY: 0.7, IMAGE_MAX_WIDTH: 800 };
         const FEED_FILTERS = { MAIN: 'main', COMMUNITIES: 'communities', COMMUNITY: 'community', CONNECTIONS: 'connections', USER_CHAT: 'user_chat' };
         
-        const state = { gun: Gun({ peers: CONFIG.GUN_PEERS, localStorage: false, radisk: true }), user: null, currentPage: 'feed', activeSubscriptions: new Map(), tempAvatarFile: null, currentCommunity: { id: null, name: null }, postsData: new Map(), countdownInterval: null, usersCache: new Map(), currentUserProfile: null, currentFeedFilter: FEED_FILTERS.MAIN, currentChatUser: null, mutualConnections: new Set(), tempPostImage: null };
+        const state = { gun: Gun({ peers: CONFIG.GUN_PEERS, localStorage: false, radisk: true }), user: null, currentPage: 'feed', activeSubscriptions: new Map(), tempAvatarFile: null, currentCommunity: { id: null, name: null }, postsData: new Map(), countdownInterval: null, usersCache: new Map(), currentUserProfile: null, currentFeedFilter: FEED_FILTERS.MAIN, currentChatUser: null, mutualConnections: new Set(), tempPostImage: null, tempPostAudio: null, mediaRecorder: null, audioChunks: [], isRecording: false };
         
         const ui = {
             pages: document.querySelectorAll('.page'), navItems: document.querySelectorAll('.nav-item'),
@@ -197,7 +187,10 @@
             rememberMe: document.getElementById('remember-me'),
             attachImageBtn: document.getElementById('attach-image-btn'), imageInput: document.getElementById('image-input'),
             imagePreviewContainer: document.getElementById('image-preview-container'), imagePreview: document.getElementById('image-preview'),
-            removeImageBtn: document.getElementById('remove-image-btn')
+            removeImageBtn: document.getElementById('remove-image-btn'),
+            attachAudioBtn: document.getElementById('attach-audio-btn'),
+            audioPreviewContainer: document.getElementById('audio-preview-container'), audioPreview: document.getElementById('audio-preview'),
+            removeAudioBtn: document.getElementById('remove-audio-btn')
         };
         
         const sanitizeHTML = (str) => { const t = document.createElement('div'); t.textContent = str || ''; return t.innerHTML; };
@@ -209,7 +202,7 @@
         const clearSubscriptions = () => { state.activeSubscriptions.forEach(s => s.off()); state.activeSubscriptions.clear(); if(state.countdownInterval) clearInterval(state.countdownInterval); };
         
         const shouldShowPost = (post) => {
-            if (!post || (!post.content && !post.image_data) || !state.user?.is) return false;
+            if (!post || (!post.content && !post.image_data && !post.audio_data) || !state.user?.is) return false;
             if (Date.now() - post.lastActivityAt > CONFIG.POST_EXPIRATION_MS) return false;
             if (state.currentFeedFilter === FEED_FILTERS.USER_CHAT && state.currentChatUser) {
                 const isFromMe = (post.authorPub === state.user.is.pub && post.connectionChat === state.currentChatUser.pub);
@@ -284,7 +277,7 @@
             state.gun.get('users').get(pub).put({alias, lastSeen: Date.now()});
             updateUIForUser(); ui.authModal.classList.remove('active'); ui.authSubmitBtn.disabled = false; ui.authSubmitBtn.innerHTML='Continuar';
             showNotification('Login bem-sucedido!', 'success');
-            if (state.currentPage === 'feed') loadFeed();
+            navigateTo(state.currentPage);
         };
         
         const logout = () => { state.gun.user().leave(); state.user = null; localStorage.removeItem(CONFIG.REMEMBER_ME_KEY); updateUIForUser(); navigateTo('feed'); showNotification('Você saiu.', 'warning'); };
@@ -294,20 +287,28 @@
             renderFeedUI(); ui.postsContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
             state.postsData.clear(); if(state.countdownInterval) clearInterval(state.countdownInterval);
             loadUserConnections().then(() => {
-                const sub = state.gun.get('posts').map().on((post, id) => {
-                    if (shouldShowPost(post)) state.postsData.set(id, {...post, id}); else state.postsData.delete(id);
-                    renderSortedFeed();
+                const postsNode = state.gun.get('posts');
+                const sub = postsNode.map().on((post, id) => {
+                    state.gun.get('posts').get(id).on(updatedPost => {
+                        if (shouldShowPost(updatedPost)) state.postsData.set(id, {...updatedPost, id});
+                        else state.postsData.delete(id);
+                        renderSortedFeed();
+                    });
                 });
                 state.activeSubscriptions.set('feed', sub);
             });
-            state.countdownInterval = setInterval(updateAllCountdowns, 60000);
+            state.countdownInterval = setInterval(updateAllCountdowns, 5000);
         };
         
         const renderSortedFeed = debounce(() => {
             const posts = Array.from(state.postsData.values()).sort((a,b) => b.lastActivityAt - a.lastActivityAt);
             if(posts.length === 0) { ui.postsContainer.innerHTML = `<div class="card" style="text-align:center;color:var(--gray);"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;"></i><p>Nenhum post aqui.</p></div>`; return; }
+            const focusedElement = document.activeElement;
             ui.postsContainer.innerHTML = ''; posts.forEach(p => renderPost(p));
-        }, 100);
+            if (focusedElement && focusedElement.id && document.getElementById(focusedElement.id)) {
+                document.getElementById(focusedElement.id).focus();
+            }
+        }, 150);
         
         const renderPost = async (post) => {
             if(document.getElementById(`post-${post.id}`)) return updatePost(post);
@@ -315,8 +316,9 @@
             let author = state.usersCache.get(post.authorPub);
             if(!author) { author = await new Promise(r => state.gun.get(`~${post.authorPub}`).once(p => r(p || {alias:'...'}))); state.usersCache.set(post.authorPub, author); }
             const contentHTML = post.content ? `<div class="post-content">${sanitizeHTML(post.content)}</div>` : '';
-            const imageHTML = post.image_data ? `<div class="post-image-container"><img src="${post.image_data}" class="post-image" alt="Postagem de ${sanitizeHTML(author.alias)}"></div>` : '';
-            el.innerHTML = `<div class="post-header"><div class="post-author-info">${renderAvatar(author)}<div><div class="post-author">${sanitizeHTML(author.alias)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div></div><div class="post-countdown" data-timestamp="${post.lastActivityAt}">${formatCountdown(post.lastActivityAt)}</div></div>${imageHTML}${contentHTML}<div class="post-actions"><div class="post-action" data-action="like"><i class="far fa-heart"></i> <span class="like-count">0</span></div><div class="post-action" data-action="comment"><i class="far fa-comment"></i> <span>Comentar</span></div></div><div class="comments-section"></div>`;
+            const imageHTML = post.image_data ? `<div class="post-media-container"><img src="${post.image_data}" class="post-image" alt="Postagem de ${sanitizeHTML(author.alias)}"></div>` : '';
+            const audioHTML = post.audio_data ? `<div class="post-media-container"><audio src="${post.audio_data}" class="post-audio" controls></audio></div>` : '';
+            el.innerHTML = `<div class="post-header"><div class="post-author-info">${renderAvatar(author)}<div><div class="post-author">${sanitizeHTML(author.alias)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div></div><div class="post-countdown" data-timestamp="${post.lastActivityAt}">${formatCountdown(post.lastActivityAt)}</div></div>${imageHTML}${audioHTML}${contentHTML}<div class="post-actions"><div class="post-action" data-action="like"><i class="far fa-heart"></i> <span class="like-count">0</span></div><div class="post-action" data-action="comment"><i class="far fa-comment"></i> <span>Comentar</span></div></div><div class="comments-section"></div>`;
             ui.postsContainer.appendChild(el);
             el.querySelector('[data-action="like"]').addEventListener('click',()=>handlePostInteraction(post.id, 'like'));
             el.querySelector('[data-action="comment"]').addEventListener('click', e => {
@@ -330,13 +332,14 @@
         
         const createPost = () => {
             const content = ui.postContent.value.trim();
-            if (!content && !state.tempPostImage) return showNotification('Escreva algo ou anexe uma imagem.', 'error');
+            if (!content && !state.tempPostImage && !state.tempPostAudio) return showNotification('Adicione conteúdo para postar.', 'error');
             if (!state.user?.is) return showNotification('Faça login para publicar.', 'error');
             const postData = { authorPub: state.user.is.pub, content, createdAt: Date.now(), lastActivityAt: Date.now() };
             if (state.tempPostImage) postData.image_data = state.tempPostImage;
+            if (state.tempPostAudio) postData.audio_data = state.tempPostAudio;
             if (state.currentCommunity.id) postData.communityId = state.currentCommunity.id;
             else if (state.currentChatUser) postData.connectionChat = state.currentChatUser.pub;
-            state.gun.get('posts').set(postData); ui.postContent.value = ''; resetImageSelection(); showNotification('Publicado!', 'success');
+            state.gun.get('posts').set(postData); ui.postContent.value = ''; resetImageSelection(); resetAudioSelection(); showNotification('Publicado!', 'success');
         };
         
         const handlePostInteraction = (postId, type) => {
@@ -388,44 +391,62 @@
         });
         
         const compressImage = (file) => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image(); img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const scaleFactor = Math.min(1, CONFIG.IMAGE_MAX_WIDTH / img.width);
-                    canvas.width = img.width * scaleFactor;
-                    canvas.height = img.height * scaleFactor;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    resolve(canvas.toDataURL('image/jpeg', CONFIG.IMAGE_COMPRESSION_QUALITY));
-                };
-            };
-            reader.onerror = error => reject(error);
+            const reader = new FileReader(); reader.readAsDataURL(file);
+            reader.onload = e => { const i = new Image(); i.src = e.target.result; i.onload = () => { const c = document.createElement('canvas'), s = Math.min(1, CONFIG.IMAGE_MAX_WIDTH / i.width); c.width = i.width*s; c.height = i.height*s; const ctx=c.getContext('2d'); ctx.drawImage(i,0,0,c.width,c.height); resolve(c.toDataURL('image/jpeg',CONFIG.IMAGE_COMPRESSION_QUALITY)); }; i.onerror=reject; }; reader.onerror=reject;
         });
         
         const handleImageSelection = async (event) => {
             const file = event.target.files[0]; if (!file || !file.type.startsWith('image/')) return;
             try {
-                const compressedImageData = await compressImage(file);
-                state.tempPostImage = compressedImageData;
-                ui.imagePreview.src = compressedImageData;
-                ui.imagePreviewContainer.classList.remove('hidden');
-            } catch (error) { showNotification('Erro ao processar imagem.', 'error'); }
+                resetAudioSelection(); const data = await compressImage(file); state.tempPostImage = data; ui.imagePreview.src = data; ui.imagePreviewContainer.classList.remove('hidden');
+            } catch (error) { showNotification('Erro ao processar imagem.', 'error'); console.error(error); }
         };
-
         const resetImageSelection = () => { state.tempPostImage = null; ui.imageInput.value = ''; ui.imagePreviewContainer.classList.add('hidden'); };
+
+        const toggleAudioRecording = async () => {
+            if (state.isRecording) {
+                state.mediaRecorder.stop();
+                ui.attachAudioBtn.classList.remove('recording');
+                ui.attachAudioBtn.innerHTML = '<i class="fas fa-microphone"></i> Áudio';
+                state.isRecording = false;
+                return;
+            }
+            try {
+                resetImageSelection();
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                state.isRecording = true;
+                state.audioChunks = [];
+                state.mediaRecorder = new MediaRecorder(stream);
+                state.mediaRecorder.ondataavailable = e => state.audioChunks.push(e.data);
+                state.mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(state.audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        state.tempPostAudio = e.target.result;
+                        ui.audioPreview.src = e.target.result;
+                        ui.audioPreviewContainer.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(audioBlob);
+                    stream.getTracks().forEach(track => track.stop()); // Libera o microfone
+                };
+                state.mediaRecorder.start();
+                ui.attachAudioBtn.classList.add('recording');
+                ui.attachAudioBtn.innerHTML = '<i class="fas fa-stop"></i> Gravando...';
+            } catch (err) {
+                showNotification('Permissão de microfone negada.', 'error');
+                console.error("Erro ao gravar áudio:", err);
+            }
+        };
+        const resetAudioSelection = () => { state.tempPostAudio=null; ui.audioPreviewContainer.classList.add('hidden'); };
 
         const loadProfile = () => {
             if (!state.user?.is) { ui.profileContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver seu perfil</p><button id="profile-login-btn" class="btn">Login</button></div>`; document.getElementById('profile-login-btn').addEventListener('click', ()=>ui.authModal.classList.add('active')); return; }
             ui.profileContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
             state.gun.get(`~${state.user.is.pub}`).once(p => {
-                p = p || {alias: state.user.is.alias, bio: ''};
-                state.currentUserProfile = p;
-                ui.profileContainer.innerHTML = `<div class="card"><div class="profile-header"><div class="profile-avatar" style="${p.avatar ? `background-image:url('${p.avatar}')` : ''}">${!p.avatar?p.alias.charAt(0).toUpperCase():''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1>${sanitizeHTML(p.alias)}</h1><p class="profile-bio">${sanitizeHTML(p.bio||'Sem bio.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div></div></div><div class="card"><h3>Editar Perfil</h3><div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" class="form-control" rows="3">${sanitizeHTML(p.bio||'')}</textarea></div><button id="save-profile-btn" class="btn">Salvar</button></div>`;
+                p = p || {alias: state.user.is.alias, bio: ''}; state.currentUserProfile = p;
+                ui.profileContainer.innerHTML = `<div class="card"><div class="profile-header"><div class="profile-avatar" style="${p.avatar ? `background-image:url('${p.avatar}')` : ''}">${!p.avatar?(p.alias?p.alias.charAt(0).toUpperCase():'?'):''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1>${sanitizeHTML(p.alias)}</h1><p class="profile-bio">${sanitizeHTML(p.bio||'Sem bio.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div></div></div><div class="card"><h3>Editar Perfil</h3><div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" class="form-control" rows="3">${sanitizeHTML(p.bio||'')}</textarea></div><button id="save-profile-btn" class="btn">Salvar</button></div>`;
                 document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
-                document.querySelector('.profile-avatar').addEventListener('click', ()=>{ ui.avatarPreview.style.backgroundImage = p.avatar ? `url('${p.avatar}')` : ''; ui.avatarPreview.innerHTML = !p.avatar ? p.alias.charAt(0).toUpperCase():''; ui.avatarModal.classList.add('active'); });
+                document.querySelector('.profile-avatar').addEventListener('click', ()=>{ ui.avatarPreview.style.backgroundImage = p.avatar ? `url('${p.avatar}')` : ''; ui.avatarPreview.innerHTML = !p.avatar ? (p.alias?p.alias.charAt(0).toUpperCase():'?'):''; ui.avatarModal.classList.add('active'); });
                 loadProfileStats();
             });
         };
@@ -455,7 +476,7 @@
             loadAllUsers();
         };
         const loadAllUsers = () => {
-            ui.allUsersContainer.innerHTML=`<div class="loading"><div class="loading-spinner"></div></div>`; let has=false; const processed=new Set([state.user.is.pub]);
+            ui.allUsersContainer.innerHTML=`<div class="loading"><div class="loading-spinner"></div></div>`; let has=false; const processed=new Set(state.user?[state.user.is.pub]:[]);
             const renderIfNeeded=async(user,pub)=>{ if(!user||!user.alias||processed.has(pub))return; processed.add(pub); if(!has)ui.allUsersContainer.innerHTML=''; has=true; if(!document.getElementById(`user-${pub}`))await renderUserCard(user,pub); };
             state.gun.get('users').map().once((user, pub)=>renderIfNeeded(user,pub));
             state.gun.get('posts').map().once(post => { if(post?.authorPub && !processed.has(post.authorPub)) state.gun.get(`~${post.authorPub}`).once(p=>renderIfNeeded(p,post.authorPub)); });
@@ -494,6 +515,8 @@
             ui.attachImageBtn.addEventListener('click', () => ui.imageInput.click());
             ui.imageInput.addEventListener('change', handleImageSelection);
             ui.removeImageBtn.addEventListener('click', resetImageSelection);
+            ui.attachAudioBtn.addEventListener('click', toggleAudioRecording);
+            ui.removeAudioBtn.addEventListener('click', resetAudioSelection);
         };
         
         const init = () => { setupEventListeners(); checkUserSession(); navigateTo('feed'); };
