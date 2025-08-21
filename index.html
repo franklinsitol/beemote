@@ -105,8 +105,9 @@
         #brush-size { width: 100px; }
         #drawing-modal .modal-content { max-width: 95%; width: auto; }
         @media (min-width: 768px) { #drawing-modal .modal-content { max-width: 700px; } }
-        #connection-status { width: 12px; height: 12px; border-radius: 50%; background-color: var(--danger); transition: background-color 0.5s ease; }
+        #connection-status { width: 12px; height: 12px; border-radius: 50%; background-color: var(--warning); transition: background-color 0.5s ease; }
         #connection-status.connected { background-color: var(--success); }
+        #connection-status.disconnected { background-color: var(--danger); }
     </style>
 </head>
 <body>
@@ -114,7 +115,7 @@
         <div class="logo"><i class="fas fa-bee"></i> Beemote</div>
         <div id="auth-status">
             <span id="user-alias"></span>
-            <div id="connection-status" title="Status da Conexão"></div>
+            <div id="connection-status" title="Conectando..."></div>
             <button id="logout-btn" class="btn btn-outline btn-sm hidden"><i class="fas fa-sign-out-alt"></i> Sair</button>
             <button id="login-btn" class="btn btn-sm"><i class="fas fa-sign-in-alt"></i> Entrar</button>
         </div>
@@ -122,25 +123,7 @@
     
     <main>
         <div id="notification-bar" class="notification"></div>
-        <div id="feed-page" class="page">
-            <div id="feed-header-container" class="hidden"></div>
-            <div id="feed-filters-container" class="feed-filters"></div>
-            <div class="card">
-                <textarea id="post-content" class="form-control" placeholder="O que você está pensando?" rows="3"></textarea>
-                <div id="image-preview-container" class="media-preview-container hidden"><img id="image-preview" src="#" alt="Preview"/><button id="remove-image-btn" class="remove-media-btn">&times;</button></div>
-                <div id="audio-preview-container" class="media-preview-container hidden"><audio id="audio-preview" controls></audio><button id="remove-audio-btn" class="remove-media-btn">&times;</button></div>
-                <div id="post-creator-actions">
-                    <div id="post-creator-media-buttons">
-                        <input type="file" id="image-input" accept="image/*" style="display: none;">
-                        <button id="attach-image-btn" class="btn btn-outline btn-sm" title="Anexar foto"><i class="fas fa-image"></i></button>
-                        <button id="attach-audio-btn" class="btn btn-outline btn-sm" title="Gravar áudio"><i class="fas fa-microphone"></i></button>
-                        <button id="attach-drawing-btn" class="btn btn-outline btn-sm" title="Desenhar"><i class="fas fa-paint-brush"></i></button>
-                    </div>
-                    <button id="create-post-btn" class="btn"><i class="fas fa-paper-plane"></i> Publicar</button>
-                </div>
-            </div>
-            <div id="posts-container"></div>
-        </div>
+        <div id="feed-page" class="page"><div id="feed-header-container" class="hidden"></div><div id="feed-filters-container" class="feed-filters"></div><div class="card"><textarea id="post-content" class="form-control" placeholder="O que você está pensando?" rows="3"></textarea><div id="image-preview-container" class="media-preview-container hidden"><img id="image-preview" src="#" alt="Preview"/><button id="remove-image-btn" class="remove-media-btn">&times;</button></div><div id="audio-preview-container" class="media-preview-container hidden"><audio id="audio-preview" controls></audio><button id="remove-audio-btn" class="remove-media-btn">&times;</button></div><div id="post-creator-actions"><div id="post-creator-media-buttons"><input type="file" id="image-input" accept="image/*" style="display: none;"><button id="attach-image-btn" class="btn btn-outline btn-sm" title="Foto"><i class="fas fa-image"></i></button><button id="attach-audio-btn" class="btn btn-outline btn-sm" title="Áudio"><i class="fas fa-microphone"></i></button><button id="attach-drawing-btn" class="btn btn-outline btn-sm" title="Desenhar"><i class="fas fa-paint-brush"></i></button></div><button id="create-post-btn" class="btn"><i class="fas fa-paper-plane"></i> Publicar</button></div></div><div id="posts-container"></div></div>
         <div id="communities-page" class="page hidden"><div class="card"><h2><i class="fas fa-users"></i> Comunidades</h2><button id="show-community-modal-btn" class="btn">Criar</button></div><div id="communities-container"></div></div>
         <div id="connections-page" class="page hidden"><div class="card"><h3><i class="fas fa-search"></i> Usuários</h3><input type="text" id="user-search-input" class="form-control" placeholder="Buscar..."><div id="all-users-container" style="margin-top: 15px;"></div></div></div>
         <div id="profile-page" class="page hidden"><div id="profile-container"></div></div>
@@ -153,17 +136,9 @@
     <div id="drawing-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header"><h2 class="modal-title">Desenhar</h2><button class="close-btn">&times;</button></div>
-            <div class="drawing-tools">
-                <div class="color-palette" id="color-palette"></div>
-                <input type="range" id="brush-size" min="1" max="50" value="5" title="Tamanho do Pincel">
-                <button id="eraser-btn" class="btn btn-outline btn-sm" title="Borracha"><i class="fas fa-eraser"></i></button>
-                <button id="clear-canvas-btn" class="btn btn-outline btn-sm" title="Limpar Tudo"><i class="fas fa-trash"></i></button>
-            </div>
+            <div class="drawing-tools"><div class="color-palette" id="color-palette"></div><input type="range" id="brush-size" min="1" max="50" value="5" title="Tamanho do Pincel"><button id="eraser-btn" class="btn btn-outline btn-sm" title="Borracha"><i class="fas fa-eraser"></i></button><button id="clear-canvas-btn" class="btn btn-outline btn-sm" title="Limpar"><i class="fas fa-trash"></i></button></div>
             <canvas id="drawing-canvas"></canvas>
-            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:15px;">
-                <button class="btn btn-outline close-btn">Cancelar</button>
-                <button id="save-drawing-btn" class="btn">Salvar Desenho</button>
-            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:15px;"><button class="btn btn-outline close-btn">Cancelar</button><button id="save-drawing-btn" class="btn">Salvar Desenho</button></div>
         </div>
     </div>
     
@@ -468,7 +443,7 @@
             new ResizeObserver(debounce(resizeCanvas, 100)).observe(modal);
             modal.addEventListener('transitionend', () => { if (modal.classList.contains('active')) resizeCanvas(); });
         };
-
+        
         const loadProfile = () => { if (!state.user?.is) { ui.profileContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver seu perfil</p><button id="profile-login-btn" class="btn">Login</button></div>`; document.getElementById('profile-login-btn').addEventListener('click', ()=>ui.authModal.classList.add('active')); return; } ui.profileContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`; state.gun.get(`~${state.user.is.pub}`).once(p => { p = p || {alias: state.user.is.alias, bio: ''}; state.currentUserProfile = p; ui.profileContainer.innerHTML = `<div class="card"><div class="profile-header"><div class="profile-avatar" style="${p.avatar ? `background-image:url('${p.avatar}')` : ''}">${!p.avatar?(p.alias?p.alias.charAt(0).toUpperCase():'?'):''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1>${sanitizeHTML(p.alias)}</h1><p class="profile-bio">${sanitizeHTML(p.bio||'Sem bio.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div></div></div><div class="card"><h3>Editar Perfil</h3><div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" class="form-control" rows="3">${sanitizeHTML(p.bio||'')}</textarea></div><button id="save-profile-btn" class="btn">Salvar</button></div>`; document.getElementById('save-profile-btn').addEventListener('click', saveProfile); document.querySelector('.profile-avatar').addEventListener('click', ()=>{ ui.avatarPreview.style.backgroundImage = p.avatar ? `url('${p.avatar}')` : ''; ui.avatarPreview.innerHTML = !p.avatar ? (p.alias?p.alias.charAt(0).toUpperCase():'?'):''; ui.avatarModal.classList.add('active'); }); loadProfileStats(); }); };
         const saveProfile = () => { if(!state.user?.is)return; const bio = document.getElementById('edit-bio').value.trim(); state.gun.get(`~${state.user.is.pub}`).get('bio').put(bio); showNotification('Bio atualizada!', 'success'); document.querySelector('.profile-bio').textContent=bio; };
         const handleAvatarUpload = (e) => { const f=e.target.files[0]; if(!f||f.size>CONFIG.AVATAR_MAX_SIZE||!f.type.startsWith('image/')) return; const r=new FileReader(); r.onload=e=>{ ui.avatarPreview.style.backgroundImage=`url('${e.target.result}')`; ui.avatarPreview.innerHTML=''; state.tempAvatarFile=e.target.result; }; r.readAsDataURL(f); };
@@ -504,7 +479,16 @@
             ui.attachDrawingBtn.addEventListener('click', () => ui.drawingModal.classList.add('active'));
         };
         
-        const updateConnectionStatus = () => { const s = document.getElementById('connection-status'); const p = state.gun.back('opt.peers'); let c=false; if(p)for(const k in p)if(p[k].wire?.readyState===p[k].wire.OPEN){c=true;break;} s.classList.toggle('connected',c); s.title=c?'Conectado':'Desconectado'; };
+        const updateConnectionStatus = () => {
+            const s = document.getElementById('connection-status');
+            const p = state.gun.back('opt.peers');
+            let connected = false;
+            if(p) for(const k in p) if(p[k].wire?.readyState === p[k].wire.OPEN) { connected=true; break; }
+            s.classList.toggle('connected', connected);
+            s.classList.toggle('disconnected', !connected);
+            s.title = connected ? 'Conectado à Rede' : 'Desconectado da Rede';
+        };
+
         const init = () => { setupEventListeners(); setupDrawingCanvas(); checkUserSession(); navigateTo('feed'); setInterval(updateConnectionStatus, 3000); updateConnectionStatus(); };
         init();
     })();
