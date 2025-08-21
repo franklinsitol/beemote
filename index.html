@@ -841,15 +841,6 @@
         
         <div id="connections-page" class="page hidden">
             <div class="card">
-                <h3><i class="fas fa-user-clock"></i> Solicitações Pendentes</h3>
-                <div id="pending-requests-container">
-                    <div class="loading">
-                        <div class="loading-spinner"></div>
-                        <div>Carregando solicitações...</div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
                 <h3><i class="fas fa-search"></i> Buscar Usuários</h3>
                 <input type="text" id="user-search-input" class="form-control" placeholder="Digite o nome de um usuário...">
                 <div id="all-users-container" style="margin-top: 15px;">
@@ -1012,7 +1003,8 @@
             currentChatUser: null,
             userConnections: new Set(),
             userSearchIndex: new Map(),
-            connectionRequests: new Map() // Para armazenar solicitações de conexão
+            connectionRequests: new Map(),
+            mutualConnections: new Set() // Para armazenar conexões mútuas
         };
         
         // UI elements
@@ -1044,7 +1036,6 @@
             createCommunitySubmitBtn: document.getElementById('create-community-submit-btn'),
             feedHeaderContainer: document.getElementById('feed-header-container'),
             feedFiltersContainer: document.getElementById('feed-filters-container'),
-            pendingRequestsContainer: document.getElementById('pending-requests-container'),
             allUsersContainer: document.getElementById('all-users-container'),
             userSearchInput: document.getElementById('user-search-input'),
             rememberMe: document.getElementById('remember-me')
@@ -1141,7 +1132,7 @@
             
             // Filtro de conexões: posts de usuários conectados
             if (state.currentFeedFilter === FEED_FILTERS.CONNECTIONS) {
-                return state.userConnections.has(post.authorPub);
+                return state.mutualConnections.has(post.authorPub);
             }
             
             // Filtro de chat com usuário específico
@@ -1161,10 +1152,10 @@
                     return;
                 }
                 
-                state.userConnections.clear();
-                state.gun.user().get('connections').map().once((val, pub) => {
+                state.mutualConnections.clear();
+                state.gun.user().get('mutualConnections').map().once((val, pub) => {
                     if (val) {
-                        state.userConnections.add(pub);
+                        state.mutualConnections.add(pub);
                     }
                 });
                 
@@ -1227,7 +1218,7 @@
             </button>`;
             
             // Show connections filter only if user has connections
-            if (state.userConnections.size > 0) {
+            if (state.mutualConnections.size > 0) {
                 filtersHTML += `<button class="filter-btn ${state.currentFeedFilter === FEED_FILTERS.CONNECTIONS ? 'active' : ''}" data-filter="${FEED_FILTERS.CONNECTIONS}">
                     <i class="fas fa-link"></i> Conexões
                 </button>`;
@@ -1993,7 +1984,7 @@
             });
             
             // Count connections
-            userRef.get('connections').map().once((val) => {
+            userRef.get('mutualConnections').map().once((val) => {
                 if (val) {
                     connCount++;
                     document.getElementById('connection-count').textContent = connCount;
@@ -2107,7 +2098,7 @@
                     <div class="card">
                         <div style="text-align: center; padding: 20px;">
                             <i class="fas fa-user-lock" style="font-size: 2rem; color: var(--gray); margin-bottom: 10px;"></i>
-                            <p>Faça login para gerenciar conexões</p>
+                            <p>Faça login para ver outros usuários</p>
                             <button class="btn" style="margin-top: 10px;">
                                 <i class="fas fa-sign-in-alt"></i> Fazer Login
                             </button>
@@ -2115,7 +2106,6 @@
                     </div>
                 `;
                 
-                ui.pendingRequestsContainer.innerHTML = msg;
                 ui.allUsersContainer.innerHTML = msg;
                 
                 document.querySelectorAll('#connections-page .btn').forEach(btn => {
@@ -2129,86 +2119,8 @@
             
             // Ensure connections are loaded before displaying
             loadUserConnections().then(() => {
-                loadPendingRequests();
                 loadAllUsers();
             });
-        };
-        
-        const loadPendingRequests = () => {
-            const container = ui.pendingRequestsContainer;
-            container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando solicitações...</div></div>';
-            
-            let hasRequests = false;
-            
-            // Clear previous requests
-            state.connectionRequests.clear();
-            
-            // Listen for connection requests
-            const sub = state.gun.get(`~${state.user.is.pub}`).get('connectionRequests').map().on(async (request, senderPub) => {
-                console.log('Connection request received:', request, 'from', senderPub);
-                
-                if (request && request.status === 'pending') {
-                    if (!hasRequests) {
-                        container.innerHTML = '';
-                        hasRequests = true;
-                    }
-                    
-                    // Check if we've already rendered this request
-                    if (document.getElementById(`req-${senderPub}`)) return;
-                    
-                    // Store the request
-                    state.connectionRequests.set(senderPub, request);
-                    
-                    // Get sender profile
-                    const senderProfile = await new Promise(resolve => {
-                        state.gun.get(`~${senderPub}`).once(profile => {
-                            resolve(profile || { alias: 'Usuário' });
-                        });
-                    });
-                    
-                    const newCard = document.createElement('div');
-                    newCard.className = 'user-card fade-in';
-                    newCard.id = `req-${senderPub}`;
-                    
-                    newCard.innerHTML = `
-                        <div class="user-card-info">
-                            ${renderAvatar(senderProfile, 'avatar', 'width: 45px; height: 45px;')}
-                            <span class="user-card-alias">${sanitizeHTML(senderProfile.alias)}</span>
-                        </div>
-                        <div class="user-card-actions">
-                            <button class="btn btn-success btn-sm" data-pub="${senderPub}" data-action="accept">
-                                <i class="fas fa-check"></i> Aceitar
-                            </button>
-                            <button class="btn btn-danger btn-sm" data-pub="${senderPub}" data-action="decline">
-                                <i class="fas fa-times"></i> Recusar
-                            </button>
-                        </div>
-                    `;
-                    
-                    container.prepend(newCard);
-                } else {
-                    // Remove request if it's no longer pending
-                    const cardEl = document.getElementById(`req-${senderPub}`);
-                    if (cardEl) {
-                        cardEl.remove();
-                        state.connectionRequests.delete(senderPub);
-                    }
-                }
-            });
-            
-            state.activeSubscriptions.set('pending-requests', sub);
-            
-            // Show message if no requests after 3 seconds
-            setTimeout(() => {
-                if (!hasRequests) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 15px; color: var(--gray);">
-                            <i class="fas fa-inbox" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
-                            <p>Nenhuma solicitação pendente</p>
-                        </div>
-                    `;
-                }
-            }, 3000);
         };
         
         const loadAllUsers = () => {
@@ -2297,29 +2209,31 @@
             }
             
             // Check connection status
-            const connectionStatus = await new Promise(resolve => {
-                state.gun.user().get('connections').get(pub).once(val => resolve(!!val));
+            const mutualConnectionStatus = await new Promise(resolve => {
+                state.gun.user().get('mutualConnections').get(pub).once(val => resolve(!!val));
             });
             
-            const sentRequestStatus = await new Promise(resolve => {
-                state.gun.user().get('sentRequests').get(pub).once(val => resolve(!!val));
+            const sentConnectionStatus = await new Promise(resolve => {
+                state.gun.user().get('sentConnections').get(pub).once(val => resolve(!!val));
+            });
+            
+            const receivedConnectionStatus = await new Promise(resolve => {
+                state.gun.get(`~${pub}`).get('sentConnections').get(state.user.is.pub).once(val => resolve(!!val));
             });
             
             let buttonHTML = '';
-            if (connectionStatus) {
+            if (mutualConnectionStatus) {
                 buttonHTML = `
                     <button class="btn btn-sm" data-pub="${pub}" data-action="chat">
                         <i class="fas fa-comment"></i> Conversar
-                    </button>
-                    <button class="btn btn-danger btn-sm" data-pub="${pub}" data-action="remove">
-                        <i class="fas fa-user-times"></i> Remover
                     </button>`;
-            } else if (sentRequestStatus) {
-                buttonHTML = `<button class="btn btn-outline btn-sm" disabled>
-                    <i class="fas fa-clock"></i> Solicitado
-                </button>`;
+            } else if (sentConnectionStatus) {
+                buttonHTML = `
+                    <button class="btn btn-sm" data-pub="${pub}" data-action="chat">
+                        <i class="fas fa-comment"></i> Conversar
+                    </button>`;
             } else {
-                buttonHTML = `<button class="btn btn-sm" data-pub="${pub}" data-action="request">
+                buttonHTML = `<button class="btn btn-sm" data-pub="${pub}" data-action="connect">
                     <i class="fas fa-user-plus"></i> Conectar
                 </button>`;
             }
@@ -2335,61 +2249,40 @@
             `;
         };
         
-        const sendRequest = (targetPub) => {
+        const connectUser = async (targetPub) => {
             const myPub = state.user.is.pub;
             
-            // Send connection request
-            state.gun.get(`~${targetPub}`).get('connectionRequests').get(myPub).put({ 
-                status: 'pending',
-                timestamp: Date.now()
+            // Add to sent connections
+            state.gun.user().get('sentConnections').get(targetPub).put(true);
+            
+            // Check if the target user has also sent a connection request
+            const targetSentConnection = await new Promise(resolve => {
+                state.gun.get(`~${targetPub}`).get('sentConnections').get(myPub).once(val => resolve(!!val));
             });
             
-            // Track sent request
-            state.gun.user().get('sentRequests').get(targetPub).put(true);
-            
-            showNotification('Solicitação enviada!');
-        };
-        
-        const acceptRequest = (senderPub) => {
-            const myPub = state.user.is.pub;
-            
-            // Add to connections
-            state.gun.user().get('connections').get(senderPub).put(true);
-            state.gun.get(`~${senderPub}`).get('connections').get(myPub).put(true);
-            
-            // Remove the request
-            state.gun.user().get('connectionRequests').get(senderPub).put(null);
-            state.gun.get(`~${senderPub}`).get('sentRequests').get(myPub).put(null);
+            if (targetSentConnection) {
+                // Create mutual connection
+                state.gun.user().get('mutualConnections').get(targetPub).put(true);
+                state.gun.get(`~${targetPub}`).get('mutualConnections').get(myPub).put(true);
+                
+                // Remove from sent connections
+                state.gun.user().get('sentConnections').get(targetPub).put(null);
+                state.gun.get(`~${targetPub}`).get('sentConnections').get(myPub).put(null);
+                
+                showNotification('Conexão estabelecida! Agora vocês estão conectados.');
+            } else {
+                showNotification('Solicitação de conexão enviada! Quando o usuário também conectar, a conexão será estabelecida.');
+            }
             
             // Update UI
-            const cardEl = document.getElementById(`req-${senderPub}`);
-            if (cardEl) cardEl.remove();
-            
-            showNotification('Conexão aceita!');
-        };
-        
-        const declineRequest = (senderPub) => {
-            const myPub = state.user.is.pub;
-            
-            // Remove the request
-            state.gun.user().get('connectionRequests').get(senderPub).put(null);
-            state.gun.get(`~${senderPub}`).get('sentRequests').get(myPub).put(null);
-            
-            // Update UI
-            const cardEl = document.getElementById(`req-${senderPub}`);
-            if (cardEl) cardEl.remove();
-            
-            showNotification('Solicitação recusada.');
-        };
-        
-        const removeConnection = (friendPub) => {
-            const myPub = state.user.is.pub;
-            
-            // Remove connection
-            state.gun.user().get('connections').get(friendPub).put(null);
-            state.gun.get(`~${friendPub}`).get('connections').get(myPub).put(null);
-            
-            showNotification('Conexão removida.');
+            const userCard = document.getElementById(`user-${targetPub}`);
+            if (userCard) {
+                userCard.querySelector('.user-card-actions').innerHTML = `
+                    <button class="btn btn-sm" data-pub="${targetPub}" data-action="chat">
+                        <i class="fas fa-comment"></i> Conversar
+                    </button>
+                `;
+            }
         };
         
         const startChat = async (userPub) => {
@@ -2467,10 +2360,7 @@
                 if (!action || !pub) return;
                 
                 switch(action) {
-                    case 'accept': acceptRequest(pub); break;
-                    case 'decline': declineRequest(pub); break;
-                    case 'remove': removeConnection(pub); break;
-                    case 'request': sendRequest(pub); break;
+                    case 'connect': connectUser(pub); break;
                     case 'chat': startChat(pub); break;
                 }
             });
