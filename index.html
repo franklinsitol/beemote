@@ -61,9 +61,9 @@
         .loading { text-align: center; padding: 30px; color: var(--gray); display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .loading-spinner { width: 40px; height: 40px; border: 4px solid var(--gray-light); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 10px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-content { background-color: white; border-radius: var(--border-radius); padding: 25px; width: 100%; max-width: 500px; }
+        .modal-content { background-color: white; border-radius: var(--border-radius); padding: 25px; width: 100%; max-width: 500px; max-height: 95vh; display: flex; flex-direction: column; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--gray-light); padding-bottom: 15px; }
         .modal-title { font-size: 1.5rem; font-weight: 700; }
         .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray); }
@@ -98,17 +98,23 @@
         .remove-media-btn { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 20px; height: 20px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
         .btn.recording { background-color: var(--danger); }
         .btn.recording:hover { background-color: #c82333; }
-        @media (max-width: 480px) { .logo { font-size: 1.5rem; } #user-alias { max-width: 80px; } .btn { padding: 8px 12px; } .profile-avatar { width: 80px; height: 80px; } .profile-name { font-size: 1.5rem; } }
+
+        /* Estilos do Canvas de Desenho */
+        #drawing-canvas { border: 1px solid var(--gray-light); cursor: crosshair; touch-action: none; background-color: white; }
+        .drawing-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--gray-light); }
+        .color-palette { display: flex; gap: 5px; }
+        .color-box { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .color-box.active { border-color: var(--primary); transform: scale(1.1); }
+        #brush-size { width: 100px; }
+        #drawing-modal .modal-content { max-width: 95%; width: auto; }
+        @media (min-width: 768px) { #drawing-modal .modal-content { max-width: 700px; } }
+
     </style>
 </head>
 <body>
     <header>
         <div class="logo"><i class="fas fa-bee"></i> Beemote</div>
-        <div id="auth-status">
-            <span id="user-alias"></span>
-            <button id="logout-btn" class="btn btn-outline btn-sm hidden"><i class="fas fa-sign-out-alt"></i> Sair</button>
-            <button id="login-btn" class="btn btn-sm"><i class="fas fa-sign-in-alt"></i> Entrar</button>
-        </div>
+        <div id="auth-status"><span id="user-alias"></span><button id="logout-btn" class="btn btn-outline btn-sm hidden"><i class="fas fa-sign-out-alt"></i> Sair</button><button id="login-btn" class="btn btn-sm"><i class="fas fa-sign-in-alt"></i> Entrar</button></div>
     </header>
     
     <main>
@@ -118,41 +124,45 @@
             <div id="feed-filters-container" class="feed-filters"></div>
             <div class="card">
                 <textarea id="post-content" class="form-control" placeholder="O que você está pensando?" rows="3"></textarea>
-                <div id="image-preview-container" class="media-preview-container hidden">
-                    <img id="image-preview" src="#" alt="Pré-visualização"/>
-                    <button id="remove-image-btn" class="remove-media-btn">&times;</button>
-                </div>
-                 <div id="audio-preview-container" class="media-preview-container hidden">
-                    <audio id="audio-preview" controls></audio>
-                    <button id="remove-audio-btn" class="remove-media-btn">&times;</button>
-                </div>
+                <div id="image-preview-container" class="media-preview-container hidden"><img id="image-preview" src="#" alt="Preview"/><button id="remove-image-btn" class="remove-media-btn">&times;</button></div>
+                <div id="audio-preview-container" class="media-preview-container hidden"><audio id="audio-preview" controls></audio><button id="remove-audio-btn" class="remove-media-btn">&times;</button></div>
                 <div id="post-creator-actions">
                     <div id="post-creator-media-buttons">
                         <input type="file" id="image-input" accept="image/*" style="display: none;">
-                        <button id="attach-image-btn" class="btn btn-outline btn-sm"><i class="fas fa-image"></i> Foto</button>
-                        <button id="attach-audio-btn" class="btn btn-outline btn-sm"><i class="fas fa-microphone"></i> Áudio</button>
+                        <button id="attach-image-btn" class="btn btn-outline btn-sm" title="Anexar foto"><i class="fas fa-image"></i></button>
+                        <button id="attach-audio-btn" class="btn btn-outline btn-sm" title="Gravar áudio"><i class="fas fa-microphone"></i></button>
+                        <button id="attach-drawing-btn" class="btn btn-outline btn-sm" title="Desenhar"><i class="fas fa-paint-brush"></i></button>
                     </div>
                     <button id="create-post-btn" class="btn"><i class="fas fa-paper-plane"></i> Publicar</button>
                 </div>
             </div>
             <div id="posts-container"></div>
         </div>
-        <div id="communities-page" class="page hidden">
-            <div class="card"><h2><i class="fas fa-users"></i> Comunidades</h2><button id="show-community-modal-btn" class="btn">Criar Comunidade</button></div>
-            <div id="communities-container"></div>
-        </div>
-        <div id="connections-page" class="page hidden">
-            <div class="card"><h3><i class="fas fa-search"></i> Encontrar Usuários</h3><input type="text" id="user-search-input" class="form-control" placeholder="Buscar usuário..."><div id="all-users-container" style="margin-top: 15px;"></div></div>
-        </div>
-        <div id="profile-page" class="page hidden">
-            <div id="profile-container"></div>
-        </div>
+        <div id="communities-page" class="page hidden"><div class="card"><h2><i class="fas fa-users"></i> Comunidades</h2><button id="show-community-modal-btn" class="btn">Criar</button></div><div id="communities-container"></div></div>
+        <div id="connections-page" class="page hidden"><div class="card"><h3><i class="fas fa-search"></i> Usuários</h3><input type="text" id="user-search-input" class="form-control" placeholder="Buscar..."><div id="all-users-container" style="margin-top: 15px;"></div></div></div>
+        <div id="profile-page" class="page hidden"><div id="profile-container"></div></div>
     </main>
     
     <!-- Modals -->
-    <div id="auth-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="modal-title">Entrar / Cadastrar</h2><button class="close-btn">&times;</button></div><div class="form-group"><label for="auth-alias">Usuário</label><input type="text" id="auth-alias" class="form-control"></div><div class="form-group"><label for="auth-pass">Senha</label><input type="password" id="auth-pass" class="form-control"></div><div class="form-group"><label><input type="checkbox" id="remember-me" checked> Manter-me conectado</label></div><button id="auth-submit-btn" class="btn" style="width: 100%;">Continuar</button></div></div>
-    <div id="avatar-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="modal-title">Alterar Avatar</h2><button class="close-btn">&times;</button></div><div style="text-align:center;"><label for="avatar-input" style="cursor:pointer;"><div id="avatar-preview" class="avatar" style="width:120px;height:120px;font-size:3rem;margin:auto;"></div></label><input type="file" id="avatar-input" accept="image/*" style="display:none;"><p style="margin-top:15px;color:var(--gray);">Clique para selecionar</p></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;"><button class="btn btn-outline close-btn">Cancelar</button><button id="save-avatar-btn" class="btn">Salvar</button></div></div></div>
-    <div id="community-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="modal-title">Criar Comunidade</h2><button class="close-btn">&times;</button></div><div class="form-group"><label for="community-name">Nome</label><input type="text" id="community-name" class="form-control"></div><div class="form-group"><label for="community-desc">Descrição</label><textarea id="community-desc" class="form-control" rows="3"></textarea></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-outline close-btn">Cancelar</button><button id="create-community-submit-btn" class="btn">Criar</button></div></div></div>
+    <div id="auth-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="modal-title">Entrar</h2><button class="close-btn">&times;</button></div><div class="form-group"><label for="auth-alias">Usuário</label><input type="text" id="auth-alias" class="form-control"></div><div class="form-group"><label for="auth-pass">Senha</label><input type="password" id="auth-pass" class="form-control"></div><div class="form-group"><label><input type="checkbox" id="remember-me" checked> Lembrar</label></div><button id="auth-submit-btn" class="btn" style="width: 100%;">Continuar</button></div></div>
+    <div id="avatar-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="modal-title">Avatar</h2><button class="close-btn">&times;</button></div><div style="text-align:center;"><label for="avatar-input" style="cursor:pointer;"><div id="avatar-preview" class="avatar" style="width:120px;height:120px;font-size:3rem;margin:auto;"></div></label><input type="file" id="avatar-input" accept="image/*" style="display:none;"><p style="margin-top:15px;color:var(--gray);">Clique para selecionar</p></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;"><button class="btn btn-outline close-btn">Cancelar</button><button id="save-avatar-btn" class="btn">Salvar</button></div></div></div>
+    <div id="community-modal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h2 class="modal-title">Comunidade</h2><button class="close-btn">&times;</button></div><div class="form-group"><label for="community-name">Nome</label><input type="text" id="community-name" class="form-control"></div><div class="form-group"><label for="community-desc">Descrição</label><textarea id="community-desc" class="form-control" rows="3"></textarea></div><div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-outline close-btn">Cancelar</button><button id="create-community-submit-btn" class="btn">Criar</button></div></div></div>
+    <div id="drawing-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header"><h2 class="modal-title">Desenhar</h2><button class="close-btn">&times;</button></div>
+            <div class="drawing-tools">
+                <div class="color-palette" id="color-palette"></div>
+                <input type="range" id="brush-size" min="1" max="50" value="5">
+                <button id="eraser-btn" class="btn btn-outline btn-sm"><i class="fas fa-eraser"></i></button>
+                <button id="clear-canvas-btn" class="btn btn-outline btn-sm"><i class="fas fa-trash"></i></button>
+            </div>
+            <canvas id="drawing-canvas"></canvas>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:15px;">
+                <button class="btn btn-outline close-btn">Cancelar</button>
+                <button id="save-drawing-btn" class="btn">Salvar Desenho</button>
+            </div>
+        </div>
+    </div>
     
     <nav>
         <a href="#" class="nav-item active" data-page="feed"><i class="fas fa-home"></i><span>Feed</span></a>
@@ -190,7 +200,8 @@
             removeImageBtn: document.getElementById('remove-image-btn'),
             attachAudioBtn: document.getElementById('attach-audio-btn'),
             audioPreviewContainer: document.getElementById('audio-preview-container'), audioPreview: document.getElementById('audio-preview'),
-            removeAudioBtn: document.getElementById('remove-audio-btn')
+            removeAudioBtn: document.getElementById('remove-audio-btn'),
+            attachDrawingBtn: document.getElementById('attach-drawing-btn'), drawingModal: document.getElementById('drawing-modal')
         };
         
         const sanitizeHTML = (str) => { const t = document.createElement('div'); t.textContent = str || ''; return t.innerHTML; };
@@ -305,9 +316,7 @@
             if(posts.length === 0) { ui.postsContainer.innerHTML = `<div class="card" style="text-align:center;color:var(--gray);"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;"></i><p>Nenhum post aqui.</p></div>`; return; }
             const focusedElement = document.activeElement;
             ui.postsContainer.innerHTML = ''; posts.forEach(p => renderPost(p));
-            if (focusedElement && focusedElement.id && document.getElementById(focusedElement.id)) {
-                document.getElementById(focusedElement.id).focus();
-            }
+            if (focusedElement && focusedElement.id && document.getElementById(focusedElement.id)) document.getElementById(focusedElement.id).focus();
         }, 150);
         
         const renderPost = async (post) => {
@@ -397,47 +406,108 @@
         
         const handleImageSelection = async (event) => {
             const file = event.target.files[0]; if (!file || !file.type.startsWith('image/')) return;
-            try {
-                resetAudioSelection(); const data = await compressImage(file); state.tempPostImage = data; ui.imagePreview.src = data; ui.imagePreviewContainer.classList.remove('hidden');
-            } catch (error) { showNotification('Erro ao processar imagem.', 'error'); console.error(error); }
+            try { resetAudioSelection(); const data = await compressImage(file); state.tempPostImage = data; ui.imagePreview.src = data; ui.imagePreviewContainer.classList.remove('hidden'); }
+            catch (error) { showNotification('Erro ao processar imagem.', 'error'); console.error(error); }
         };
         const resetImageSelection = () => { state.tempPostImage = null; ui.imageInput.value = ''; ui.imagePreviewContainer.classList.add('hidden'); };
 
         const toggleAudioRecording = async () => {
-            if (state.isRecording) {
-                state.mediaRecorder.stop();
-                ui.attachAudioBtn.classList.remove('recording');
-                ui.attachAudioBtn.innerHTML = '<i class="fas fa-microphone"></i> Áudio';
-                state.isRecording = false;
-                return;
-            }
+            if (state.isRecording) { state.mediaRecorder.stop(); ui.attachAudioBtn.classList.remove('recording'); ui.attachAudioBtn.innerHTML = '<i class="fas fa-microphone"></i>'; state.isRecording = false; return; }
             try {
                 resetImageSelection();
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                state.isRecording = true;
-                state.audioChunks = [];
-                state.mediaRecorder = new MediaRecorder(stream);
+                state.isRecording = true; state.audioChunks = []; state.mediaRecorder = new MediaRecorder(stream);
                 state.mediaRecorder.ondataavailable = e => state.audioChunks.push(e.data);
                 state.mediaRecorder.onstop = () => {
                     const audioBlob = new Blob(state.audioChunks, { type: 'audio/webm' });
                     const reader = new FileReader();
-                    reader.onload = e => {
-                        state.tempPostAudio = e.target.result;
-                        ui.audioPreview.src = e.target.result;
-                        ui.audioPreviewContainer.classList.remove('hidden');
-                    };
+                    reader.onload = e => { state.tempPostAudio = e.target.result; ui.audioPreview.src = e.target.result; ui.audioPreviewContainer.classList.remove('hidden'); };
                     reader.readAsDataURL(audioBlob);
-                    stream.getTracks().forEach(track => track.stop()); // Libera o microfone
+                    stream.getTracks().forEach(track => track.stop());
                 };
                 state.mediaRecorder.start();
-                ui.attachAudioBtn.classList.add('recording');
-                ui.attachAudioBtn.innerHTML = '<i class="fas fa-stop"></i> Gravando...';
-            } catch (err) {
-                showNotification('Permissão de microfone negada.', 'error');
-                console.error("Erro ao gravar áudio:", err);
-            }
+                ui.attachAudioBtn.classList.add('recording'); ui.attachAudioBtn.innerHTML = '<i class="fas fa-stop"></i>';
+            } catch (err) { showNotification('Permissão de microfone negada.', 'error'); console.error(err); }
         };
         const resetAudioSelection = () => { state.tempPostAudio=null; ui.audioPreviewContainer.classList.add('hidden'); };
+
+        const setupDrawingCanvas = () => {
+            const modal = ui.drawingModal;
+            const canvas = modal.querySelector('#drawing-canvas');
+            const ctx = canvas.getContext('2d');
+            const tools = {
+                palette: modal.querySelector('#color-palette'),
+                brushSize: modal.querySelector('#brush-size'),
+                eraserBtn: modal.querySelector('#eraser-btn'),
+                clearBtn: modal.querySelector('#clear-canvas-btn'),
+                saveBtn: modal.querySelector('#save-drawing-btn')
+            };
+            const colors = ['#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
+            let isDrawing = false, lastX = 0, lastY = 0;
+
+            tools.palette.innerHTML = colors.map((color, i) => `<div class="color-box ${i === 0 ? 'active' : ''}" style="background-color:${color}" data-color="${color}"></div>`).join('');
+            ctx.strokeStyle = colors[0];
+            ctx.lineWidth = tools.brushSize.value;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+
+            const resizeCanvas = () => {
+                const container = canvas.parentElement;
+                canvas.width = container.clientWidth;
+                canvas.height = Math.min(window.innerHeight * 0.5, 400);
+                ctx.fillStyle = "white";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            };
+            
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const evt = e.touches ? e.touches[0] : e;
+                return [evt.clientX - rect.left, evt.clientY - rect.top];
+            };
+
+            const startDrawing = (e) => { isDrawing = true; [lastX, lastY] = getPos(e); };
+            const draw = (e) => {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const [currentX, currentY] = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(currentX, currentY);
+                ctx.stroke();
+                [lastX, lastY] = [currentX, currentY];
+            };
+            const stopDrawing = () => isDrawing = false;
+            
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            canvas.addEventListener('touchstart', startDrawing);
+            canvas.addEventListener('touchmove', draw);
+            canvas.addEventListener('touchend', stopDrawing);
+
+            tools.palette.addEventListener('click', e => {
+                if (e.target.classList.contains('color-box')) {
+                    ctx.strokeStyle = e.target.dataset.color;
+                    tools.palette.querySelector('.active')?.classList.remove('active');
+                    e.target.classList.add('active');
+                }
+            });
+            tools.brushSize.addEventListener('input', e => ctx.lineWidth = e.target.value);
+            tools.eraserBtn.addEventListener('click', () => ctx.strokeStyle = '#FFFFFF');
+            tools.clearBtn.addEventListener('click', () => ctx.fillRect(0, 0, canvas.width, canvas.height));
+            tools.saveBtn.addEventListener('click', () => {
+                const dataURL = canvas.toDataURL('image/png');
+                resetAudioSelection();
+                state.tempPostImage = dataURL;
+                ui.imagePreview.src = dataURL;
+                ui.imagePreviewContainer.classList.remove('hidden');
+                modal.classList.remove('active');
+            });
+            
+            resizeCanvas();
+            window.addEventListener('resize', debounce(resizeCanvas, 250));
+        };
 
         const loadProfile = () => {
             if (!state.user?.is) { ui.profileContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver seu perfil</p><button id="profile-login-btn" class="btn">Login</button></div>`; document.getElementById('profile-login-btn').addEventListener('click', ()=>ui.authModal.classList.add('active')); return; }
@@ -454,49 +524,13 @@
         const handleAvatarUpload = (e) => { const f=e.target.files[0]; if(!f||f.size>CONFIG.AVATAR_MAX_SIZE||!f.type.startsWith('image/')) return; const r=new FileReader(); r.onload=e=>{ ui.avatarPreview.style.backgroundImage=`url('${e.target.result}')`; ui.avatarPreview.innerHTML=''; state.tempAvatarFile=e.target.result; }; r.readAsDataURL(f); };
         const saveAvatar = () => { if(!state.user?.is||!state.tempAvatarFile)return; state.gun.get(`~${state.user.is.pub}`).get('avatar').put(state.tempAvatarFile); showNotification('Avatar salvo!', 'success'); ui.avatarModal.classList.remove('active'); state.tempAvatarFile=null; loadProfile(); };
         const loadProfileStats = () => { let p=0,c=0,n=0; const u=state.gun.user(); u.get('posts').map().once(()=>{const e=document.getElementById('post-count'); if(e)e.textContent=++p;}); u.get('communities').map().once(()=>{const e=document.getElementById('community-count'); if(e)e.textContent=++c;}); u.get('mutualConnections').map().once(v=>{if(v){const e=document.getElementById('connection-count'); if(e)e.textContent=++n;}}); };
-        
-        const loadCommunities = () => {
-            ui.communitiesContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
-            let has=false; const sub=state.gun.get('communities').map().on((comm, id)=>{ if(comm?.name){ if(!has)ui.communitiesContainer.innerHTML=''; has=true; if(document.getElementById(`comm-${id}`))return; renderCommunity(comm,id); } });
-            state.activeSubscriptions.set('communities-list', sub);
-            setTimeout(() => { if(!has) ui.communitiesContainer.innerHTML=`<div class="card" style="text-align:center;color:var(--gray);">Nenhuma comunidade.</div>`; }, 3000);
-        };
+        const loadCommunities = () => { ui.communitiesContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`; let has=false; const sub=state.gun.get('communities').map().on((comm, id)=>{ if(comm?.name){ if(!has)ui.communitiesContainer.innerHTML=''; has=true; if(document.getElementById(`comm-${id}`))return; renderCommunity(comm,id); } }); state.activeSubscriptions.set('communities-list', sub); setTimeout(() => { if(!has) ui.communitiesContainer.innerHTML=`<div class="card" style="text-align:center;color:var(--gray);">Nenhuma comunidade.</div>`; }, 3000); };
         const renderCommunity = (comm, id) => { const el=document.createElement('div'); el.className='community-card fade-in'; el.id=`comm-${id}`; el.innerHTML=`<div class="community-info-details">${renderAvatar({alias:comm.name})}<div class="community-info"><div class="community-name">${sanitizeHTML(comm.name)}</div></div></div><i class="fas fa-chevron-right"></i>`; el.addEventListener('click', ()=>{ state.currentCommunity={id, name:comm.name}; state.currentFeedFilter=FEED_FILTERS.COMMUNITY; navigateTo('feed'); }); ui.communitiesContainer.prepend(el); };
-        const createCommunity = () => {
-            if(!state.user?.is) return showNotification('Faça login para criar.', 'error');
-            const name=document.getElementById('community-name').value.trim(); if(!name)return showNotification('Nome é obrigatório.', 'error');
-            const desc = document.getElementById('community-desc').value.trim();
-            const commRef = state.gun.get('communities').set({name, description: desc, creatorPub:state.user.is.pub});
-            state.gun.user().get('communities').set(commRef);
-            ui.communityModal.classList.remove('active'); showNotification('Comunidade criada!', 'success');
-        };
-        
-        const loadConnectionsPage = () => {
-            if (!state.user?.is) { ui.allUsersContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver usuários</p><button class="btn" onclick="document.getElementById('auth-modal').classList.add('active')">Login</button></div>`; return; }
-            loadAllUsers();
-        };
-        const loadAllUsers = () => {
-            ui.allUsersContainer.innerHTML=`<div class="loading"><div class="loading-spinner"></div></div>`; let has=false; const processed=new Set(state.user?[state.user.is.pub]:[]);
-            const renderIfNeeded=async(user,pub)=>{ if(!user||!user.alias||processed.has(pub))return; processed.add(pub); if(!has)ui.allUsersContainer.innerHTML=''; has=true; if(!document.getElementById(`user-${pub}`))await renderUserCard(user,pub); };
-            state.gun.get('users').map().once((user, pub)=>renderIfNeeded(user,pub));
-            state.gun.get('posts').map().once(post => { if(post?.authorPub && !processed.has(post.authorPub)) state.gun.get(`~${post.authorPub}`).once(p=>renderIfNeeded(p,post.authorPub)); });
-            setTimeout(() => { if(!has) ui.allUsersContainer.innerHTML=`<div style="text-align:center;padding:15px;color:var(--gray);">Nenhum usuário encontrado.</div>`; }, 3500);
-        };
-        const renderUserCard = async (user, pub) => {
-            let el=document.getElementById(`user-${pub}`); if(!el){el=document.createElement('div'); el.className='user-card fade-in'; el.id=`user-${pub}`; el.dataset.alias=user.alias.toLowerCase(); ui.allUsersContainer.appendChild(el);}
-            const isMutual=state.mutualConnections.has(pub); const sent=await new Promise(r=>state.gun.user().get('sentConnections').get(pub).once(v=>r(!!v)));
-            let btn; if(isMutual)btn=`<button class="btn btn-sm btn-success" data-pub="${pub}" data-action="chat"><i class="fas fa-comment"></i> Conversar</button>`;
-            else if(sent)btn=`<button class="btn btn-sm btn-warning" disabled><i class="fas fa-clock"></i> Pendente</button>`;
-            else btn=`<button class="btn btn-sm" data-pub="${pub}" data-action="connect"><i class="fas fa-user-plus"></i> Conectar</button>`;
-            el.innerHTML = `<div class="user-card-info">${renderAvatar(user)}<span>${sanitizeHTML(user.alias)}</span></div><div class="user-card-actions">${btn}</div>`;
-        };
-        const connectUser = async (targetPub) => {
-            state.gun.user().get('sentConnections').get(targetPub).put(true);
-            const targetSent = await new Promise(r=>state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).once(v=>r(!!v)));
-            if(targetSent){ state.gun.user().get('mutualConnections').get(targetPub).put(true); state.gun.get(`~${targetPub}`).get('mutualConnections').get(state.user.is.pub).put(true); state.gun.user().get('sentConnections').get(targetPub).put(null); state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).put(null); showNotification('Conexão estabelecida!', 'success'); state.mutualConnections.add(targetPub); }
-            else showNotification('Solicitação enviada!', 'info');
-            const card = document.getElementById(`user-${targetPub}`); if(card) renderUserCard({alias:card.dataset.alias}, targetPub);
-        };
+        const createCommunity = () => { if(!state.user?.is) return showNotification('Faça login para criar.', 'error'); const name=document.getElementById('community-name').value.trim(); if(!name)return showNotification('Nome é obrigatório.', 'error'); const desc = document.getElementById('community-desc').value.trim(); const commRef = state.gun.get('communities').set({name, description: desc, creatorPub:state.user.is.pub}); state.gun.user().get('communities').set(commRef); ui.communityModal.classList.remove('active'); showNotification('Comunidade criada!', 'success'); };
+        const loadConnectionsPage = () => { if (!state.user?.is) { ui.allUsersContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver usuários</p><button class="btn" onclick="document.getElementById('auth-modal').classList.add('active')">Login</button></div>`; return; } loadAllUsers(); };
+        const loadAllUsers = () => { ui.allUsersContainer.innerHTML=`<div class="loading"><div class="loading-spinner"></div></div>`; let has=false; const processed=new Set(state.user?[state.user.is.pub]:[]); const renderIfNeeded=async(user,pub)=>{ if(!user||!user.alias||processed.has(pub))return; processed.add(pub); if(!has)ui.allUsersContainer.innerHTML=''; has=true; if(!document.getElementById(`user-${pub}`))await renderUserCard(user,pub); }; state.gun.get('users').map().once((user, pub)=>renderIfNeeded(user,pub)); state.gun.get('posts').map().once(post => { if(post?.authorPub && !processed.has(post.authorPub)) state.gun.get(`~${post.authorPub}`).once(p=>renderIfNeeded(p,post.authorPub)); }); setTimeout(() => { if(!has) ui.allUsersContainer.innerHTML=`<div style="text-align:center;padding:15px;color:var(--gray);">Nenhum usuário encontrado.</div>`; }, 3500); };
+        const renderUserCard = async (user, pub) => { let el=document.getElementById(`user-${pub}`); if(!el){el=document.createElement('div'); el.className='user-card fade-in'; el.id=`user-${pub}`; el.dataset.alias=user.alias.toLowerCase(); ui.allUsersContainer.appendChild(el);} const isMutual=state.mutualConnections.has(pub); const sent=await new Promise(r=>state.gun.user().get('sentConnections').get(pub).once(v=>r(!!v))); let btn; if(isMutual)btn=`<button class="btn btn-sm btn-success" data-pub="${pub}" data-action="chat"><i class="fas fa-comment"></i> Conversar</button>`; else if(sent)btn=`<button class="btn btn-sm btn-warning" disabled><i class="fas fa-clock"></i> Pendente</button>`; else btn=`<button class="btn btn-sm" data-pub="${pub}" data-action="connect"><i class="fas fa-user-plus"></i> Conectar</button>`; el.innerHTML = `<div class="user-card-info">${renderAvatar(user)}<span>${sanitizeHTML(user.alias)}</span></div><div class="user-card-actions">${btn}</div>`; };
+        const connectUser = async (targetPub) => { state.gun.user().get('sentConnections').get(targetPub).put(true); const targetSent = await new Promise(r=>state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).once(v=>r(!!v))); if(targetSent){ state.gun.user().get('mutualConnections').get(targetPub).put(true); state.gun.get(`~${targetPub}`).get('mutualConnections').get(state.user.is.pub).put(true); state.gun.user().get('sentConnections').get(targetPub).put(null); state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).put(null); showNotification('Conexão estabelecida!', 'success'); state.mutualConnections.add(targetPub); } else showNotification('Solicitação enviada!', 'info'); const card = document.getElementById(`user-${targetPub}`); if(card) renderUserCard({alias:card.dataset.alias}, targetPub); };
         const startChat = async (userPub) => { const p = await new Promise(r=>state.gun.get(`~${userPub}`).once(p=>r(p||{alias:'?',pub:userPub}))); state.currentChatUser={...p,pub:userPub}; state.currentFeedFilter=FEED_FILTERS.USER_CHAT; navigateTo('feed'); };
         
         const setupEventListeners = () => {
@@ -517,9 +551,10 @@
             ui.removeImageBtn.addEventListener('click', resetImageSelection);
             ui.attachAudioBtn.addEventListener('click', toggleAudioRecording);
             ui.removeAudioBtn.addEventListener('click', resetAudioSelection);
+            ui.attachDrawingBtn.addEventListener('click', () => ui.drawingModal.classList.add('active'));
         };
         
-        const init = () => { setupEventListeners(); checkUserSession(); navigateTo('feed'); };
+        const init = () => { setupEventListeners(); setupDrawingCanvas(); checkUserSession(); navigateTo('feed'); };
         init();
     })();
     </script>
