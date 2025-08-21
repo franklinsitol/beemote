@@ -98,13 +98,11 @@
         .filter-btn.active, .filter-btn:hover { background-color: var(--primary); color: white; }
         .fade-in { animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Estilos para o Criador de Post com Imagem */
         #post-creator-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
-        #image-preview-container { position: relative; margin-top: 10px; }
+        #image-preview-container { position: relative; margin-top: 10px; display: inline-block; }
         #image-preview { max-width: 100px; max-height: 100px; border-radius: 8px; }
         #remove-image-btn { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 20px; height: 20px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-        
+        @media (max-width: 480px) { header { padding: 10px 15px; } .logo { font-size: 1.5rem; } #user-alias { max-width: 80px; } .btn { padding: 8px 12px; font-size: 0.9rem; } .profile-avatar { width: 80px; height: 80px; font-size: 2rem; } .profile-name { font-size: 1.5rem; } .feed-header { flex-direction: column; gap: 10px; align-items: flex-start; } }
     </style>
 </head>
 <body>
@@ -197,7 +195,6 @@
             feedHeaderContainer: document.getElementById('feed-header-container'), feedFiltersContainer: document.getElementById('feed-filters-container'),
             allUsersContainer: document.getElementById('all-users-container'), userSearchInput: document.getElementById('user-search-input'),
             rememberMe: document.getElementById('remember-me'),
-            // Novos elementos de UI para imagem
             attachImageBtn: document.getElementById('attach-image-btn'), imageInput: document.getElementById('image-input'),
             imagePreviewContainer: document.getElementById('image-preview-container'), imagePreview: document.getElementById('image-preview'),
             removeImageBtn: document.getElementById('remove-image-btn')
@@ -317,10 +314,8 @@
             const el = document.createElement('div'); el.className='card fade-in'; el.id=`post-${post.id}`;
             let author = state.usersCache.get(post.authorPub);
             if(!author) { author = await new Promise(r => state.gun.get(`~${post.authorPub}`).once(p => r(p || {alias:'...'}))); state.usersCache.set(post.authorPub, author); }
-            
             const contentHTML = post.content ? `<div class="post-content">${sanitizeHTML(post.content)}</div>` : '';
             const imageHTML = post.image_data ? `<div class="post-image-container"><img src="${post.image_data}" class="post-image" alt="Postagem de ${sanitizeHTML(author.alias)}"></div>` : '';
-
             el.innerHTML = `<div class="post-header"><div class="post-author-info">${renderAvatar(author)}<div><div class="post-author">${sanitizeHTML(author.alias)}</div><div class="post-time">${formatTime(post.createdAt)}</div></div></div><div class="post-countdown" data-timestamp="${post.lastActivityAt}">${formatCountdown(post.lastActivityAt)}</div></div>${imageHTML}${contentHTML}<div class="post-actions"><div class="post-action" data-action="like"><i class="far fa-heart"></i> <span class="like-count">0</span></div><div class="post-action" data-action="comment"><i class="far fa-comment"></i> <span>Comentar</span></div></div><div class="comments-section"></div>`;
             ui.postsContainer.appendChild(el);
             el.querySelector('[data-action="like"]').addEventListener('click',()=>handlePostInteraction(post.id, 'like'));
@@ -337,16 +332,11 @@
             const content = ui.postContent.value.trim();
             if (!content && !state.tempPostImage) return showNotification('Escreva algo ou anexe uma imagem.', 'error');
             if (!state.user?.is) return showNotification('Faça login para publicar.', 'error');
-            
             const postData = { authorPub: state.user.is.pub, content, createdAt: Date.now(), lastActivityAt: Date.now() };
             if (state.tempPostImage) postData.image_data = state.tempPostImage;
             if (state.currentCommunity.id) postData.communityId = state.currentCommunity.id;
             else if (state.currentChatUser) postData.connectionChat = state.currentChatUser.pub;
-            
-            state.gun.get('posts').set(postData);
-            ui.postContent.value = '';
-            resetImageSelection();
-            showNotification('Publicado!', 'success');
+            state.gun.get('posts').set(postData); ui.postContent.value = ''; resetImageSelection(); showNotification('Publicado!', 'success');
         };
         
         const handlePostInteraction = (postId, type) => {
@@ -401,12 +391,11 @@
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
+                const img = new Image(); img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const scaleFactor = CONFIG.IMAGE_MAX_WIDTH / img.width;
-                    canvas.width = CONFIG.IMAGE_MAX_WIDTH;
+                    const scaleFactor = Math.min(1, CONFIG.IMAGE_MAX_WIDTH / img.width);
+                    canvas.width = img.width * scaleFactor;
                     canvas.height = img.height * scaleFactor;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -417,37 +406,77 @@
         });
         
         const handleImageSelection = async (event) => {
-            const file = event.target.files[0];
-            if (!file || !file.type.startsWith('image/')) return;
+            const file = event.target.files[0]; if (!file || !file.type.startsWith('image/')) return;
             try {
                 const compressedImageData = await compressImage(file);
                 state.tempPostImage = compressedImageData;
                 ui.imagePreview.src = compressedImageData;
                 ui.imagePreviewContainer.classList.remove('hidden');
-            } catch (error) {
-                showNotification('Erro ao processar imagem.', 'error');
-            }
+            } catch (error) { showNotification('Erro ao processar imagem.', 'error'); }
         };
 
-        const resetImageSelection = () => {
-            state.tempPostImage = null;
-            ui.imageInput.value = '';
-            ui.imagePreviewContainer.classList.add('hidden');
-        };
+        const resetImageSelection = () => { state.tempPostImage = null; ui.imageInput.value = ''; ui.imagePreviewContainer.classList.add('hidden'); };
 
-        const loadProfile = () => { /* ... seu código anterior aqui ... */ };
-        const saveProfile = () => { /* ... seu código anterior aqui ... */ };
-        const handleAvatarUpload = (e) => { /* ... seu código anterior aqui ... */ };
-        const saveAvatar = () => { /* ... seu código anterior aqui ... */ };
-        const loadProfileStats = () => { /* ... seu código anterior aqui ... */ };
-        const loadCommunities = () => { /* ... seu código anterior aqui ... */ };
-        const renderCommunity = (comm, id) => { /* ... seu código anterior aqui ... */ };
-        const createCommunity = () => { /* ... seu código anterior aqui ... */ };
-        const loadConnectionsPage = () => { /* ... seu código anterior aqui ... */ };
-        const loadAllUsers = () => { /* ... seu código anterior aqui ... */ };
-        const renderUserCard = async (user, pub) => { /* ... seu código anterior aqui ... */ };
-        const connectUser = async (targetPub) => { /* ... seu código anterior aqui ... */ };
-        const startChat = async (userPub) => { /* ... seu código anterior aqui ... */ };
+        const loadProfile = () => {
+            if (!state.user?.is) { ui.profileContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver seu perfil</p><button id="profile-login-btn" class="btn">Login</button></div>`; document.getElementById('profile-login-btn').addEventListener('click', ()=>ui.authModal.classList.add('active')); return; }
+            ui.profileContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
+            state.gun.get(`~${state.user.is.pub}`).once(p => {
+                p = p || {alias: state.user.is.alias, bio: ''};
+                state.currentUserProfile = p;
+                ui.profileContainer.innerHTML = `<div class="card"><div class="profile-header"><div class="profile-avatar" style="${p.avatar ? `background-image:url('${p.avatar}')` : ''}">${!p.avatar?p.alias.charAt(0).toUpperCase():''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1>${sanitizeHTML(p.alias)}</h1><p class="profile-bio">${sanitizeHTML(p.bio||'Sem bio.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div></div></div><div class="card"><h3>Editar Perfil</h3><div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" class="form-control" rows="3">${sanitizeHTML(p.bio||'')}</textarea></div><button id="save-profile-btn" class="btn">Salvar</button></div>`;
+                document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
+                document.querySelector('.profile-avatar').addEventListener('click', ()=>{ ui.avatarPreview.style.backgroundImage = p.avatar ? `url('${p.avatar}')` : ''; ui.avatarPreview.innerHTML = !p.avatar ? p.alias.charAt(0).toUpperCase():''; ui.avatarModal.classList.add('active'); });
+                loadProfileStats();
+            });
+        };
+        const saveProfile = () => { if(!state.user?.is)return; const bio = document.getElementById('edit-bio').value.trim(); state.gun.get(`~${state.user.is.pub}`).get('bio').put(bio); showNotification('Bio atualizada!', 'success'); document.querySelector('.profile-bio').textContent=bio; };
+        const handleAvatarUpload = (e) => { const f=e.target.files[0]; if(!f||f.size>CONFIG.AVATAR_MAX_SIZE||!f.type.startsWith('image/')) return; const r=new FileReader(); r.onload=e=>{ ui.avatarPreview.style.backgroundImage=`url('${e.target.result}')`; ui.avatarPreview.innerHTML=''; state.tempAvatarFile=e.target.result; }; r.readAsDataURL(f); };
+        const saveAvatar = () => { if(!state.user?.is||!state.tempAvatarFile)return; state.gun.get(`~${state.user.is.pub}`).get('avatar').put(state.tempAvatarFile); showNotification('Avatar salvo!', 'success'); ui.avatarModal.classList.remove('active'); state.tempAvatarFile=null; loadProfile(); };
+        const loadProfileStats = () => { let p=0,c=0,n=0; const u=state.gun.user(); u.get('posts').map().once(()=>{const e=document.getElementById('post-count'); if(e)e.textContent=++p;}); u.get('communities').map().once(()=>{const e=document.getElementById('community-count'); if(e)e.textContent=++c;}); u.get('mutualConnections').map().once(v=>{if(v){const e=document.getElementById('connection-count'); if(e)e.textContent=++n;}}); };
+        
+        const loadCommunities = () => {
+            ui.communitiesContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
+            let has=false; const sub=state.gun.get('communities').map().on((comm, id)=>{ if(comm?.name){ if(!has)ui.communitiesContainer.innerHTML=''; has=true; if(document.getElementById(`comm-${id}`))return; renderCommunity(comm,id); } });
+            state.activeSubscriptions.set('communities-list', sub);
+            setTimeout(() => { if(!has) ui.communitiesContainer.innerHTML=`<div class="card" style="text-align:center;color:var(--gray);">Nenhuma comunidade.</div>`; }, 3000);
+        };
+        const renderCommunity = (comm, id) => { const el=document.createElement('div'); el.className='community-card fade-in'; el.id=`comm-${id}`; el.innerHTML=`<div class="community-info-details">${renderAvatar({alias:comm.name})}<div class="community-info"><div class="community-name">${sanitizeHTML(comm.name)}</div></div></div><i class="fas fa-chevron-right"></i>`; el.addEventListener('click', ()=>{ state.currentCommunity={id, name:comm.name}; state.currentFeedFilter=FEED_FILTERS.COMMUNITY; navigateTo('feed'); }); ui.communitiesContainer.prepend(el); };
+        const createCommunity = () => {
+            if(!state.user?.is) return showNotification('Faça login para criar.', 'error');
+            const name=document.getElementById('community-name').value.trim(); if(!name)return showNotification('Nome é obrigatório.', 'error');
+            const desc = document.getElementById('community-desc').value.trim();
+            const commRef = state.gun.get('communities').set({name, description: desc, creatorPub:state.user.is.pub});
+            state.gun.user().get('communities').set(commRef);
+            ui.communityModal.classList.remove('active'); showNotification('Comunidade criada!', 'success');
+        };
+        
+        const loadConnectionsPage = () => {
+            if (!state.user?.is) { ui.allUsersContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver usuários</p><button class="btn" onclick="document.getElementById('auth-modal').classList.add('active')">Login</button></div>`; return; }
+            loadAllUsers();
+        };
+        const loadAllUsers = () => {
+            ui.allUsersContainer.innerHTML=`<div class="loading"><div class="loading-spinner"></div></div>`; let has=false; const processed=new Set([state.user.is.pub]);
+            const renderIfNeeded=async(user,pub)=>{ if(!user||!user.alias||processed.has(pub))return; processed.add(pub); if(!has)ui.allUsersContainer.innerHTML=''; has=true; if(!document.getElementById(`user-${pub}`))await renderUserCard(user,pub); };
+            state.gun.get('users').map().once((user, pub)=>renderIfNeeded(user,pub));
+            state.gun.get('posts').map().once(post => { if(post?.authorPub && !processed.has(post.authorPub)) state.gun.get(`~${post.authorPub}`).once(p=>renderIfNeeded(p,post.authorPub)); });
+            setTimeout(() => { if(!has) ui.allUsersContainer.innerHTML=`<div style="text-align:center;padding:15px;color:var(--gray);">Nenhum usuário encontrado.</div>`; }, 3500);
+        };
+        const renderUserCard = async (user, pub) => {
+            let el=document.getElementById(`user-${pub}`); if(!el){el=document.createElement('div'); el.className='user-card fade-in'; el.id=`user-${pub}`; el.dataset.alias=user.alias.toLowerCase(); ui.allUsersContainer.appendChild(el);}
+            const isMutual=state.mutualConnections.has(pub); const sent=await new Promise(r=>state.gun.user().get('sentConnections').get(pub).once(v=>r(!!v)));
+            let btn; if(isMutual)btn=`<button class="btn btn-sm btn-success" data-pub="${pub}" data-action="chat"><i class="fas fa-comment"></i> Conversar</button>`;
+            else if(sent)btn=`<button class="btn btn-sm btn-warning" disabled><i class="fas fa-clock"></i> Pendente</button>`;
+            else btn=`<button class="btn btn-sm" data-pub="${pub}" data-action="connect"><i class="fas fa-user-plus"></i> Conectar</button>`;
+            el.innerHTML = `<div class="user-card-info">${renderAvatar(user)}<span>${sanitizeHTML(user.alias)}</span></div><div class="user-card-actions">${btn}</div>`;
+        };
+        const connectUser = async (targetPub) => {
+            state.gun.user().get('sentConnections').get(targetPub).put(true);
+            const targetSent = await new Promise(r=>state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).once(v=>r(!!v)));
+            if(targetSent){ state.gun.user().get('mutualConnections').get(targetPub).put(true); state.gun.get(`~${targetPub}`).get('mutualConnections').get(state.user.is.pub).put(true); state.gun.user().get('sentConnections').get(targetPub).put(null); state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).put(null); showNotification('Conexão estabelecida!', 'success'); state.mutualConnections.add(targetPub); }
+            else showNotification('Solicitação enviada!', 'info');
+            const card = document.getElementById(`user-${targetPub}`); if(card) renderUserCard({alias:card.dataset.alias}, targetPub);
+        };
+        const startChat = async (userPub) => { const p = await new Promise(r=>state.gun.get(`~${userPub}`).once(p=>r(p||{alias:'?',pub:userPub}))); state.currentChatUser={...p,pub:userPub}; state.currentFeedFilter=FEED_FILTERS.USER_CHAT; navigateTo('feed'); };
         
         const setupEventListeners = () => {
             document.body.addEventListener('click', e => {
@@ -462,8 +491,6 @@
             ui.createPostBtn.addEventListener('click',createPost); ui.showCommunityModalBtn.addEventListener('click',()=>ui.communityModal.classList.add('active'));
             ui.createCommunitySubmitBtn.addEventListener('click',createCommunity); ui.avatarInput.addEventListener('change',handleAvatarUpload);
             ui.saveAvatarBtn.addEventListener('click',saveAvatar); ui.userSearchInput.addEventListener('input',debounce(e=>{const t=e.target.value.toLowerCase();document.querySelectorAll('#all-users-container .user-card').forEach(c=>c.style.display=c.dataset.alias.includes(t)?'flex':'none');},300));
-
-            // Listeners para upload de imagem no post
             ui.attachImageBtn.addEventListener('click', () => ui.imageInput.click());
             ui.imageInput.addEventListener('change', handleImageSelection);
             ui.removeImageBtn.addEventListener('click', resetImageSelection);
