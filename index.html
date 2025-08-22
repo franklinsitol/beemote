@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<!-- TODO O HTML E CSS ANTERIOR PERMANECE O MESMO -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script> <!-- A biblioteca já está aqui! -->
     <style>
         :root {
             --primary: #6C63FF; --primary-dark: #564fcc; --primary-light: #e9e8ff;
@@ -165,7 +166,17 @@
         };
         const FEED_FILTERS = { MAIN: 'main', COMMUNITIES: 'communities', COMMUNITY: 'community', CONNECTIONS: 'connections', USER_CHAT: 'user_chat' };
         
-        const state = { gun: Gun({ peers: CONFIG.GUN_PEERS, localStorage: false, radisk: true }), user: null, currentPage: 'feed', activeSubscriptions: new Map(), tempAvatarFile: null, currentCommunity: { id: null, name: null }, postsData: new Map(), countdownInterval: null, usersCache: new Map(), currentUserProfile: null, currentFeedFilter: FEED_FILTERS.MAIN, currentChatUser: null, mutualConnections: new Set(), tempPostImage: null, tempPostAudio: null, mediaRecorder: null, audioChunks: [], isRecording: false };
+        // ========= A MUDANÇA ESTÁ AQUI =========
+        const state = {
+            gun: Gun({
+                peers: CONFIG.GUN_PEERS,
+                localStorage: false, // Usaremos IndexedDB que é muito melhor
+                radisk: false, // Desativamos o radisk (antigo)
+                indexeddb: true, // ATIVAMOS O INDEXEDDB!
+            }),
+            user: null, currentPage: 'feed', activeSubscriptions: new Map(), tempAvatarFile: null, currentCommunity: { id: null, name: null }, postsData: new Map(), countdownInterval: null, usersCache: new Map(), currentUserProfile: null, currentFeedFilter: FEED_FILTERS.MAIN, currentChatUser: null, mutualConnections: new Set(), tempPostImage: null, tempPostAudio: null, mediaRecorder: null, audioChunks: [], isRecording: false
+        };
+        // ======================================
         
         const ui = {
             pages: document.querySelectorAll('.page'), navItems: document.querySelectorAll('.nav-item'),
@@ -191,6 +202,8 @@
             attachDrawingBtn: document.getElementById('attach-drawing-btn'), drawingModal: document.getElementById('drawing-modal')
         };
         
+        // ... O restante do script permanece o mesmo, pois as lógicas já estão corretas ...
+        // A ativação do IndexedDB resolve o problema de persistência sem alterar outras funções.
         const sanitizeHTML = (str) => { const t = document.createElement('div'); t.textContent = str || ''; return t.innerHTML; };
         const showNotification = (message, type = 'success') => { ui.notificationBar.textContent = message; ui.notificationBar.className = `notification ${type} show`; setTimeout(() => ui.notificationBar.classList.remove('show'), 3000); };
         const renderAvatar = (p, c = 'avatar', s = '') => `<div class="${c}" style="${p?.avatar ? `background-image: url('${p.avatar}')` : ''}; ${s}">${!p?.avatar ? (p?.alias ? p.alias.charAt(0).toUpperCase() : '?') : ''}</div>`;
@@ -198,7 +211,6 @@
         const formatCountdown = (ts) => { const l = (ts + CONFIG.POST_EXPIRATION_MS) - Date.now(); if (l <= 0) return "Expirado"; return `Expira em ${Math.floor(l/3600000)}h ${Math.floor((l%3600000)/60000)}m`; };
         const debounce = (func, wait) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; };
         const clearSubscriptions = () => { state.activeSubscriptions.forEach(s => s.off()); state.activeSubscriptions.clear(); if(state.countdownInterval) clearInterval(state.countdownInterval); };
-        
         const shouldShowPost = (post) => {
             if (!post || (!post.content && !post.image_data && !post.audio_data) || !state.user?.is) return false;
             if (Date.now() - post.lastActivityAt > CONFIG.POST_EXPIRATION_MS) return false;
@@ -214,14 +226,12 @@
             if (state.currentFeedFilter === FEED_FILTERS.CONNECTIONS) return state.mutualConnections.has(post.authorPub) && !post.connectionChat;
             return false;
         };
-        
         const loadUserConnections = () => new Promise(resolve => {
             if (!state.user?.is) return resolve();
             state.mutualConnections.clear();
             state.gun.user().get('mutualConnections').map().once((val, pub) => { if (val) state.mutualConnections.add(pub); });
             setTimeout(resolve, 500);
         });
-        
         const navigateTo = (page) => {
             clearSubscriptions(); state.currentPage = page;
             if (page !== 'feed') { state.currentFeedFilter = FEED_FILTERS.MAIN; state.currentCommunity = { id: null, name: null }; state.currentChatUser = null; }
@@ -230,9 +240,7 @@
             ui.navItems.forEach(item => item.classList.toggle('active', item.dataset.page === page));
             loadPageContent(page);
         };
-        
         const loadPageContent = (page) => { const actions = { feed: loadFeed, profile: loadProfile, connections: loadConnectionsPage, communities: loadCommunities }; if (actions[page]) actions[page](); };
-        
         const renderFeedUI = () => {
             ui.feedHeaderContainer.classList.add('hidden'); ui.feedHeaderContainer.innerHTML = '';
             const createHeader = (title, btnText) => {
@@ -251,13 +259,11 @@
             ui.feedFiltersContainer.innerHTML = filtersHTML;
             ui.feedFiltersContainer.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => { state.currentFeedFilter = btn.dataset.filter; loadFeed(); }));
         };
-        
         const checkUserSession = () => {
             const r = localStorage.getItem(CONFIG.REMEMBER_ME_KEY);
             if(r) try { const {alias,pub} = JSON.parse(r); state.gun.user().auth(alias,null,ack => { if(ack&&ack.pub) onAuthSuccess(ack.pub,alias,true); else state.gun.user().recall({sessionStorage:true}, r=>{if(r&&r.pub)onAuthSuccess(r.pub,r.alias,false)})}); } catch(e){}
             else state.gun.user().recall({sessionStorage:true}, ack => { if(ack&&ack.pub) onAuthSuccess(ack.pub,ack.alias,false); });
         };
-        
         const handleAuth = () => {
             const alias = ui.authAlias.value.trim(); const pass = ui.authPass.value.trim();
             if (!alias || !pass) return showNotification('Preencha todos os campos.', 'error');
@@ -267,7 +273,6 @@
                 else onAuthSuccess(ack.pub, alias, ui.rememberMe.checked);
             });
         };
-        
         const onAuthSuccess = (pub, alias, remember) => {
             state.user = state.gun.user();
             if(remember) localStorage.setItem(CONFIG.REMEMBER_ME_KEY, JSON.stringify({alias, pub})); else localStorage.removeItem(CONFIG.REMEMBER_ME_KEY);
@@ -277,43 +282,27 @@
             showNotification('Login bem-sucedido!', 'success');
             navigateTo(state.currentPage);
         };
-        
         const logout = () => { state.gun.user().leave(); state.user = null; localStorage.removeItem(CONFIG.REMEMBER_ME_KEY); updateUIForUser(); navigateTo('feed'); showNotification('Você saiu.', 'warning'); };
         const updateUIForUser = () => { ui.userAlias.textContent = state.user?.is?.alias || ''; ui.loginBtn.classList.toggle('hidden', !!state.user?.is); ui.logoutBtn.classList.toggle('hidden', !state.user?.is); };
-        
         const loadFeed = () => {
             renderFeedUI(); ui.postsContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
             state.postsData.clear(); clearSubscriptions();
-            
             loadUserConnections().then(() => {
                 const postsNode = state.gun.get('posts');
                 const mainSub = postsNode.map().on((post, id) => {
                     const postSub = state.gun.get('posts').get(id).on(updatedPost => {
-                        if (shouldShowPost(updatedPost)) {
-                            state.postsData.set(id, {...updatedPost, id});
-                        } else {
-                            state.postsData.delete(id);
-                        }
+                        if (shouldShowPost(updatedPost)) state.postsData.set(id, {...updatedPost, id});
+                        else state.postsData.delete(id);
                         renderSortedFeed();
                     });
                     state.activeSubscriptions.set(`post-${id}`, postSub);
                 });
                 state.activeSubscriptions.set('feed', mainSub);
-
-                // Sincronizador periódico
-                const syncInterval = setInterval(() => {
-                    postsNode.map().once((post, id) => {
-                        if (shouldShowPost(post)) {
-                            state.postsData.set(id, {...post, id});
-                            renderSortedFeed();
-                        }
-                    });
-                }, 15000); // A cada 15 segundos
+                const syncInterval = setInterval(() => { postsNode.map().once((post, id) => { if (shouldShowPost(post)) { state.postsData.set(id, {...post, id}); renderSortedFeed(); } }); }, 15000);
                 state.activeSubscriptions.set('sync-interval', { off: () => clearInterval(syncInterval) });
             });
             state.countdownInterval = setInterval(updateAllCountdowns, 5000);
         };
-        
         const renderSortedFeed = debounce(() => {
             const posts = Array.from(state.postsData.values()).sort((a,b) => b.lastActivityAt - a.lastActivityAt);
             if(posts.length === 0) { ui.postsContainer.innerHTML = `<div class="card" style="text-align:center;color:var(--gray);"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;"></i><p>Nenhum post aqui.</p></div>`; return; }
@@ -321,7 +310,6 @@
             ui.postsContainer.innerHTML = ''; posts.forEach(p => renderPost(p));
             if (focusedElement && focusedElement.id && document.getElementById(focusedElement.id)) document.getElementById(focusedElement.id).focus();
         }, 150);
-        
         const renderPost = async (post) => {
             if(document.getElementById(`post-${post.id}`)) return updatePost(post);
             const el = document.createElement('div'); el.className='card fade-in'; el.id=`post-${post.id}`;
@@ -339,9 +327,7 @@
             });
             updateLikes(post.id, el);
         };
-        
         const updatePost = (post) => { const el = document.querySelector(`#post-${post.id} .post-countdown`); if(el) el.textContent = formatCountdown(post.lastActivityAt); };
-        
         const createPost = () => {
             const content = ui.postContent.value.trim();
             if (!content && !state.tempPostImage && !state.tempPostAudio) return showNotification('Adicione conteúdo para postar.', 'error');
@@ -353,13 +339,11 @@
             else if (state.currentChatUser) postData.connectionChat = state.currentChatUser.pub;
             state.gun.get('posts').set(postData); ui.postContent.value = ''; resetImageSelection(); resetAudioSelection(); showNotification('Publicado!', 'success');
         };
-        
         const handlePostInteraction = (postId, type) => {
             if (!state.user?.is) return showNotification('Faça login para interagir.', 'error');
             state.gun.get('posts').get(postId).get('lastActivityAt').put(Date.now());
             if (type === 'like') { const ref = state.gun.get('posts').get(postId).get('likes').get(state.user.is.pub); ref.once(v => ref.put(!v)); }
         };
-        
         const updateLikes = (postId, postEl) => {
             const likesRef = state.gun.get('posts').get(postId).get('likes');
             const sub = likesRef.map().on(() => {
@@ -371,7 +355,6 @@
             });
             state.activeSubscriptions.set(`likes-${postId}`, sub);
         };
-        
         const renderComments = (postId, container) => {
             container.innerHTML = `<div class="comments-list"></div><div class="comment-form"><input type="text" class="form-control comment-input" placeholder="Seu comentário..."><button class="btn btn-sm comment-submit-btn"><i class="fas fa-paper-plane"></i></button></div>`;
             container.querySelector('.comment-submit-btn').addEventListener('click', () => createComment(postId, container));
@@ -387,7 +370,6 @@
             });
             state.activeSubscriptions.set(`comments-${postId}`, sub);
         };
-        
         const createComment = (postId, container) => {
             const input = container.querySelector('.comment-input'); const content = input.value.trim();
             if (!content || !state.user?.is) return;
@@ -395,25 +377,21 @@
             const commentData = { authorPub: state.user.is.pub, content, createdAt: Date.now() };
             state.gun.get('posts').get(postId).get('comments').set(commentData); input.value = '';
         };
-
         const updateAllCountdowns = () => document.querySelectorAll('.post-countdown').forEach(el => {
             const ts = parseInt(el.dataset.timestamp, 10);
             if (ts && Date.now() - ts > CONFIG.POST_EXPIRATION_MS) el.closest('.card')?.remove();
             else if (ts) el.textContent = formatCountdown(ts);
         });
-        
         const compressImage = (file) => new Promise((resolve, reject) => {
             const reader = new FileReader(); reader.readAsDataURL(file);
             reader.onload = e => { const i = new Image(); i.src = e.target.result; i.onload = () => { const c = document.createElement('canvas'), s = Math.min(1, CONFIG.IMAGE_MAX_WIDTH / i.width); c.width = i.width*s; c.height = i.height*s; const ctx=c.getContext('2d'); ctx.drawImage(i,0,0,c.width,c.height); resolve(c.toDataURL('image/jpeg',CONFIG.IMAGE_COMPRESSION_QUALITY)); }; i.onerror=reject; }; reader.onerror=reject;
         });
-        
         const handleImageSelection = async (event) => {
             const file = event.target.files[0]; if (!file || !file.type.startsWith('image/')) return;
             try { resetAudioSelection(); const data = await compressImage(file); state.tempPostImage = data; ui.imagePreview.src = data; ui.imagePreviewContainer.classList.remove('hidden'); }
             catch (error) { showNotification('Erro ao processar imagem.', 'error'); console.error(error); }
         };
         const resetImageSelection = () => { state.tempPostImage = null; ui.imageInput.value = ''; ui.imagePreviewContainer.classList.add('hidden'); };
-
         const toggleAudioRecording = async () => {
             if (state.isRecording) { state.mediaRecorder.stop(); ui.attachAudioBtn.classList.remove('recording'); ui.attachAudioBtn.innerHTML = '<i class="fas fa-microphone"></i>'; state.isRecording = false; return; }
             try {
@@ -433,7 +411,6 @@
             } catch (err) { showNotification('Permissão de microfone negada.', 'error'); console.error(err); }
         };
         const resetAudioSelection = () => { state.tempPostAudio=null; ui.audioPreviewContainer.classList.add('hidden'); };
-
         const setupDrawingCanvas = () => {
             const modal = ui.drawingModal, canvas = modal.querySelector('#drawing-canvas'), ctx = canvas.getContext('2d'), tools = { palette: modal.querySelector('#color-palette'), brushSize: modal.querySelector('#brush-size'), eraserBtn: modal.querySelector('#eraser-btn'), clearBtn: modal.querySelector('#clear-canvas-btn'), saveBtn: modal.querySelector('#save-drawing-btn') };
             const colors = ['#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
@@ -455,7 +432,6 @@
             new ResizeObserver(debounce(resizeCanvas, 100)).observe(modal);
             modal.addEventListener('transitionend', () => { if (modal.classList.contains('active')) resizeCanvas(); });
         };
-        
         const loadProfile = () => { if (!state.user?.is) { ui.profileContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver seu perfil</p><button id="profile-login-btn" class="btn">Login</button></div>`; document.getElementById('profile-login-btn').addEventListener('click', ()=>ui.authModal.classList.add('active')); return; } ui.profileContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`; state.gun.get(`~${state.user.is.pub}`).once(p => { p = p || {alias: state.user.is.alias, bio: ''}; state.currentUserProfile = p; ui.profileContainer.innerHTML = `<div class="card"><div class="profile-header"><div class="profile-avatar" style="${p.avatar ? `background-image:url('${p.avatar}')` : ''}">${!p.avatar?(p.alias?p.alias.charAt(0).toUpperCase():'?'):''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1>${sanitizeHTML(p.alias)}</h1><p class="profile-bio">${sanitizeHTML(p.bio||'Sem bio.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div></div></div><div class="card"><h3>Editar Perfil</h3><div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" class="form-control" rows="3">${sanitizeHTML(p.bio||'')}</textarea></div><button id="save-profile-btn" class="btn">Salvar</button></div>`; document.getElementById('save-profile-btn').addEventListener('click', saveProfile); document.querySelector('.profile-avatar').addEventListener('click', ()=>{ ui.avatarPreview.style.backgroundImage = p.avatar ? `url('${p.avatar}')` : ''; ui.avatarPreview.innerHTML = !p.avatar ? (p.alias?p.alias.charAt(0).toUpperCase():'?'):''; ui.avatarModal.classList.add('active'); }); loadProfileStats(); }); };
         const saveProfile = () => { if(!state.user?.is)return; const bio = document.getElementById('edit-bio').value.trim(); state.gun.get(`~${state.user.is.pub}`).get('bio').put(bio); showNotification('Bio atualizada!', 'success'); document.querySelector('.profile-bio').textContent=bio; };
         const handleAvatarUpload = (e) => { const f=e.target.files[0]; if(!f||f.size>CONFIG.AVATAR_MAX_SIZE||!f.type.startsWith('image/')) return; const r=new FileReader(); r.onload=e=>{ ui.avatarPreview.style.backgroundImage=`url('${e.target.result}')`; ui.avatarPreview.innerHTML=''; state.tempAvatarFile=e.target.result; }; r.readAsDataURL(f); };
