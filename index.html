@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<!-- TODO O HTML E CSS ANTERIOR PERMANECE O MESMO -->
+<!-- O HTML e CSS permanecem os mesmos -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script> <!-- A biblioteca já está aqui! -->
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
     <style>
         :root {
             --primary: #6C63FF; --primary-dark: #564fcc; --primary-light: #e9e8ff;
@@ -166,17 +166,15 @@
         };
         const FEED_FILTERS = { MAIN: 'main', COMMUNITIES: 'communities', COMMUNITY: 'community', CONNECTIONS: 'connections', USER_CHAT: 'user_chat' };
         
-        // ========= A MUDANÇA ESTÁ AQUI =========
-        const state = {
-            gun: Gun({
-                peers: CONFIG.GUN_PEERS,
-                localStorage: false, // Usaremos IndexedDB que é muito melhor
-                radisk: false, // Desativamos o radisk (antigo)
-                indexeddb: true, // ATIVAMOS O INDEXEDDB!
-            }),
-            user: null, currentPage: 'feed', activeSubscriptions: new Map(), tempAvatarFile: null, currentCommunity: { id: null, name: null }, postsData: new Map(), countdownInterval: null, usersCache: new Map(), currentUserProfile: null, currentFeedFilter: FEED_FILTERS.MAIN, currentChatUser: null, mutualConnections: new Set(), tempPostImage: null, tempPostAudio: null, mediaRecorder: null, audioChunks: [], isRecording: false
-        };
-        // ======================================
+        const gun = Gun({
+            peers: CONFIG.GUN_PEERS,
+            localStorage: false,
+            radisk: true, // Manter como fallback
+            axe: false, // Desativar AXE para simplificar
+            // A biblioteca rindexed.js se conectará automaticamente se incluída
+        });
+        
+        const state = { gun: gun, user: gun.user(), currentPage: 'feed', activeSubscriptions: new Map(), tempAvatarFile: null, currentCommunity: { id: null, name: null }, postsData: new Map(), countdownInterval: null, usersCache: new Map(), currentUserProfile: null, currentFeedFilter: FEED_FILTERS.MAIN, currentChatUser: null, mutualConnections: new Set(), tempPostImage: null, tempPostAudio: null, mediaRecorder: null, audioChunks: [], isRecording: false };
         
         const ui = {
             pages: document.querySelectorAll('.page'), navItems: document.querySelectorAll('.nav-item'),
@@ -202,8 +200,6 @@
             attachDrawingBtn: document.getElementById('attach-drawing-btn'), drawingModal: document.getElementById('drawing-modal')
         };
         
-        // ... O restante do script permanece o mesmo, pois as lógicas já estão corretas ...
-        // A ativação do IndexedDB resolve o problema de persistência sem alterar outras funções.
         const sanitizeHTML = (str) => { const t = document.createElement('div'); t.textContent = str || ''; return t.innerHTML; };
         const showNotification = (message, type = 'success') => { ui.notificationBar.textContent = message; ui.notificationBar.className = `notification ${type} show`; setTimeout(() => ui.notificationBar.classList.remove('show'), 3000); };
         const renderAvatar = (p, c = 'avatar', s = '') => `<div class="${c}" style="${p?.avatar ? `background-image: url('${p.avatar}')` : ''}; ${s}">${!p?.avatar ? (p?.alias ? p.alias.charAt(0).toUpperCase() : '?') : ''}</div>`;
@@ -211,12 +207,13 @@
         const formatCountdown = (ts) => { const l = (ts + CONFIG.POST_EXPIRATION_MS) - Date.now(); if (l <= 0) return "Expirado"; return `Expira em ${Math.floor(l/3600000)}h ${Math.floor((l%3600000)/60000)}m`; };
         const debounce = (func, wait) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), wait); }; };
         const clearSubscriptions = () => { state.activeSubscriptions.forEach(s => s.off()); state.activeSubscriptions.clear(); if(state.countdownInterval) clearInterval(state.countdownInterval); };
+        
         const shouldShowPost = (post) => {
-            if (!post || (!post.content && !post.image_data && !post.audio_data) || !state.user?.is) return false;
+            if (!post || (!post.content && !post.image_data && !post.audio_data)) return false;
             if (Date.now() - post.lastActivityAt > CONFIG.POST_EXPIRATION_MS) return false;
             if (state.currentFeedFilter === FEED_FILTERS.USER_CHAT && state.currentChatUser) {
-                const isFromMe = (post.authorPub === state.user.is.pub && post.connectionChat === state.currentChatUser.pub);
-                const isToMe = (post.authorPub === state.currentChatUser.pub && post.connectionChat === state.user.is.pub);
+                const isFromMe = (post.authorPub === state.user.is?.pub && post.connectionChat === state.currentChatUser.pub);
+                const isToMe = (post.authorPub === state.currentChatUser.pub && post.connectionChat === state.user.is?.pub);
                 return isFromMe || isToMe;
             }
             if (state.currentChatUser) return false;
@@ -226,12 +223,14 @@
             if (state.currentFeedFilter === FEED_FILTERS.CONNECTIONS) return state.mutualConnections.has(post.authorPub) && !post.connectionChat;
             return false;
         };
+        
         const loadUserConnections = () => new Promise(resolve => {
-            if (!state.user?.is) return resolve();
+            if (!state.user.is) return resolve();
             state.mutualConnections.clear();
-            state.gun.user().get('mutualConnections').map().once((val, pub) => { if (val) state.mutualConnections.add(pub); });
+            state.user.get('mutualConnections').map().once((val, pub) => { if (val) state.mutualConnections.add(pub); });
             setTimeout(resolve, 500);
         });
+        
         const navigateTo = (page) => {
             clearSubscriptions(); state.currentPage = page;
             if (page !== 'feed') { state.currentFeedFilter = FEED_FILTERS.MAIN; state.currentCommunity = { id: null, name: null }; state.currentChatUser = null; }
@@ -240,7 +239,9 @@
             ui.navItems.forEach(item => item.classList.toggle('active', item.dataset.page === page));
             loadPageContent(page);
         };
+        
         const loadPageContent = (page) => { const actions = { feed: loadFeed, profile: loadProfile, connections: loadConnectionsPage, communities: loadCommunities }; if (actions[page]) actions[page](); };
+        
         const renderFeedUI = () => {
             ui.feedHeaderContainer.classList.add('hidden'); ui.feedHeaderContainer.innerHTML = '';
             const createHeader = (title, btnText) => {
@@ -259,31 +260,51 @@
             ui.feedFiltersContainer.innerHTML = filtersHTML;
             ui.feedFiltersContainer.querySelectorAll('.filter-btn').forEach(btn => btn.addEventListener('click', () => { state.currentFeedFilter = btn.dataset.filter; loadFeed(); }));
         };
-        const checkUserSession = () => {
-            const r = localStorage.getItem(CONFIG.REMEMBER_ME_KEY);
-            if(r) try { const {alias,pub} = JSON.parse(r); state.gun.user().auth(alias,null,ack => { if(ack&&ack.pub) onAuthSuccess(ack.pub,alias,true); else state.gun.user().recall({sessionStorage:true}, r=>{if(r&&r.pub)onAuthSuccess(r.pub,r.alias,false)})}); } catch(e){}
-            else state.gun.user().recall({sessionStorage:true}, ack => { if(ack&&ack.pub) onAuthSuccess(ack.pub,ack.alias,false); });
-        };
+        
         const handleAuth = () => {
             const alias = ui.authAlias.value.trim(); const pass = ui.authPass.value.trim();
             if (!alias || !pass) return showNotification('Preencha todos os campos.', 'error');
             ui.authSubmitBtn.disabled = true; ui.authSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            state.gun.user().auth(alias, pass, ack => {
-                if (ack.err) state.gun.user().create(alias, pass, cAck => { if(cAck.err) { ui.authSubmitBtn.disabled=false; ui.authSubmitBtn.innerHTML='Continuar'; return showNotification('Credenciais inválidas ou usuário existe.', 'error'); } state.gun.user().auth(alias,pass,fAck => onAuthSuccess(fAck.pub, alias, ui.rememberMe.checked)); });
-                else onAuthSuccess(ack.pub, alias, ui.rememberMe.checked);
+            state.user.auth(alias, pass, ack => {
+                if (ack.err) {
+                    state.user.create(alias, pass, createAck => {
+                        if (createAck.err) {
+                            ui.authSubmitBtn.disabled = false;
+                            ui.authSubmitBtn.innerHTML = 'Continuar';
+                            return showNotification('Credenciais inválidas ou usuário já existe.', 'error');
+                        }
+                        // Após criar, autentica novamente para iniciar a sessão
+                        state.user.auth(alias, pass);
+                    });
+                }
+                // O evento 'auth' do Gun tratará o sucesso
             });
         };
-        const onAuthSuccess = (pub, alias, remember) => {
-            state.user = state.gun.user();
-            if(remember) localStorage.setItem(CONFIG.REMEMBER_ME_KEY, JSON.stringify({alias, pub})); else localStorage.removeItem(CONFIG.REMEMBER_ME_KEY);
-            state.gun.get(`~${pub}`).once(p => { if(!p) state.gun.get(`~${pub}`).put({alias, bio:''}); state.currentUserProfile = p || {alias}; });
-            state.gun.get('users').get(pub).put({alias, lastSeen: Date.now()});
-            updateUIForUser(); ui.authModal.classList.remove('active'); ui.authSubmitBtn.disabled = false; ui.authSubmitBtn.innerHTML='Continuar';
+        
+        const onAuthSuccess = (user) => {
+            if(state.user.is) { // Evita múltiplos logins
+                console.log("Usuário já autenticado:", state.user.is.alias);
+                return;
+            }
+            console.log("Autenticado como:", user.alias);
+            const remember = ui.rememberMe.checked;
+            if(remember) localStorage.setItem(CONFIG.REMEMBER_ME_KEY, JSON.stringify({ alias: user.alias, pub: user.pub })); else localStorage.removeItem(CONFIG.REMEMBER_ME_KEY);
+            state.gun.get(`~${user.pub}`).once(p => { if(!p) state.gun.get(`~${user.pub}`).put({alias: user.alias, bio:''}); });
+            state.gun.get('users').get(user.pub).put({alias: user.alias, lastSeen: Date.now()});
+            
+            updateUIForUser();
+            ui.authModal.classList.remove('active');
+            ui.authSubmitBtn.disabled = false;
+            ui.authSubmitBtn.innerHTML = 'Continuar';
             showNotification('Login bem-sucedido!', 'success');
+            
+            // Recarrega o conteúdo da página atual agora que o usuário está logado
             navigateTo(state.currentPage);
         };
-        const logout = () => { state.gun.user().leave(); state.user = null; localStorage.removeItem(CONFIG.REMEMBER_ME_KEY); updateUIForUser(); navigateTo('feed'); showNotification('Você saiu.', 'warning'); };
+        
+        const logout = () => { state.user.leave(); localStorage.removeItem(CONFIG.REMEMBER_ME_KEY); updateUIForUser(); navigateTo('feed'); showNotification('Você saiu.', 'warning'); };
         const updateUIForUser = () => { ui.userAlias.textContent = state.user?.is?.alias || ''; ui.loginBtn.classList.toggle('hidden', !!state.user?.is); ui.logoutBtn.classList.toggle('hidden', !state.user?.is); };
+        
         const loadFeed = () => {
             renderFeedUI(); ui.postsContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`;
             state.postsData.clear(); clearSubscriptions();
@@ -303,6 +324,7 @@
             });
             state.countdownInterval = setInterval(updateAllCountdowns, 5000);
         };
+        
         const renderSortedFeed = debounce(() => {
             const posts = Array.from(state.postsData.values()).sort((a,b) => b.lastActivityAt - a.lastActivityAt);
             if(posts.length === 0) { ui.postsContainer.innerHTML = `<div class="card" style="text-align:center;color:var(--gray);"><i class="fas fa-inbox" style="font-size:2rem;margin-bottom:10px;"></i><p>Nenhum post aqui.</p></div>`; return; }
@@ -310,6 +332,7 @@
             ui.postsContainer.innerHTML = ''; posts.forEach(p => renderPost(p));
             if (focusedElement && focusedElement.id && document.getElementById(focusedElement.id)) document.getElementById(focusedElement.id).focus();
         }, 150);
+        
         const renderPost = async (post) => {
             if(document.getElementById(`post-${post.id}`)) return updatePost(post);
             const el = document.createElement('div'); el.className='card fade-in'; el.id=`post-${post.id}`;
@@ -327,11 +350,13 @@
             });
             updateLikes(post.id, el);
         };
+        
         const updatePost = (post) => { const el = document.querySelector(`#post-${post.id} .post-countdown`); if(el) el.textContent = formatCountdown(post.lastActivityAt); };
+        
         const createPost = () => {
             const content = ui.postContent.value.trim();
             if (!content && !state.tempPostImage && !state.tempPostAudio) return showNotification('Adicione conteúdo para postar.', 'error');
-            if (!state.user?.is) return showNotification('Faça login para publicar.', 'error');
+            if (!state.user.is) return showNotification('Faça login para publicar.', 'error');
             const postData = { authorPub: state.user.is.pub, content, createdAt: Date.now(), lastActivityAt: Date.now() };
             if (state.tempPostImage) postData.image_data = state.tempPostImage;
             if (state.tempPostAudio) postData.audio_data = state.tempPostAudio;
@@ -339,22 +364,25 @@
             else if (state.currentChatUser) postData.connectionChat = state.currentChatUser.pub;
             state.gun.get('posts').set(postData); ui.postContent.value = ''; resetImageSelection(); resetAudioSelection(); showNotification('Publicado!', 'success');
         };
+        
         const handlePostInteraction = (postId, type) => {
-            if (!state.user?.is) return showNotification('Faça login para interagir.', 'error');
+            if (!state.user.is) return showNotification('Faça login para interagir.', 'error');
             state.gun.get('posts').get(postId).get('lastActivityAt').put(Date.now());
             if (type === 'like') { const ref = state.gun.get('posts').get(postId).get('likes').get(state.user.is.pub); ref.once(v => ref.put(!v)); }
         };
+        
         const updateLikes = (postId, postEl) => {
             const likesRef = state.gun.get('posts').get(postId).get('likes');
             const sub = likesRef.map().on(() => {
                 let count = 0; likesRef.map().once(v => { if(v) count++; });
-                if(state.user?.is) likesRef.get(state.user.is.pub).once(v => {
+                if(state.user.is) likesRef.get(state.user.is.pub).once(v => {
                     const a = postEl.querySelector('[data-action="like"]'); if(a) { a.classList.toggle('liked',!!v); a.querySelector('i').className = v ? 'fas fa-heart':'far fa-heart'; }
                 });
                 setTimeout(() => { const c = postEl.querySelector('.like-count'); if(c) c.textContent=count; }, 50);
             });
             state.activeSubscriptions.set(`likes-${postId}`, sub);
         };
+        
         const renderComments = (postId, container) => {
             container.innerHTML = `<div class="comments-list"></div><div class="comment-form"><input type="text" class="form-control comment-input" placeholder="Seu comentário..."><button class="btn btn-sm comment-submit-btn"><i class="fas fa-paper-plane"></i></button></div>`;
             container.querySelector('.comment-submit-btn').addEventListener('click', () => createComment(postId, container));
@@ -370,22 +398,26 @@
             });
             state.activeSubscriptions.set(`comments-${postId}`, sub);
         };
+        
         const createComment = (postId, container) => {
             const input = container.querySelector('.comment-input'); const content = input.value.trim();
-            if (!content || !state.user?.is) return;
+            if (!content || !state.user.is) return;
             handlePostInteraction(postId, 'comment');
             const commentData = { authorPub: state.user.is.pub, content, createdAt: Date.now() };
             state.gun.get('posts').get(postId).get('comments').set(commentData); input.value = '';
         };
+
         const updateAllCountdowns = () => document.querySelectorAll('.post-countdown').forEach(el => {
             const ts = parseInt(el.dataset.timestamp, 10);
             if (ts && Date.now() - ts > CONFIG.POST_EXPIRATION_MS) el.closest('.card')?.remove();
             else if (ts) el.textContent = formatCountdown(ts);
         });
+        
         const compressImage = (file) => new Promise((resolve, reject) => {
             const reader = new FileReader(); reader.readAsDataURL(file);
             reader.onload = e => { const i = new Image(); i.src = e.target.result; i.onload = () => { const c = document.createElement('canvas'), s = Math.min(1, CONFIG.IMAGE_MAX_WIDTH / i.width); c.width = i.width*s; c.height = i.height*s; const ctx=c.getContext('2d'); ctx.drawImage(i,0,0,c.width,c.height); resolve(c.toDataURL('image/jpeg',CONFIG.IMAGE_COMPRESSION_QUALITY)); }; i.onerror=reject; }; reader.onerror=reject;
         });
+        
         const handleImageSelection = async (event) => {
             const file = event.target.files[0]; if (!file || !file.type.startsWith('image/')) return;
             try { resetAudioSelection(); const data = await compressImage(file); state.tempPostImage = data; ui.imagePreview.src = data; ui.imagePreviewContainer.classList.remove('hidden'); }
@@ -432,18 +464,18 @@
             new ResizeObserver(debounce(resizeCanvas, 100)).observe(modal);
             modal.addEventListener('transitionend', () => { if (modal.classList.contains('active')) resizeCanvas(); });
         };
-        const loadProfile = () => { if (!state.user?.is) { ui.profileContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver seu perfil</p><button id="profile-login-btn" class="btn">Login</button></div>`; document.getElementById('profile-login-btn').addEventListener('click', ()=>ui.authModal.classList.add('active')); return; } ui.profileContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`; state.gun.get(`~${state.user.is.pub}`).once(p => { p = p || {alias: state.user.is.alias, bio: ''}; state.currentUserProfile = p; ui.profileContainer.innerHTML = `<div class="card"><div class="profile-header"><div class="profile-avatar" style="${p.avatar ? `background-image:url('${p.avatar}')` : ''}">${!p.avatar?(p.alias?p.alias.charAt(0).toUpperCase():'?'):''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1>${sanitizeHTML(p.alias)}</h1><p class="profile-bio">${sanitizeHTML(p.bio||'Sem bio.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div></div></div><div class="card"><h3>Editar Perfil</h3><div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" class="form-control" rows="3">${sanitizeHTML(p.bio||'')}</textarea></div><button id="save-profile-btn" class="btn">Salvar</button></div>`; document.getElementById('save-profile-btn').addEventListener('click', saveProfile); document.querySelector('.profile-avatar').addEventListener('click', ()=>{ ui.avatarPreview.style.backgroundImage = p.avatar ? `url('${p.avatar}')` : ''; ui.avatarPreview.innerHTML = !p.avatar ? (p.alias?p.alias.charAt(0).toUpperCase():'?'):''; ui.avatarModal.classList.add('active'); }); loadProfileStats(); }); };
-        const saveProfile = () => { if(!state.user?.is)return; const bio = document.getElementById('edit-bio').value.trim(); state.gun.get(`~${state.user.is.pub}`).get('bio').put(bio); showNotification('Bio atualizada!', 'success'); document.querySelector('.profile-bio').textContent=bio; };
+        const loadProfile = () => { if (!state.user.is) { ui.profileContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver seu perfil</p><button id="profile-login-btn" class="btn">Login</button></div>`; document.getElementById('profile-login-btn').addEventListener('click', ()=>ui.authModal.classList.add('active')); return; } ui.profileContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`; state.gun.get(`~${state.user.is.pub}`).once(p => { p = p || {alias: state.user.is.alias, bio: ''}; state.currentUserProfile = p; ui.profileContainer.innerHTML = `<div class="card"><div class="profile-header"><div class="profile-avatar" style="${p.avatar ? `background-image:url('${p.avatar}')` : ''}">${!p.avatar?(p.alias?p.alias.charAt(0).toUpperCase():'?'):''}<div class="profile-avatar-edit"><i class="fas fa-camera"></i></div></div><h1>${sanitizeHTML(p.alias)}</h1><p class="profile-bio">${sanitizeHTML(p.bio||'Sem bio.')}</p></div><div class="profile-stats"><div class="stat-item"><div id="post-count" class="stat-number">0</div><div class="stat-label">Posts</div></div><div class="stat-item"><div id="community-count" class="stat-number">0</div><div class="stat-label">Comunidades</div></div><div class="stat-item"><div id="connection-count" class="stat-number">0</div><div class="stat-label">Conexões</div></div></div></div><div class="card"><h3>Editar Perfil</h3><div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" class="form-control" rows="3">${sanitizeHTML(p.bio||'')}</textarea></div><button id="save-profile-btn" class="btn">Salvar</button></div>`; document.getElementById('save-profile-btn').addEventListener('click', saveProfile); document.querySelector('.profile-avatar').addEventListener('click', ()=>{ ui.avatarPreview.style.backgroundImage = p.avatar ? `url('${p.avatar}')` : ''; ui.avatarPreview.innerHTML = !p.avatar ? (p.alias?p.alias.charAt(0).toUpperCase():'?'):''; ui.avatarModal.classList.add('active'); }); loadProfileStats(); }); };
+        const saveProfile = () => { if(!state.user.is)return; const bio = document.getElementById('edit-bio').value.trim(); state.user.get('profile').get('bio').put(bio); showNotification('Bio atualizada!', 'success'); document.querySelector('.profile-bio').textContent=bio; };
         const handleAvatarUpload = (e) => { const f=e.target.files[0]; if(!f||f.size>CONFIG.AVATAR_MAX_SIZE||!f.type.startsWith('image/')) return; const r=new FileReader(); r.onload=e=>{ ui.avatarPreview.style.backgroundImage=`url('${e.target.result}')`; ui.avatarPreview.innerHTML=''; state.tempAvatarFile=e.target.result; }; r.readAsDataURL(f); };
-        const saveAvatar = () => { if(!state.user?.is||!state.tempAvatarFile)return; state.gun.get(`~${state.user.is.pub}`).get('avatar').put(state.tempAvatarFile); showNotification('Avatar salvo!', 'success'); ui.avatarModal.classList.remove('active'); state.tempAvatarFile=null; loadProfile(); };
-        const loadProfileStats = () => { let p=0,c=0,n=0; const u=state.gun.user(); if(!u) return; u.get('posts').map().once(()=>{const e=document.getElementById('post-count'); if(e)e.textContent=++p;}); u.get('communities').map().once(()=>{const e=document.getElementById('community-count'); if(e)e.textContent=++c;}); u.get('mutualConnections').map().once(v=>{if(v){const e=document.getElementById('connection-count'); if(e)e.textContent=++n;}}); };
+        const saveAvatar = () => { if(!state.user.is||!state.tempAvatarFile)return; state.user.get('profile').get('avatar').put(state.tempAvatarFile); showNotification('Avatar salvo!', 'success'); ui.avatarModal.classList.remove('active'); state.tempAvatarFile=null; loadProfile(); };
+        const loadProfileStats = () => { let p=0,c=0,n=0; const u=state.user; if(!u.is) return; u.get('posts').map().once(()=>{const e=document.getElementById('post-count'); if(e)e.textContent=++p;}); u.get('communities').map().once(()=>{const e=document.getElementById('community-count'); if(e)e.textContent=++c;}); u.get('mutualConnections').map().once(v=>{if(v){const e=document.getElementById('connection-count'); if(e)e.textContent=++n;}}); };
         const loadCommunities = () => { ui.communitiesContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div></div>`; let has=false; const sub=state.gun.get('communities').map().on((comm, id)=>{ if(comm?.name){ if(!has)ui.communitiesContainer.innerHTML=''; has=true; if(document.getElementById(`comm-${id}`))return; renderCommunity(comm,id); } }); state.activeSubscriptions.set('communities-list', sub); setTimeout(() => { if(!has) ui.communitiesContainer.innerHTML=`<div class="card" style="text-align:center;color:var(--gray);">Nenhuma comunidade.</div>`; }, 3000); };
         const renderCommunity = (comm, id) => { const el=document.createElement('div'); el.className='community-card fade-in'; el.id=`comm-${id}`; el.innerHTML=`<div class="community-info-details">${renderAvatar({alias:comm.name})}<div class="community-info"><div class="community-name">${sanitizeHTML(comm.name)}</div></div></div><i class="fas fa-chevron-right"></i>`; el.addEventListener('click', ()=>{ state.currentCommunity={id, name:comm.name}; state.currentFeedFilter=FEED_FILTERS.COMMUNITY; navigateTo('feed'); }); ui.communitiesContainer.prepend(el); };
-        const createCommunity = () => { if(!state.user?.is) return showNotification('Faça login para criar.', 'error'); const name=document.getElementById('community-name').value.trim(); if(!name)return showNotification('Nome é obrigatório.', 'error'); const desc = document.getElementById('community-desc').value.trim(); const commRef = state.gun.get('communities').set({name, description: desc, creatorPub:state.user.is.pub}); state.gun.user().get('communities').set(commRef); ui.communityModal.classList.remove('active'); showNotification('Comunidade criada!', 'success'); };
-        const loadConnectionsPage = () => { if (!state.user?.is) { ui.allUsersContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver usuários</p><button class="btn" onclick="document.getElementById('auth-modal').classList.add('active')">Login</button></div>`; return; } loadAllUsers(); };
+        const createCommunity = () => { if(!state.user.is) return showNotification('Faça login para criar.', 'error'); const name=document.getElementById('community-name').value.trim(); if(!name)return showNotification('Nome é obrigatório.', 'error'); const desc = document.getElementById('community-desc').value.trim(); const commRef = state.gun.get('communities').set({name, description: desc, creatorPub:state.user.is.pub}); state.user.get('communities').set(commRef); ui.communityModal.classList.remove('active'); showNotification('Comunidade criada!', 'success'); };
+        const loadConnectionsPage = () => { if (!state.user.is) { ui.allUsersContainer.innerHTML = `<div class="card" style="text-align:center;"><p>Faça login para ver usuários</p><button class="btn" onclick="document.getElementById('auth-modal').classList.add('active')">Login</button></div>`; return; } loadAllUsers(); };
         const loadAllUsers = () => { ui.allUsersContainer.innerHTML=`<div class="loading"><div class="loading-spinner"></div></div>`; let has=false; const processed=new Set(state.user?[state.user.is.pub]:[]); const renderIfNeeded=async(user,pub)=>{ if(!user||!user.alias||processed.has(pub))return; processed.add(pub); if(!has)ui.allUsersContainer.innerHTML=''; has=true; if(!document.getElementById(`user-${pub}`))await renderUserCard(user,pub); }; state.gun.get('users').map().once((user, pub)=>renderIfNeeded(user,pub)); state.gun.get('posts').map().once(post => { if(post?.authorPub && !processed.has(post.authorPub)) state.gun.get(`~${post.authorPub}`).once(p=>renderIfNeeded(p,post.authorPub)); }); setTimeout(() => { if(!has) ui.allUsersContainer.innerHTML=`<div style="text-align:center;padding:15px;color:var(--gray);">Nenhum usuário encontrado.</div>`; }, 3500); };
-        const renderUserCard = async (user, pub) => { let el=document.getElementById(`user-${pub}`); if(!el){el=document.createElement('div'); el.className='user-card fade-in'; el.id=`user-${pub}`; el.dataset.alias=user.alias.toLowerCase(); ui.allUsersContainer.appendChild(el);} const isMutual=state.mutualConnections.has(pub); const sent=await new Promise(r=>state.gun.user().get('sentConnections').get(pub).once(v=>r(!!v))); let btn; if(isMutual)btn=`<button class="btn btn-sm btn-success" data-pub="${pub}" data-action="chat"><i class="fas fa-comment"></i> Conversar</button>`; else if(sent)btn=`<button class="btn btn-sm btn-warning" disabled><i class="fas fa-clock"></i> Pendente</button>`; else btn=`<button class="btn btn-sm" data-pub="${pub}" data-action="connect"><i class="fas fa-user-plus"></i> Conectar</button>`; el.innerHTML = `<div class="user-card-info">${renderAvatar(user)}<span>${sanitizeHTML(user.alias)}</span></div><div class="user-card-actions">${btn}</div>`; };
-        const connectUser = async (targetPub) => { state.gun.user().get('sentConnections').get(targetPub).put(true); const targetSent = await new Promise(r=>state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).once(v=>r(!!v))); if(targetSent){ state.gun.user().get('mutualConnections').get(targetPub).put(true); state.gun.get(`~${targetPub}`).get('mutualConnections').get(state.user.is.pub).put(true); state.gun.user().get('sentConnections').get(targetPub).put(null); state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).put(null); showNotification('Conexão estabelecida!', 'success'); state.mutualConnections.add(targetPub); } else showNotification('Solicitação enviada!', 'info'); const card = document.getElementById(`user-${targetPub}`); if(card) renderUserCard({alias:card.dataset.alias}, targetPub); };
+        const renderUserCard = async (user, pub) => { let el=document.getElementById(`user-${pub}`); if(!el){el=document.createElement('div'); el.className='user-card fade-in'; el.id=`user-${pub}`; el.dataset.alias=user.alias.toLowerCase(); ui.allUsersContainer.appendChild(el);} const isMutual=state.mutualConnections.has(pub); const sent=await new Promise(r=>state.user.get('sentConnections').get(pub).once(v=>r(!!v))); let btn; if(isMutual)btn=`<button class="btn btn-sm btn-success" data-pub="${pub}" data-action="chat"><i class="fas fa-comment"></i> Conversar</button>`; else if(sent)btn=`<button class="btn btn-sm btn-warning" disabled><i class="fas fa-clock"></i> Pendente</button>`; else btn=`<button class="btn btn-sm" data-pub="${pub}" data-action="connect"><i class="fas fa-user-plus"></i> Conectar</button>`; el.innerHTML = `<div class="user-card-info">${renderAvatar(user)}<span>${sanitizeHTML(user.alias)}</span></div><div class="user-card-actions">${btn}</div>`; };
+        const connectUser = async (targetPub) => { state.user.get('sentConnections').get(targetPub).put(true); const targetSent = await new Promise(r=>state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).once(v=>r(!!v))); if(targetSent){ state.user.get('mutualConnections').get(targetPub).put(true); state.gun.get(`~${targetPub}`).get('mutualConnections').get(state.user.is.pub).put(true); state.user.get('sentConnections').get(targetPub).put(null); state.gun.get(`~${targetPub}`).get('sentConnections').get(state.user.is.pub).put(null); showNotification('Conexão estabelecida!', 'success'); state.mutualConnections.add(targetPub); } else showNotification('Solicitação enviada!', 'info'); const card = document.getElementById(`user-${targetPub}`); if(card) renderUserCard({alias:card.dataset.alias}, targetPub); };
         const startChat = async (userPub) => { const p = await new Promise(r=>state.gun.get(`~${userPub}`).once(p=>r(p||{alias:'?',pub:userPub}))); state.currentChatUser={...p,pub:userPub}; state.currentFeedFilter=FEED_FILTERS.USER_CHAT; navigateTo('feed'); };
         
         const setupEventListeners = () => {
@@ -477,7 +509,21 @@
             s.title = connected ? 'Conectado à Rede' : 'Desconectado da Rede';
         };
 
-        const init = () => { setupEventListeners(); setupDrawingCanvas(); checkUserSession(); navigateTo('feed'); setInterval(updateConnectionStatus, 3000); updateConnectionStatus(); };
+        const init = () => {
+            setupEventListeners();
+            setupDrawingCanvas();
+            // A inicialização agora acontece dentro do listener de 'auth'
+            state.gun.on('auth', (ack) => {
+                // Este evento dispara no login/criação/restauração de sessão
+                onAuthSuccess(ack);
+            });
+            state.gun.user().recall({ sessionStorage: true }); // Tenta restaurar sessão
+            updateUIForUser(); // Atualiza a UI para o estado inicial (deslogado)
+            navigateTo('feed'); // Navega para o feed
+            setInterval(updateConnectionStatus, 3000); // Inicia o monitor de conexão
+            updateConnectionStatus();
+        };
+        
         init();
     })();
     </script>
