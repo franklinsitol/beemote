@@ -77,6 +77,24 @@
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            background: var(--danger);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 3000;
+            transition: var(--transition);
+        }
+
+        .connection-status.connected {
+            background: var(--success);
+        }
+
         .auth-screen {
             display: flex;
             flex-direction: column;
@@ -516,10 +534,14 @@
             #drawingCanvas { max-height: 350px; }
             .modal-content { padding: 20px; }
             .auth-box { padding: 30px 20px; }
+            .header-content { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
 <body>
+    <!-- INDICADOR DE CONEXÃO -->
+    <div id="connectionStatus" class="connection-status">Conectando...</div>
+
     <header>
         <div class="header-content">
             <div class="logo">Beemote</div>
@@ -704,20 +726,23 @@
     </div>
 
     <script>
-        // ==================== CONFIGURAÇÃO GUN.JS - CORREÇÃO PARA VERCUL ====================
+        // ==================== CONFIGURAÇÃO GUN.JS - CORREÇÃO DE SINCRONIZAÇÃO ====================
+        const PEERS = [
+            'https://gun-manhattan.herokuapp.com/gun',
+            'https://gun-eu.herokuapp.com/gun',
+            'https://gun-us.herokuapp.com/gun',
+            'https://gun-relay.herokuapp.com/gun',
+            'https://gundb-relay.herokuapp.com/gun'
+        ];
+
         const gun = Gun({
-            peers: [
-                'https://gun-manhattan.herokuapp.com/gun',
-                'https://gun-eu.herokuapp.com/gun',
-                'https://gun-us.herokuapp.com/gun',
-                'https://gun-relay.herokuapp.com/gun',
-                'https://gun-sin.herokuapp.com/gun'
-            ],
+            peers: PEERS,
             localStorage: true,
             radisk: true,
-            WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : null,
-            retry: 5,
-            timeout: 10000
+            retry: 10,
+            timeout: 30000,
+            webRTC: true,
+            multicast: true
         });
 
         const user = gun.user();
@@ -731,6 +756,7 @@
         let ctx = null;
         let currentColor = '#000000';
         let currentBrushSize = 3;
+        let isConnected = false;
 
         const REACTION_EMOJIS = {
             like: '👍', love: '❤️', laugh: '😂', wow: '😲', sad: '😢', angry: '😠'
@@ -757,11 +783,41 @@
             canvas.addEventListener('touchend', stopDrawing, { passive: false });
             canvas.addEventListener('touchcancel', stopDrawing, { passive: false });
 
+            // Verifica conexão
+            checkConnection();
+            
+            // Auto-login
             const alias = localStorage.getItem('beemote_alias');
             if (alias) {
                 autoLogin(alias);
             }
         };
+
+        function checkConnection() {
+            // Testa conexão com os peers
+            let connectedPeers = 0;
+            const statusEl = document.getElementById('connectionStatus');
+            
+            PEERS.forEach(peer => {
+                fetch(peer.replace('gun', ''), { mode: 'no-cors' })
+                    .then(() => {
+                        connectedPeers++;
+                        isConnected = true;
+                        statusEl.textContent = `Conectado (${connectedPeers}/${PEERS.length} peers)`;
+                        statusEl.classList.add('connected');
+                    })
+                    .catch(() => {
+                        console.log('Peer offline:', peer);
+                    });
+            });
+
+            setTimeout(() => {
+                if (!isConnected) {
+                    statusEl.textContent = 'OFFLINE - Verifique sua conexão';
+                    statusEl.classList.remove('connected');
+                }
+            }, 5000);
+        }
 
         function changeColor(picker) {
             currentColor = picker.value;
@@ -909,27 +965,38 @@
             document.getElementById('userInfo').classList.remove('hidden');
             document.getElementById('username').textContent = currentUser.alias;
             
-            loadFeed();
-            loadContacts();
-            loadCommunities();
-            loadProfile();
+            // Força sincronização inicial
+            setTimeout(() => {
+                loadFeed();
+                loadContacts();
+                loadCommunities();
+                loadProfile();
+            }, 1000);
         }
 
-        // ==================== FEED E POSTS ====================
+        // ==================== FEED E POSTS - SINCRONIZAÇÃO EM TEMPO REAL ====================
         async function loadFeed() {
             const postsDiv = document.getElementById('posts');
-            postsDiv.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Carregando posts...</p>';
+            postsDiv.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">📡 Sincronizando com a rede P2P...</p>';
+            
             const posts = [];
             
-            gun.get('beemote').get('posts').map().once((data, id) => {
+            // Usa .on() em vez de .once() para escutar mudanças em tempo real
+            gun.get('beemote').get('posts').map().on((data, id) => {
                 if (!data || (data.ttl && data.ttl < Date.now())) {
                     gun.get('beemote').get('posts').get(id).put(null);
                     return;
                 }
-                posts.push({ id, ...data });
-            });
+                
+                // Evita duplicatas
+                const existingIndex = posts.findIndex(p => p.id === id);
+                if (existingIndex >= 0) {
+                    posts[existingIndex] = { id, ...data };
+                } else {
+                    posts.push({ id, ...data });
+                }
 
-            setTimeout(() => {
+                // Ordena e renderiza
                 posts.sort((a, b) => (b.bumpedAt || b.timestamp) - (a.bumpedAt || a.timestamp));
                 
                 postsDiv.innerHTML = '';
@@ -938,7 +1005,16 @@
                 if (posts.length === 0) {
                     postsDiv.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Nenhum post ainda. Seja o primeiro a publicar!</p>';
                 }
-            }, 1500);
+                
+                console.log(`✅ ${posts.length} posts carregados da rede`);
+            });
+
+            // Timeout de segurança
+            setTimeout(() => {
+                if (posts.length === 0) {
+                    postsDiv.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Nenhum post encontrado na rede. Publique algo!</p>';
+                }
+            }, 5000);
         }
 
         async function renderPost(post) {
@@ -1037,10 +1113,11 @@
                 media = canvas.toDataURL();
             }
 
-            const postId = Date.now().toString();
+            const postId = `post_${Date.now()}_${currentUser.pub.substring(0, 8)}`;
             const timestamp = Date.now();
             const postData = {
                 author: currentUser.pub,
+                authorAlias: currentUser.alias,
                 content,
                 media,
                 timestamp,
@@ -1059,7 +1136,10 @@
             });
 
             closeModal();
-            setTimeout(loadFeed, 500);
+            alert('✅ Post publicado na rede P2P!');
+            
+            // Força recarregar feed após 1s para garantir sincronização
+            setTimeout(loadFeed, 1000);
         }
 
         // ==================== PERFIL ====================
@@ -1107,17 +1187,23 @@
             wall.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Carregando depoimentos...</p>';
             
             const testimonials = [];
-            user.get('testimonials').map().once((data, id) => {
-                if (data && !data.hidden) testimonials.push({ id, ...data });
-            });
-
-            setTimeout(async () => {
+            user.get('testimonials').map().on((data, id) => {
+                if (data && !data.hidden) {
+                    const existingIndex = testimonials.findIndex(t => t.id === id);
+                    if (existingIndex >= 0) {
+                        testimonials[existingIndex] = { id, ...data };
+                    } else {
+                        testimonials.push({ id, ...data });
+                    }
+                }
+                
+                wall.innerHTML = '';
                 if (testimonials.length === 0) {
                     wall.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Nenhum depoimento ainda.</p>';
                     return;
                 }
-                wall.innerHTML = '';
-                for (const t of testimonials) {
+                
+                testimonials.forEach(async t => {
                     const author = await getUserAlias(t.author);
                     const testimonialEl = document.createElement('div');
                     testimonialEl.className = 'testimonial';
@@ -1129,8 +1215,8 @@
                         <small style="color: var(--text-secondary);">${author} - ${formatTime(t.timestamp)}</small>
                     `;
                     wall.appendChild(testimonialEl);
-                }
-            }, 1000);
+                });
+            });
         }
 
         function hideTestimonial(id) {
@@ -1142,14 +1228,14 @@
             const alias = await getUserAlias(pub);
             const text = prompt(`Escreva um depoimento para @${alias}:`);
             if (text && text.trim()) {
-                const id = Date.now().toString();
+                const id = `testimonial_${Date.now()}`;
                 gun.user(pub).get('testimonials').get(id).put({
                     author: currentUser.pub,
                     text: text.trim(),
                     timestamp: Date.now(),
                     hidden: false
                 });
-                alert('Depoimento enviado!');
+                alert('✅ Depoimento enviado!');
             }
         }
 
@@ -1158,7 +1244,7 @@
             const contactsDiv = document.getElementById('contactsList');
             contactsDiv.innerHTML = '';
             
-            user.get('contacts').map().once(data => {
+            user.get('contacts').map().on(data => {
                 if (!data) return;
                 const contactEl = document.createElement('div');
                 contactEl.className = 'contact-item';
@@ -1200,7 +1286,7 @@
                 });
                 
                 document.getElementById('contactUsername').value = '';
-                alert('Solicitação enviada!');
+                alert('✅ Solicitação enviada!');
                 loadContacts();
             });
         }
@@ -1233,7 +1319,7 @@
             
             if (!name) return alert('Digite um nome para a comunidade');
             
-            const communityId = Date.now().toString();
+            const communityId = `community_${Date.now()}_${currentUser.pub.substring(0, 8)}`;
             gun.get('beemote').get('communities').get(communityId).put({
                 id: communityId,
                 name,
@@ -1251,7 +1337,7 @@
             const communitiesDiv = document.getElementById('communitiesList');
             communitiesDiv.innerHTML = '';
             
-            gun.get('beemote').get('communities').map().once(data => {
+            gun.get('beemote').get('communities').map().on(data => {
                 if (!data) return;
                 const isMember = data.members && data.members[currentUser.pub];
                 const communityEl = document.createElement('div');
@@ -1324,10 +1410,10 @@
                     Object.entries(data.contacts || {}).forEach(([id, contact]) => user.get('contacts').get(id).put(contact));
                     Object.entries(data.testimonials || {}).forEach(([id, testimonial]) => user.get('testimonials').get(id).put(testimonial));
                     
-                    alert('Dados importados com sucesso!');
+                    alert('✅ Dados importados com sucesso!');
                     location.reload();
                 } catch (err) {
-                    alert('Erro ao importar dados: arquivo inválido ou corrompido');
+                    alert('❌ Erro ao importar dados: arquivo inválido ou corrompido');
                 }
             };
             reader.readAsText(file);
@@ -1340,6 +1426,7 @@
             event.target.classList.add('active');
             document.getElementById(tab + 'Tab').classList.remove('hidden');
             
+            // Recarrega dados ao trocar de aba
             if (tab === 'feed') loadFeed();
             if (tab === 'profile') loadProfile();
             if (tab === 'contacts') loadContacts();
@@ -1387,7 +1474,7 @@
                     document.getElementById('stopBtn').classList.remove('hidden');
                     document.getElementById('audioStatus').textContent = 'Gravando...';
                 } catch (err) {
-                    alert('Não foi possível acessar o microfone: ' + err.message);
+                    alert('❌ Não foi possível acessar o microfone: ' + err.message);
                 }
             }
         }
@@ -1413,7 +1500,7 @@
                 gun.user(postId.split('_')[0]).get('stats').get('likesReceived').put((count || 0) + 1);
             });
             
-            setTimeout(loadFeed, 300);
+            console.log(`Reação ${type} adicionada ao post ${postId}`);
         }
 
         function comment(postId) {
@@ -1421,7 +1508,7 @@
             const text = input.value.trim();
             if (!text) return;
             
-            const commentId = Date.now().toString();
+            const commentId = `comment_${Date.now()}`;
             const commentData = {
                 author: currentUser.pub,
                 authorAlias: currentUser.alias,
@@ -1433,22 +1520,16 @@
             gun.get('beemote').get('posts').get(postId).get('bumpedAt').put(Date.now());
             
             input.value = '';
-            setTimeout(loadFeed, 300);
+            console.log(`Comentário adicionado ao post ${postId}`);
         }
 
         // Receber atualizações em tempo real
-        gun.get('beemote').get('posts').map().on(() => {
-            if (currentTab === 'feed') {
-                setTimeout(loadFeed, 500);
-            }
+        gun.get('beemote').get('posts').on(() => {
+            console.log('📡 Nova atualização detectada na rede');
         });
 
-        // Auto-refresh do feed a cada 15 segundos
-        setInterval(() => {
-            if (currentTab === 'feed' && currentUser) {
-                loadFeed();
-            }
-        }, 15000);
+        // Verifica conexão periodicamente
+        setInterval(checkConnection, 30000);
     </script>
 </body>
 </html>
