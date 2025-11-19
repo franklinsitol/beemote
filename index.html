@@ -6,12 +6,16 @@
     <title>Beemote - Rede Social Descentralizada</title>
     <meta name="description" content="Rede social descentralizada com foco em privacidade e conexões genuínas">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Carregando scripts do Gun na ordem correta -->
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/webrtc.js"></script>
+
     <style>
         :root {
             --primary: #6C63FF;
@@ -974,9 +978,13 @@
     (function() {
         'use strict';
         
-        // Configuration
+        // Configuration: LISTA DE PEERS ATUALIZADA
         const CONFIG = {
-            GUN_PEERS: ['https://gun-manhattan.herokuapp.com/gun'],
+            GUN_PEERS: [
+                'https://gun-manhattan.herokuapp.com/gun', // Peer clássico (instável)
+                'https://gun-eu.herokuapp.com/gun',        // Peer alternativo
+                'https://peer.wallie.io/gun'               // Peer comunitário confiável
+            ],
             POST_EXPIRATION_MS: 24 * 60 * 60 * 1000, // 24 hours
             MAX_POST_LENGTH: 500,
             MAX_BIO_LENGTH: 200,
@@ -985,7 +993,12 @@
         
         // State management
         const state = {
-            gun: Gun({ peers: CONFIG.GUN_PEERS, localStorage: false, radisk: true }),
+            // IMPORTANTE: localStorage: true para salvar dados se a rede falhar
+            gun: Gun({ 
+                peers: CONFIG.GUN_PEERS, 
+                localStorage: true, 
+                radisk: true 
+            }),
             user: null,
             currentPage: 'feed',
             activeSubscriptions: new Map(),
@@ -2272,13 +2285,6 @@
             setupEventListeners();
             checkUserSession();
             navigateTo('feed');
-            
-            // Add service worker for PWA capabilities in production
-            if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
-                navigator.serviceWorker.register('/sw.js').catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            }
         };
         
         // Start the app
