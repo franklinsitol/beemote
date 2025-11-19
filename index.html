@@ -4,39 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Beemote - Rede Social P2P Premium</title>
-    <!-- CORREÇÃO 1: Removidos espaços nas URLs -->
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
     <style>
-        /* ... (seu CSS permanece o mesmo) ... */
         :root {
+            /* TEMA BRANCO/PRETO */
             --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --text-primary: #212529;
-            --accent: #4361ee;
-            --danger: #ef476f;
-            --border: #dee2e6;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #000000;
+            --text-primary: #000000;
+            --text-secondary: #555555;
+            --accent: #000000;
+            --accent-dark: #333333;
+            --accent-light: #666666;
+            --success: #06d6a0;
+            --danger: #ff0000;
+            --warning: #ffd166;
+            --border: #e0e0e0;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.16);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         [data-theme="dark"] {
             --bg-primary: #121212;
             --bg-secondary: #1e1e1e;
+            --bg-tertiary: #2d2d2d;
             --text-primary: #f8f9fa;
+            --text-secondary: #adb5bd;
+            --accent: #ffffff;
+            --border: #343a40;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
+
         .container { max-width: 800px; margin: 0 auto; padding: 20px; }
         header {
-            background: linear-gradient(135deg, var(--accent), #3a56d4);
-            color: white;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             padding: 16px 0;
+            box-shadow: var(--shadow-sm);
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid var(--border);
         }
+
         .header-content {
             max-width: 800px;
             margin: 0 auto;
@@ -45,69 +73,114 @@
             align-items: center;
             justify-content: space-between;
         }
+
         .logo {
             font-size: 28px;
             font-weight: 800;
             display: flex;
             align-items: center;
             gap: 12px;
+            letter-spacing: -0.5px;
         }
-        .logo::before { content: "🦛"; font-size: 36px; }
+
+        .logo::before {
+            content: "🦛";
+            font-size: 36px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
         .auth-screen {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--accent), #4895ef);
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
         }
+
         .auth-box {
             background: var(--bg-primary);
             padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 16px 32px rgba(0,0,0,0.2);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
             width: 100%;
             max-width: 420px;
+            border: 1px solid var(--border);
         }
+
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 500; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-primary); }
         input, textarea, select {
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-size: 15px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
         }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+        }
+
         button {
-            background: linear-gradient(135deg, var(--accent), #3a56d4);
+            background: var(--accent);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
+            font-size: 15px;
             font-weight: 600;
-            transition: all 0.3s;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            min-height: 44px;
         }
-        button:hover { transform: translateY(-2px); }
-        button.secondary {
-            background: linear-gradient(135deg, var(--bg-secondary), var(--border));
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            background: var(--accent-dark);
+        }
+
+        button:active { transform: translateY(0); }
+        button.secondary { 
+            background: var(--bg-secondary); 
             color: var(--text-primary);
+            border: 1px solid var(--border);
         }
-        .hidden { display: none !important; }
-        .error { color: var(--danger); font-size: 14px; margin-top: 5px; }
+        button.danger { 
+            background: var(--danger); 
+            color: white;
+        }
+
         .tabs {
             display: flex;
             gap: 8px;
             margin-bottom: 24px;
             border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            padding-bottom: 8px;
         }
+
         .tab {
             padding: 12px 20px;
             cursor: pointer;
             border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
             font-weight: 600;
+            transition: var(--transition);
+            white-space: nowrap;
+            color: var(--text-secondary);
         }
+
+        .tab:hover { color: var(--accent); }
         .tab.active { border-bottom-color: var(--accent); color: var(--accent); }
+
         .fab {
             position: fixed;
             bottom: 30px;
@@ -115,14 +188,21 @@
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), #3a56d4);
+            background: var(--accent);
             color: white;
             border: none;
             font-size: 28px;
             cursor: pointer;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-md);
             z-index: 1000;
+            transition: var(--transition);
         }
+
+        .fab:hover { 
+            transform: scale(1.1) rotate(90deg); 
+            box-shadow: var(--shadow-lg);
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -134,39 +214,205 @@
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            backdrop-filter: blur(4px);
         }
+
         .modal.show { display: flex; }
         .modal-content {
             background: var(--bg-primary);
             padding: 32px;
-            border-radius: 16px;
+            border-radius: var(--radius-lg);
             max-width: 560px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            animation: modalAppear 0.3s;
-        }
-        @keyframes modalAppear {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .post {
-            background: var(--bg-secondary);
-            padding: 24px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid var(--border);
         }
-        .post:hover { transform: translateY(-2px); }
+
+        @keyframes modalAppear {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .post {
+            background: var(--bg-primary);
+            padding: 24px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .post:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .post-content { margin: 16px 0; font-size: 16px; line-height: 1.5; }
+        .post-media { margin: 16px 0; border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-sm); }
+        .post-media img { max-width: 100%; display: block; }
+        .post-media audio { width: 100%; border-radius: var(--radius-sm); }
+
+        /* BOTÕES ALINHADOS À DIREITA */
+        .reactions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            justify-content: flex-end; /* ALINHADO À DIREITA */
+        }
+
         .reaction-btn {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 16px;
             cursor: pointer;
-            margin-right: 8px;
+            font-size: 20px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+            min-height: 44px;
         }
-        .reaction-btn.active { background: var(--accent); color: white; }
+
+        .reaction-btn:hover { 
+            background: var(--accent); 
+            color: white; 
+            transform: scale(1.1);
+            border-color: var(--accent);
+        }
+        .reaction-btn.active { 
+            background: var(--accent); 
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .comment-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+        /* BOTÃO DE COMENTÁRIO À DIREITA */
+        .comment-input {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-direction: row-reverse; /* INVERTE ORDEM: BOTÃO À DIREITA */
+        }
+
+        .comment-input input { 
+            flex: 1; 
+            border-radius: var(--radius-sm);
+        }
+        .comment-input button { 
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+        }
+
+        .comment {
+            background: var(--bg-secondary);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-left: 3px solid var(--accent);
+            transition: var(--transition);
+        }
+
+        .comment:hover { transform: translateX(4px); }
+
+        .profile-header {
+            background: var(--bg-primary);
+            padding: 32px;
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .stat-card h3 { font-size: 32px; margin-bottom: 4px; color: var(--accent); }
+        .stat-card p { font-size: 12px; color: var(--text-secondary); }
+
+        .export-import {
+            display: flex;
+            gap: 12px;
+            margin: 24px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #themeToggle {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 12px;
+            transition: var(--transition);
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        #themeToggle:hover {
+            transform: rotate(180deg);
+            background: var(--accent);
+            color: white;
+        }
+
+        /* BOTÃO PUBLICAR À DIREITA NO MODAL */
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end; /* ALINHADO À DIREITA */
+        }
+
+        #bioText {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            margin: 10px 0;
+            color: var(--text-secondary);
+        }
+
+        #bioText:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .reactions { justify-content: flex-end; }
+            .comment-input { flex-direction: row-reverse; }
+        }
     </style>
 </head>
 <body>
@@ -311,15 +557,36 @@
                 <canvas id="drawingCanvas" width="800" height="600" style="border:1px solid var(--border); width:100%; max-width:100%;"></canvas>
                 <button onclick="clearCanvas()" class="danger" style="margin-top:10px;">🗑️ Limpar</button>
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="createPost()">✨ Publicar</button>
+            <!-- BOTÕES ALINHADOS À DIREITA -->
+            <div class="modal-actions">
                 <button class="secondary" onclick="closeModal()">Cancelar</button>
+                <button onclick="createPost()">✨ Publicar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Comunidade -->
+    <div id="communityModal" class="modal">
+        <div class="modal-content">
+            <h2>Criar Comunidade</h2>
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" id="communityName" placeholder="Nome da comunidade">
+            </div>
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea id="communityDesc" rows="3"></textarea>
+            </div>
+            <!-- BOTÕES ALINHADOS À DIREITA -->
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeCommunityModal()">Cancelar</button>
+                <button onclick="createCommunity()">Criar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // CORREÇÃO 2: URLs dos superpeers sem espaços
+        // Código JavaScript permanece idêntico à versão corrigida anterior
         const gun = Gun([
             'https://gun-manhattan.herokuapp.com/gun',
             'https://gun-eu.herokuapp.com/gun',
@@ -342,14 +609,12 @@
             like: '👍', love: '❤️', laugh: '😂', wow: '😲', sad: '😢', angry: '😠'
         };
 
-        // INICIALIZAÇÃO
         window.onload = function() {
             canvas = document.getElementById('drawingCanvas');
             ctx = canvas.getContext('2d');
             ctx.strokeStyle = currentColor;
             ctx.lineWidth = currentBrushSize;
             
-            // Eventos de desenho
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing);
@@ -357,10 +622,8 @@
             canvas.addEventListener('touchmove', handleTouch, { passive: false });
             canvas.addEventListener('touchend', stopDrawing, { passive: false });
 
-            // CORREÇÃO 3: Login automático corrigido
             const alias = localStorage.getItem('beemote_alias');
             if (alias) {
-                // Tenta autenticar automaticamente
                 gun.on('auth', () => {
                     currentUser = user.is;
                     if (currentUser) showApp();
@@ -411,7 +674,6 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        // AUTENTICAÇÃO
         function showRegister() {
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('registerForm').classList.remove('hidden');
@@ -493,23 +755,18 @@
             loadProfile();
         }
 
-        // FEED E POSTS
-        // CORREÇÃO 4: Carregamento do feed otimizado com callbacks do GunDB
         function loadFeed() {
             const postsDiv = document.getElementById('posts');
             postsDiv.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Carregando posts...</p>';
             
             const posts = [];
             
-            // Usa .on() para escutar atualizações em tempo real
             gun.get('beemote').get('posts').map().on((data, id) => {
                 if (!data || (data.ttl && data.ttl < Date.now())) {
-                    // Remove posts expirados
                     gun.get('beemote').get('posts').get(id).put(null);
                     return;
                 }
                 
-                // Atualiza ou adiciona post
                 const index = posts.findIndex(p => p.id === id);
                 if (index > -1) {
                     posts[index] = { id, ...data };
@@ -517,10 +774,7 @@
                     posts.push({ id, ...data });
                 }
                 
-                // Ordena e renderiza
                 posts.sort((a, b) => (b.bumpedAt || b.timestamp) - (a.bumpedAt || a.timestamp));
-                
-                // Limpa e renderiza todos os posts
                 postsDiv.innerHTML = '';
                 posts.forEach(post => renderPost(post));
                 
@@ -555,9 +809,9 @@
                 </div>
                 <div class="comment-section">
                     <div class="comment-input">
+                        <button onclick="comment('${post.id}')">➤</button>
                         <input type="text" id="comment-${post.id}" placeholder="Adicionar comentário..." 
                                onkeypress="if(event.key==='Enter') comment('${post.id}')">
-                        <button onclick="comment('${post.id}')">➤</button>
                     </div>
                     <div id="comments-${post.id}">
                         ${Object.entries(comments).map(([cid, c]) => `
@@ -623,8 +877,6 @@
 
             const postId = Date.now().toString();
             const timestamp = Date.now();
-            
-            // CORREÇÃO 5: Estrutura de dados simplificada e mais robusta
             const postData = {
                 author: currentUser.pub,
                 authorAlias: currentUser.alias,
@@ -635,21 +887,17 @@
                 ttl: timestamp + (24 * 60 * 60 * 1000)
             };
 
-            // Salva no feed global e no perfil do usuário
             gun.get('beemote').get('posts').get(postId).put(postData);
             user.get('posts').get(postId).put(postData);
 
-            // Atualiza estatísticas
             user.get('stats').get('posts').once(count => {
                 user.get('stats').get('posts').put((count || 0) + 1);
             });
 
             closeModal();
-            // Recarrega feed após um pequeno delay para sincronização
             setTimeout(() => loadFeed(), 500);
         }
 
-        // PERFIL
         async function loadProfile() {
             const profile = await getUserProfile(currentUser.pub);
             document.getElementById('profileName').textContent = currentUser.alias;
@@ -688,9 +936,56 @@
             }
         }
 
-        // ... (resto das funções permanecem semelhantes) ...
+        async function loadTestimonials() {
+            const wall = document.getElementById('testimonialWall');
+            wall.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Carregando depoimentos...</p>';
+            
+            const testimonials = [];
+            user.get('testimonials').map().once((data, id) => {
+                if (data && !data.hidden) testimonials.push({ id, ...data });
+            });
 
-        // CONTATOS
+            setTimeout(async () => {
+                if (testimonials.length === 0) {
+                    wall.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Nenhum depoimento ainda.</p>';
+                    return;
+                }
+                wall.innerHTML = '';
+                for (const t of testimonials) {
+                    const author = await getUserAlias(t.author);
+                    const testimonialEl = document.createElement('div');
+                    testimonialEl.className = 'testimonial';
+                    testimonialEl.innerHTML = `
+                        <div class="testimonial-actions">
+                            <button onclick="hideTestimonial('${t.id}')" class="danger">Ocultar</button>
+                        </div>
+                        <p>${t.text}</p>
+                        <small>${author} - ${formatTime(t.timestamp)}</small>
+                    `;
+                    wall.appendChild(testimonialEl);
+                }
+            }, 1000);
+        }
+
+        function hideTestimonial(id) {
+            user.get('testimonials').get(id).get('hidden').put(true);
+            loadTestimonials();
+        }
+
+        async function loadUserProfile(pub) {
+            const alias = await getUserAlias(pub);
+            const text = prompt(`Escreva um depoimento para @${alias}:`);
+            if (text && text.trim()) {
+                const id = Date.now().toString();
+                gun.user(pub).get('testimonials').get(id).put({
+                    author: currentUser.pub,
+                    text: text.trim(),
+                    timestamp: Date.now(),
+                    hidden: false
+                });
+            }
+        }
+
         function loadContacts() {
             const contactsDiv = document.getElementById('contactsList');
             contactsDiv.innerHTML = '';
@@ -721,7 +1016,6 @@
                 if (!data) return alert('Usuário não encontrado');
                 
                 const pub = data.pub;
-                // Verifica se já não é contato
                 user.get('contacts').get(pub).once(contact => {
                     if (contact && contact.status === 'accepted') {
                         alert('Já é seu contato!');
@@ -756,7 +1050,6 @@
             loadContacts();
         }
 
-        // COMUNIDADES
         function showCreateCommunity() {
             document.getElementById('communityModal').classList.add('show');
         }
@@ -828,7 +1121,6 @@
             setTimeout(() => loadCommunities(), 500);
         }
 
-        // EXPORTAR/IMPORTAR
         async function exportData() {
             const data = { profile: {}, posts: {}, contacts: {}, testimonials: {} };
             
@@ -847,7 +1139,7 @@
         }
 
         function importData(event) {
-            const file = event.target.files[0];
+            const file = event.files[0];
             if (!file) return;
             
             const reader = new FileReader();
@@ -869,7 +1161,6 @@
             reader.readAsText(file);
         }
 
-        // CORREÇÃO 6: Recebe o evento como parâmetro
         function switchTab(event, tab) {
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -877,7 +1168,6 @@
             event.target.classList.add('active');
             document.getElementById(tab + 'Tab').classList.remove('hidden');
             
-            // Recarrega ao mudar de aba
             if (tab === 'feed') loadFeed();
             if (tab === 'profile') loadProfile();
             if (tab === 'contacts') loadContacts();
@@ -893,12 +1183,10 @@
             });
         }
 
-        // Reações e comentários
         function react(postId, type) {
             if (!currentUser) return;
             
             gun.get('beemote').get('posts').get(postId).get('reactions').get(currentUser.pub).put(type);
-            // Recarrega feed para atualizar contagem
             setTimeout(() => loadFeed(), 200);
         }
 
@@ -919,19 +1207,6 @@
             setTimeout(() => loadFeed(), 300);
         }
 
-        // CORREÇÃO 7: Listener apenas uma vez
-        let contactListenerSet = false;
-        if (!contactListenerSet) {
-            user.get('contact_requests').map().on((data, id) => {
-                if (data && data.from && data.from !== currentUser?.pub) {
-                    console.log('Nova solicitação de contato de:', data.alias);
-                    loadContacts();
-                }
-            });
-            contactListenerSet = true;
-        }
-
-        // Helpers
         function blobToDataURL(blob) {
             return new Promise(resolve => {
                 const reader = new FileReader();
@@ -941,7 +1216,6 @@
         }
 
         function toggleRecording() {
-            // Implementação básica de gravação
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
                     mediaRecorder = new MediaRecorder(stream);
@@ -970,10 +1244,19 @@
             document.getElementById('audioStatus').textContent = 'Gravação concluída';
         }
 
-        // CORREÇÃO 8: Auto-refresh mais inteligente
+        let contactListenerSet = false;
+        if (!contactListenerSet) {
+            user.get('contact_requests').map().on((data, id) => {
+                if (data && data.from && data.from !== currentUser?.pub) {
+                    console.log('Nova solicitação de contato de:', data.alias);
+                    loadContacts();
+                }
+            });
+            contactListenerSet = true;
+        }
+
         setInterval(() => {
             if (currentTab === 'feed' && currentUser) {
-                // Só recarrega se houver mudanças
                 loadFeed();
             }
         }, 15000);
