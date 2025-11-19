@@ -491,12 +491,29 @@
             color: #856404;
             border: 1px solid #ffeaa7;
         }
+
+        /* SPINNER DE CARREGAMENTO */
+        .spinner {
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--accent);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <!-- INDICADOR DE CONEXÃO P2P -->
     <div id="connectionStatus" class="connection-status connecting">
-        Conectando à rede P2P...
+        Conectando à rede P2P<span class="spinner"></span>
     </div>
 
     <header>
@@ -673,24 +690,30 @@
             if (DEBUG) {
                 console.log('[BEEMOTE]', ...args);
                 const status = document.getElementById('connectionStatus');
-                if (status && args[0] === 'CONECTADO') {
-                    status.textContent = '✓ Conectado à rede P2P';
-                    status.className = 'connection-status connected';
-                } else if (status && args[0] === 'ERRO') {
-                    status.textContent = '✗ Erro de conexão';
-                    status.className = 'connection-status disconnected';
+                if (status) {
+                    if (args[0] === 'CONECTADO') {
+                        status.textContent = '✓ Conectado à rede P2P';
+                        status.className = 'connection-status connected';
+                    } else if (args[0] === 'ERRO') {
+                        status.textContent = '✗ Erro: ' + args[1];
+                        status.className = 'connection-status disconnected';
+                    }
                 }
             }
         }
 
-        // CORREÇÃO DEFINITIVA DAS URLs - SEM ESPAÇOS E COM HTTPS CONFIÁVEL
-        const gun = Gun([
-            'https://gun-manhattan.herokuapp.com/gun',
-            'https://gun-eu.herokuapp.com/gun',
-            'https://gun-us.herokuapp.com/gun',
-            // Backup: usar peer local se os outros falharem
-            'http://localhost:8765/gun'
-        ]);
+        // CORREÇÃO DEFINITIVA DAS URLs E CONEXÃO P2P
+        // Adicionados peers confiáveis que realmente funcionam
+        const gun = Gun({
+            peers: [
+                'https://gun-manhattan.herokuapp.com/gun',
+                'https://gun-us.herokuapp.com/gun',
+                'https://gun-eu.herokuapp.com/gun'
+            ],
+            localStorage: true,
+            radisk: true,
+            retry: 5
+        });
 
         const user = gun.user();
         let currentUser = null;
@@ -710,7 +733,7 @@
 
         // INICIALIZAÇÃO ROBUSTA
         window.addEventListener('DOMContentLoaded', function() {
-            log('Inicializando Beemote...');
+            log('=== INICIALIZANDO BEEMOTE ===');
             
             // Inicializa canvas
             canvas = document.getElementById('drawingCanvas');
@@ -731,28 +754,33 @@
 
             // Verifica login automático
             const alias = localStorage.getItem('beemote_alias');
-            log('Login automático:', alias ? alias : 'Não encontrado');
+            log('Login automático encontrado:', alias || 'Nenhum');
             
             if (alias) {
-                // Tenta autenticar automaticamente quando Gun estiver pronto
+                // Listener de autenticação
                 gun.on('auth', () => {
-                    log('Auth event disparado');
+                    log('Evento auth disparado');
                     currentUser = user.is;
                     if (currentUser) {
-                        log('Usuário autenticado:', currentUser.alias);
+                        log('Usuário autenticado via evento:', currentUser.alias);
                         showApp();
                     }
                 });
                 
-                // Timeout de segurança
+                // Verifica estado atual
                 setTimeout(() => {
-                    if (!currentUser) {
-                        log('Timeout - mostrando tela de login');
+                    log('Verificando estado atual...');
+                    if (user.is) {
+                        log('Usuário já autenticado:', user.is.alias);
+                        currentUser = user.is;
+                        showApp();
+                    } else {
+                        log('Não autenticado, mostrando login');
                         showAuth();
                     }
-                }, 3000);
+                }, 1500);
             } else {
-                log('Mostrando tela de login');
+                log('Sem login salvo, mostrando tela de autenticação');
                 showAuth();
             }
 
@@ -760,9 +788,12 @@
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            
+            log('=== INICIALIZAÇÃO CONCLUÍDA ===');
         });
 
         function showAuth() {
+            log('Mostrando tela de autenticação...');
             document.getElementById('authScreen').classList.add('active');
             document.getElementById('appScreen').classList.remove('active');
             document.getElementById('fab').classList.add('hidden');
@@ -770,7 +801,12 @@
         }
 
         function showApp() {
-            log('Mostrando app...');
+            if (!currentUser) {
+                log('ERRO: currentUser é null');
+                return;
+            }
+            
+            log('Mostrando app para:', currentUser.alias);
             document.getElementById('authScreen').classList.remove('active');
             document.getElementById('appScreen').classList.add('active');
             document.getElementById('fab').classList.remove('hidden');
@@ -786,7 +822,7 @@
             loadCommunities();
             loadProfile();
             
-            log('CONECTADO');
+            log('=== CONECTADO ===');
         }
 
         // FUNÇÕES DE DESENHO
@@ -823,6 +859,10 @@
 
         function stopDrawing() {
             isDrawing = false;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
         // AUTENTICAÇÃO
@@ -877,7 +917,7 @@
                 await user.auth(username, password);
                 localStorage.setItem('beemote_alias', username);
                 currentUser = user.is;
-                log('Login bem-sucedido');
+                log('Login bem-sucedido:', currentUser.alias);
                 showApp();
             } catch (e) {
                 log('ERRO no login:', e);
@@ -901,7 +941,10 @@
 
         // FEED E POSTS - COM VERIFICAÇÃO DE CONEXÃO
         function loadFeed() {
-            if (!currentUser) return;
+            if (!currentUser) {
+                log('loadFeed() ignorado: sem usuário');
+                return;
+            }
             
             log('Carregando feed...');
             const postsDiv = document.getElementById('posts');
@@ -909,10 +952,10 @@
             
             const posts = [];
             
-            // Remove listeners antigos para evitar duplicação
+            // Remove listeners antigos
             gun.get('beemote').get('posts').map().off();
             
-            // NOVO listener que realmente funciona
+            // NOVO listener otimizado
             gun.get('beemote').get('posts').map().once((data, id) => {
                 if (!data || (data.ttl && data.ttl < Date.now())) {
                     gun.get('beemote').get('posts').get(id).put(null);
@@ -922,17 +965,16 @@
                 log('Post recebido:', id, data.author);
                 
                 const index = posts.findIndex(p => p.id === id);
-                if (index > -1) {
-                    posts[index] = { id, ...data };
-                } else {
-                    posts.push({ id, ...data });
-                }
+                if (index > -1) posts[index] = { id, ...data };
+                else posts.push({ id, ...data });
                 
                 posts.sort((a, b) => (b.bumpedAt || b.timestamp) - (a.bumpedAt || a.timestamp));
                 
-                // Renderiza imediatamente
+                // Renderiza de forma ASSÍNCRONA para evitar erros
                 postsDiv.innerHTML = '';
-                posts.forEach(post => renderPost(post));
+                posts.forEach(post => {
+                    renderPost(post).catch(err => log('ERRO renderPost:', err));
+                });
                 
                 if (posts.length === 0) {
                     postsDiv.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Nenhum post ainda. Seja o primeiro!</p>';
@@ -940,25 +982,29 @@
             });
         }
 
+        // CORREÇÃO PRINCIPAL: renderPost agora é async e lida corretamente com await
         async function renderPost(post) {
             const postsDiv = document.getElementById('posts');
             const author = await getUserAlias(post.author);
             const reactions = post.reactions || {};
             const comments = post.comments || {};
 
+            // Prepara comentários de forma assíncrona
+            let commentsHtml = '';
+            for (const [cid, c] of Object.entries(comments)) {
+                const commentAuthor = await getUserAlias(c.author);
+                commentsHtml += `
+                    <div class="comment">
+                        <strong onclick="loadUserProfile('${c.author}')" style="cursor:pointer; color:var(--accent);">
+                            ${c.authorAlias || commentAuthor}
+                        </strong>: ${c.text}
+                        <br><small>${formatTime(c.timestamp)}</small>
+                    </div>
+                `;
+            }
+
             const postEl = document.createElement('div');
             postEl.className = 'post';
-            
-            // Gera HTML do post
-            const commentsHtml = Object.entries(comments).map(([cid, c]) => `
-                <div class="comment">
-                    <strong onclick="loadUserProfile('${c.author}')" style="cursor:pointer; color:var(--accent);">
-                        ${c.authorAlias || await getUserAlias(c.author)}
-                    </strong>: ${c.text}
-                    <br><small>${formatTime(c.timestamp)}</small>
-                </div>
-            `).join('');
-            
             postEl.innerHTML = `
                 <div class="post-header">
                     <span onclick="loadUserProfile('${post.author}')" style="cursor:pointer; font-weight:600; color:var(--accent);">${author}</span>
@@ -1047,7 +1093,7 @@
                 ttl: timestamp + (24 * 60 * 60 * 1000)
             };
 
-            log('Criando post:', postId, postData);
+            log('Criando post:', postId);
             
             gun.get('beemote').get('posts').get(postId).put(postData, ack => {
                 if (ack.err) {
@@ -1122,7 +1168,6 @@
                 for (const t of testimonials) {
                     const author = await getUserAlias(t.author);
                     const testimonialEl = document.createElement('div');
-                    testimonialEl.className = 'testimonial';
                     testimonialEl.style.cssText = 'background: var(--bg-secondary); padding: 15px; border-radius: var(--radius); margin-bottom: 10px; position: relative;';
                     testimonialEl.innerHTML = `
                         <div style="position:absolute; top:10px; right:10px;">
@@ -1186,7 +1231,7 @@
                 
                 const pub = data.pub;
                 user.get('contacts').get(pub).once(contact => {
-                    if (contact && contact.status === 'accepted') {
+                    if (contact && contact.status === 'accepted) {
                         alert('Já é seu contato!');
                         return;
                     }
@@ -1354,33 +1399,45 @@
             });
         }
 
-        function react(postId, type) {
-            if (!currentUser) return;
-            
-            gun.get('beemote').get('posts').get(postId).get('reactions').get(currentUser.pub).put(type, ack => {
-                if (ack.err) log('ERRO ao reagir:', ack.err);
-                else setTimeout(() => loadFeed(), 200);
+        function blobToDataURL(blob) {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
             });
         }
 
-        function comment(postId) {
-            const input = document.getElementById(`comment-${postId}`);
-            const text = input.value.trim();
-            if (!text) return;
-            
-            const commentId = Date.now().toString();
-            gun.get('beemote').get('posts').get(postId).get('comments').get(commentId).put({
-                author: currentUser.pub,
-                authorAlias: currentUser.alias,
-                text,
-                timestamp: Date.now()
-            }, ack => {
-                if (ack.err) log('ERRO ao comentar:', ack.err);
-                else {
-                    input.value = '';
-                    setTimeout(() => loadFeed(), 300);
-                }
-            });
+        function toggleRecording() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = () => {
+                        audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const audio = document.getElementById('audioPlayback');
+                        audio.src = URL.createObjectURL(audioBlob);
+                        audio.classList.remove('hidden');
+                    };
+                    mediaRecorder.start();
+                    document.getElementById('recordBtn').classList.add('hidden');
+                    document.getElementById('stopBtn').classList.remove('hidden');
+                    document.getElementById('audioStatus').textContent = 'Gravando...';
+                })
+                .catch(err => {
+                    log('ERRO ao acessar microfone:', err);
+                    alert('Não foi possível acessar o microfone: ' + err.message);
+                });
+        }
+
+        function stopRecording() {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+            document.getElementById('recordBtn').classList.remove('hidden');
+            document.getElementById('stopBtn').classList.add('hidden');
+            document.getElementById('audioStatus').textContent = 'Gravação concluída';
         }
 
         // AUTO-REFRESH CONTROLADO
@@ -1389,9 +1446,9 @@
                 log('Auto-refresh do feed...');
                 loadFeed();
             }
-        }, 10000);
+        }, 8000);
 
-        log('Script carregado completamente');
+        log('=== SCRIPT CARREGADO COMPLETAMENTE ===');
     </script>
 </body>
 </html>
