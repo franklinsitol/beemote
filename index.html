@@ -9,36 +9,24 @@
     <style>
         :root {
             --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-tertiary: #e9ecef;
-            --text-primary: #212529;
-            --text-secondary: #6c757d;
-            --accent: #4361ee;
-            --accent-dark: #3a56d4;
-            --accent-light: #4895ef;
-            --success: #06d6a0;
-            --danger: #ef476f;
-            --warning: #ffd166;
-            --border: #dee2e6;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-            --shadow-md: 0 8px 16px rgba(0,0,0,0.15);
-            --shadow-lg: 0 16px 32px rgba(0,0,0,0.2);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
+            --bg-secondary: #f8f8f8;
+            --bg-tertiary: #eeeeee;
+            --text-primary: #000000;
+            --text-secondary: #555555;
+            --accent: #000000;
+            --accent-light: #333333;
+            --accent-dark: #000000;
+            --success: #00a86b;
+            --danger: #d0021b;
+            --warning: #f5a623;
+            --border: #dddddd;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.16);
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #121212;
-            --bg-secondary: #1e1e1e;
-            --bg-tertiary: #2d2d2d;
-            --text-primary: #f8f9fa;
-            --text-secondary: #adb5bd;
-            --accent: #4895ef;
-            --border: #343a40;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
-            --shadow-md: 0 8px 16px rgba(0,0,0,0.4);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -54,14 +42,14 @@
 
         .container { max-width: 800px; margin: 0 auto; padding: 20px; }
         header {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-            color: white;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
             padding: 16px 0;
-            box-shadow: var(--shadow-sm);
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-sm);
         }
 
         .header-content {
@@ -80,12 +68,13 @@
             align-items: center;
             gap: 12px;
             letter-spacing: -0.5px;
+            color: var(--accent);
         }
 
         .logo::before {
             content: "🦛";
             font-size: 36px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
         .auth-screen {
@@ -94,7 +83,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
         }
 
         .auth-box {
@@ -104,15 +93,14 @@
             box-shadow: var(--shadow-lg);
             width: 100%;
             max-width: 420px;
-            transition: var(--transition);
+            border: 1px solid var(--border);
         }
 
-        .auth-box:hover { transform: translateY(-4px); }
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-primary); }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary); font-size: 14px; }
         input, textarea, select {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             font-size: 15px;
@@ -124,31 +112,38 @@
         input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
         }
 
         button {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            background: var(--accent);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 14px 24px;
             border-radius: var(--radius-sm);
             cursor: pointer;
             font-size: 15px;
             font-weight: 600;
             transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-            min-height: 44px;
+            min-height: 48px;
+            width: 100%;
         }
 
         button:hover {
+            background: var(--accent-dark);
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
 
         button:active { transform: translateY(0); }
-        button.secondary { background: linear-gradient(135deg, var(--bg-tertiary), var(--border)); color: var(--text-primary); }
-        button.danger { background: linear-gradient(135deg, var(--danger), #d90429); }
+        button.secondary { 
+            background: var(--bg-secondary); 
+            color: var(--text-primary); 
+            border: 1px solid var(--border);
+        }
+        button.secondary:hover { background: var(--bg-tertiary); }
+        button.danger { background: var(--danger); }
+        button.danger:hover { background: #b0011a; }
 
         .tabs {
             display: flex;
@@ -168,6 +163,7 @@
             transition: var(--transition);
             white-space: nowrap;
             color: var(--text-secondary);
+            font-size: 15px;
         }
 
         .tab:hover { color: var(--accent); }
@@ -180,7 +176,7 @@
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            background: var(--accent);
             color: white;
             border: none;
             font-size: 28px;
@@ -188,9 +184,16 @@
             box-shadow: var(--shadow-md);
             z-index: 1000;
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .fab:hover { transform: scale(1.1) rotate(90deg); box-shadow: var(--shadow-lg); }
+        .fab:hover { 
+            transform: scale(1.1) rotate(90deg); 
+            box-shadow: var(--shadow-lg); 
+            background: var(--accent-dark);
+        }
 
         .modal {
             display: none;
@@ -199,7 +202,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.5);
             align-items: center;
             justify-content: center;
             z-index: 2000;
@@ -211,11 +214,12 @@
             background: var(--bg-primary);
             padding: 32px;
             border-radius: var(--radius-lg);
-            max-width: 560px;
+            max-width: 600px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
             animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -230,24 +234,49 @@
             border-radius: var(--radius-md);
             margin-bottom: 20px;
             box-shadow: var(--shadow-sm);
-            transition: var(--transition);
             border: 1px solid var(--border);
+            transition: var(--transition);
         }
 
-        .post:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .post:hover { 
+            transform: translateY(-3px); 
+            box-shadow: var(--shadow-md); 
+            border-color: var(--accent);
+        }
 
         .post-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             font-size: 14px;
             color: var(--text-secondary);
+            align-items: center;
         }
 
-        .post-content { margin: 16px 0; font-size: 16px; line-height: 1.5; }
-        .post-media { margin: 16px 0; border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-sm); }
-        .post-media img { max-width: 100%; display: block; }
-        .post-media audio { width: 100%; border-radius: var(--radius-sm); }
+        .post-content { 
+            margin: 16px 0; 
+            font-size: 16px; 
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .post-media { 
+            margin: 16px 0; 
+            border-radius: var(--radius-sm); 
+            overflow: hidden; 
+            box-shadow: var(--shadow-sm);
+        }
+
+        .post-media img { 
+            max-width: 100%; 
+            display: block;
+            border-radius: var(--radius-sm);
+        }
+
+        .post-media audio { 
+            width: 100%; 
+            border-radius: var(--radius-sm);
+        }
 
         .drawing-toolbar {
             display: flex;
@@ -258,6 +287,7 @@
             border-radius: var(--radius-sm);
             align-items: center;
             flex-wrap: wrap;
+            border: 1px solid var(--border);
         }
 
         .color-pickers { display: flex; gap: 8px; }
@@ -273,7 +303,7 @@
         .color-picker:hover { transform: scale(1.1); }
         .color-picker.active {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
         }
 
         .brush-size {
@@ -313,15 +343,20 @@
             gap: 4px;
             color: var(--text-secondary);
             min-height: 44px;
+            font-weight: 500;
         }
 
-        .reaction-btn:hover { background: var(--accent-light); color: white; transform: scale(1.1); }
+        .reaction-btn:hover { 
+            background: var(--accent); 
+            color: white; 
+            transform: scale(1.05); 
+        }
         .reaction-btn.active { background: var(--accent); color: white; }
 
         .comment-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
         .comment-input { display: flex; gap: 12px; margin-bottom: 12px; }
         .comment-input input { flex: 1; }
-        .comment-input button { padding: 8px 16px; }
+        .comment-input button { padding: 8px 16px; width: auto; }
         .comment {
             background: var(--bg-primary);
             padding: 12px;
@@ -330,6 +365,7 @@
             font-size: 14px;
             border-left: 3px solid var(--accent);
             transition: var(--transition);
+            border: 1px solid var(--border);
         }
 
         .comment:hover { transform: translateX(4px); }
@@ -341,6 +377,7 @@
             margin-bottom: 24px;
             text-align: center;
             box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
         }
 
         .stats {
@@ -351,7 +388,7 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            background: var(--accent);
             color: white;
             padding: 20px;
             border-radius: var(--radius-md);
@@ -361,8 +398,8 @@
         }
 
         .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-        .stat-card h3 { font-size: 32px; margin-bottom: 4px; }
-        .stat-card p { font-size: 12px; }
+        .stat-card h3 { font-size: 32px; margin-bottom: 4px; font-weight: 700; }
+        .stat-card p { font-size: 12px; opacity: 0.9; }
 
         .testimonial {
             background: var(--bg-secondary);
@@ -371,18 +408,19 @@
             margin-bottom: 16px;
             position: relative;
             transition: var(--transition);
+            border: 1px solid var(--border);
         }
 
         .testimonial:hover { transform: translateX(4px); }
         .testimonial-actions { position: absolute; top: 5px; right: 5px; display: flex; gap: 5px; }
-        .testimonial-actions button { padding: 5px 10px; font-size: 12px; }
+        .testimonial-actions button { padding: 5px 10px; font-size: 12px; width: auto; }
 
         .hidden { display: none; }
-        .error { color: var(--danger); font-size: 14px; margin-top: 5px; }
-        .success { color: var(--success); font-size: 14px; margin-top: 5px; }
+        .error { color: var(--danger); font-size: 14px; margin-top: 8px; font-weight: 500; }
+        .success { color: var(--success); font-size: 14px; margin-top: 8px; font-weight: 500; }
 
         #themeToggle {
-            background: rgba(255,255,255,0.2);
+            background: var(--bg-tertiary);
             border: none;
             border-radius: 50%;
             width: 40px;
@@ -390,10 +428,12 @@
             margin-left: 12px;
             transition: var(--transition);
             font-size: 18px;
+            cursor: pointer;
+            color: var(--text-primary);
         }
 
         #themeToggle:hover {
-            background: rgba(255,255,255,0.3);
+            background: var(--border);
             transform: rotate(180deg);
         }
 
@@ -410,6 +450,7 @@
             margin: 10px 0;
             position: relative;
             overflow: hidden;
+            background: white;
         }
 
         #drawingCanvas {
@@ -424,14 +465,47 @@
 
         #bioText {
             cursor: pointer;
-            padding: 8px;
+            padding: 12px;
             border-radius: var(--radius-sm);
             transition: var(--transition);
             margin: 10px 0;
+            font-size: 16px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed transparent;
         }
 
         #bioText:hover {
-            background: rgba(0,0,0,0.05);
+            background: rgba(0,0,0,0.03);
+            border-color: var(--accent);
+        }
+
+        select#postType {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+
+        .audio-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .audio-controls button {
+            width: auto;
+            padding: 10px 20px;
+        }
+
+        #audioStatus {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
         @media (max-width: 768px) {
@@ -440,6 +514,8 @@
             .brush-size { justify-content: center; }
             .canvas-container { max-height: 400px; }
             #drawingCanvas { max-height: 350px; }
+            .modal-content { padding: 20px; }
+            .auth-box { padding: 30px 20px; }
         }
     </style>
 </head>
@@ -460,7 +536,7 @@
         <div id="authScreen" class="auth-screen">
             <div class="auth-box">
                 <div id="loginForm">
-                    <h2>Entrar no Beemote</h2>
+                    <h2 style="margin-bottom: 24px; text-align: center; color: var(--accent);">Entrar no Beemote</h2>
                     <div class="form-group">
                         <label>Usuário</label>
                         <input type="text" id="loginUsername" placeholder="seu_usuario">
@@ -470,12 +546,12 @@
                         <input type="password" id="loginPassword" placeholder="••••••••">
                     </div>
                     <button onclick="login()">Entrar</button>
-                    <button class="secondary" onclick="showRegister()" style="width: 100%; margin-top: 10px;">Criar Conta</button>
+                    <button class="secondary" onclick="showRegister()" style="margin-top: 10px;">Criar Conta</button>
                     <div id="loginError" class="error"></div>
                 </div>
                 
                 <div id="registerForm" class="hidden">
-                    <h2>Criar Conta</h2>
+                    <h2 style="margin-bottom: 24px; text-align: center; color: var(--accent);">Criar Conta</h2>
                     <div class="form-group">
                         <label>Usuário (único)</label>
                         <input type="text" id="regUsername" placeholder="seu_usuario_unico">
@@ -484,8 +560,8 @@
                         <label>Senha</label>
                         <input type="password" id="regPassword" placeholder="mínimo 8 caracteres">
                     </div>
-                    <button onclick="register()">Criar</button>
-                    <button class="secondary" onclick="showLogin()" style="width: 100%; margin-top: 10px;">Voltar</button>
+                    <button onclick="register()">Criar Conta</button>
+                    <button class="secondary" onclick="showLogin()" style="margin-top: 10px;">Voltar</button>
                     <div id="regError" class="error"></div>
                     <div id="regSuccess" class="success"></div>
                 </div>
@@ -514,7 +590,7 @@
                 <div class="stats">
                     <div class="stat-card">
                         <h3 id="statPosts">0</h3>
-                        <p>Posts</p>
+                        <p>Publicações</p>
                     </div>
                     <div class="stat-card">
                         <h3 id="statLikes">0</h3>
@@ -530,7 +606,7 @@
                     <button onclick="document.getElementById('importFile').click()">📤 Importar Dados</button>
                     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
                 </div>
-                <h3>Mural de Depoimentos</h3>
+                <h3 style="margin-top: 32px; margin-bottom: 16px; color: var(--accent);">Mural de Depoimentos</h3>
                 <div id="testimonialWall"></div>
             </div>
 
@@ -539,14 +615,14 @@
                     <label>Adicionar Contato</label>
                     <div style="display: flex; gap: 10px;">
                         <input type="text" id="contactUsername" placeholder="usuário">
-                        <button onclick="requestContact()">Solicitar</button>
+                        <button onclick="requestContact()" style="width: auto; white-space: nowrap;">Solicitar</button>
                     </div>
                 </div>
                 <div id="contactsList"></div>
             </div>
 
             <div id="communitiesTab" class="tab-content hidden">
-                <button onclick="showCreateCommunity()" class="secondary">Criar Comunidade</button>
+                <button onclick="showCreateCommunity()" class="secondary" style="width: auto;">Criar Comunidade</button>
                 <div id="communitiesList" style="margin-top: 20px;"></div>
             </div>
         </div>
@@ -558,7 +634,7 @@
     <!-- Modal de Criar Post -->
     <div id="createPostModal" class="modal">
         <div class="modal-content">
-            <h2>Criar Post</h2>
+            <h2 style="margin-bottom: 20px; color: var(--accent);">Criar Publicação</h2>
             <div class="form-group">
                 <label>Tipo de Conteúdo</label>
                 <select id="postType" onchange="changePostType()">
@@ -599,7 +675,7 @@
                 <div class="canvas-container">
                     <canvas id="drawingCanvas" width="800" height="600"></canvas>
                 </div>
-                <button onclick="clearCanvas()" class="danger">🗑️ Limpar</button>
+                <button onclick="clearCanvas()" class="danger" style="margin-top: 10px; width: auto;">🗑️ Limpar</button>
             </div>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button onclick="createPost()">✨ Publicar</button>
@@ -611,14 +687,14 @@
     <!-- Modal de Comunidade -->
     <div id="communityModal" class="modal">
         <div class="modal-content">
-            <h2>Criar Comunidade</h2>
+            <h2 style="margin-bottom: 20px; color: var(--accent);">Criar Comunidade</h2>
             <div class="form-group">
                 <label>Nome</label>
                 <input type="text" id="communityName" placeholder="Nome da comunidade">
             </div>
             <div class="form-group">
                 <label>Descrição</label>
-                <textarea id="communityDesc" rows="3"></textarea>
+                <textarea id="communityDesc" rows="3" placeholder="Descrição da comunidade"></textarea>
             </div>
             <div style="display: flex; gap: 10px;">
                 <button onclick="createCommunity()">Criar</button>
@@ -628,12 +704,21 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO GUN
-        const gun = Gun([
-            'https://gun-manhattan.herokuapp.com/gun',
-            'https://gun-eu.herokuapp.com/gun',
-            'https://gun-us.herokuapp.com/gun'
-        ]);
+        // ==================== CONFIGURAÇÃO GUN.JS - CORREÇÃO PARA VERCUL ====================
+        const gun = Gun({
+            peers: [
+                'https://gun-manhattan.herokuapp.com/gun',
+                'https://gun-eu.herokuapp.com/gun',
+                'https://gun-us.herokuapp.com/gun',
+                'https://gun-relay.herokuapp.com/gun',
+                'https://gun-sin.herokuapp.com/gun'
+            ],
+            localStorage: true,
+            radisk: true,
+            WebSocket: typeof WebSocket !== 'undefined' ? WebSocket : null,
+            retry: 5,
+            timeout: 10000
+        });
 
         const user = gun.user();
         let currentUser = null;
@@ -651,7 +736,7 @@
             like: '👍', love: '❤️', laugh: '😂', wow: '😲', sad: '😢', angry: '😠'
         };
 
-        // INICIALIZAÇÃO
+        // ==================== INICIALIZAÇÃO ====================
         window.onload = function() {
             canvas = document.getElementById('drawingCanvas');
             ctx = canvas.getContext('2d');
@@ -673,12 +758,9 @@
             canvas.addEventListener('touchcancel', stopDrawing, { passive: false });
 
             const alias = localStorage.getItem('beemote_alias');
-            if (alias) autoLogin(alias);
-            
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-            updateBrushSize();
+            if (alias) {
+                autoLogin(alias);
+            }
         };
 
         function changeColor(picker) {
@@ -718,8 +800,6 @@
             e.preventDefault();
             const touch = e.touches[0];
             const rect = canvas.getBoundingClientRect();
-            
-            // CORREÇÃO DE ESCALA PARA MOBILE
             const scaleX = canvas.width / rect.width;
             const scaleY = canvas.height / rect.height;
             const canvasX = (touch.clientX - rect.left) * scaleX;
@@ -743,7 +823,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        // AUTENTICAÇÃO
+        // ==================== AUTENTICAÇÃO ====================
         function showRegister() {
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('registerForm').classList.remove('hidden');
@@ -767,7 +847,7 @@
             const password = document.getElementById('regPassword').value;
             
             if (!username || password.length < 8) {
-                document.getElementById('regError').textContent = 'Usuário inválido ou senha curta';
+                document.getElementById('regError').textContent = 'Usuário inválido ou senha curta (mínimo 8 caracteres)';
                 return;
             }
             
@@ -777,10 +857,10 @@
                     bio: 'Hello Beemote! 🦛',
                     joined: Date.now()
                 });
-                document.getElementById('regSuccess').textContent = 'Conta criada! Faça login.';
+                document.getElementById('regSuccess').textContent = 'Conta criada com sucesso! Faça login.';
                 setTimeout(showLogin, 2000);
             } catch (e) {
-                document.getElementById('regError').textContent = 'Usuário já existe';
+                document.getElementById('regError').textContent = 'Erro: Usuário já existe ou inválido';
             }
         }
 
@@ -794,7 +874,7 @@
                 currentUser = user.is;
                 showApp();
             } catch (e) {
-                document.getElementById('loginError').textContent = 'Login falhou';
+                document.getElementById('loginError').textContent = 'Login falhou: credenciais inválidas';
             }
         }
 
@@ -835,7 +915,7 @@
             loadProfile();
         }
 
-        // FEED E POSTS
+        // ==================== FEED E POSTS ====================
         async function loadFeed() {
             const postsDiv = document.getElementById('posts');
             postsDiv.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Carregando posts...</p>';
@@ -856,7 +936,7 @@
                 posts.forEach(post => renderPost(post));
                 
                 if (posts.length === 0) {
-                    postsDiv.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Nenhum post ainda. Seja o primeiro!</p>';
+                    postsDiv.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Nenhum post ainda. Seja o primeiro a publicar!</p>';
                 }
             }, 1500);
         }
@@ -871,7 +951,7 @@
             postEl.className = 'post';
             postEl.innerHTML = `
                 <div class="post-header">
-                    <span onclick="loadUserProfile('${post.author}')" style="cursor:pointer; font-weight:600; color:var(--accent);">${author}</span>
+                    <span onclick="loadUserProfile('${post.author}')" style="cursor:pointer; font-weight:700; color:var(--accent);">${author}</span>
                     <span>${formatTime(post.bumpedAt || post.timestamp)}</span>
                 </div>
                 <div class="post-content">${post.content || ''}</div>
@@ -888,12 +968,12 @@
                     <div class="comment-input">
                         <input type="text" id="comment-${post.id}" placeholder="Adicionar comentário..." 
                                onkeypress="if(event.key==='Enter') comment('${post.id}')">
-                        <button onclick="comment('${post.id}')">➤</button>
+                        <button onclick="comment('${post.id}')" style="width: auto;">➤</button>
                     </div>
                     <div id="comments-${post.id}">
                         ${Object.entries(comments).map(([cid, c]) => `
                             <div class="comment">
-                                <strong onclick="loadUserProfile('${c.author}')" style="cursor:pointer; color:var(--accent);">
+                                <strong onclick="loadUserProfile('${c.author}')" style="cursor:pointer; color:var(--accent); font-weight: 600;">
                                     ${c.authorAlias || 'Anônimo'}
                                 </strong>: ${c.text}
                                 <br><small>${formatTime(c.timestamp)}</small>
@@ -911,13 +991,18 @@
         }
 
         function renderMedia(media) {
-            if (media.startsWith('data:image')) return `<img src="${media}" alt="Desenho">`;
-            if (media.startsWith('data:audio')) return `<audio controls src="${media}"></audio>`;
+            if (media.startsWith('data:image')) return `<img src="${media}" alt="Desenho" style="border-radius: var(--radius-sm);">`;
+            if (media.startsWith('data:audio')) return `<audio controls src="${media}" style="border-radius: var(--radius-sm);"></audio>`;
             return '';
         }
 
         function formatTime(timestamp) {
-            return new Date(timestamp).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            return new Date(timestamp).toLocaleString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                day: '2-digit',
+                month: '2-digit'
+            });
         }
 
         function showCreatePost() {
@@ -945,7 +1030,7 @@
             
             if (type === 'text') {
                 content = document.getElementById('postText').value.trim();
-                if (!content) return alert('Escreva algo!');
+                if (!content) return alert('Escreva algo para publicar!');
             } else if (type === 'audio' && audioBlob) {
                 media = await blobToDataURL(audioBlob);
             } else if (type === 'drawing') {
@@ -965,6 +1050,7 @@
                 comments: {}
             };
 
+            // Salva nos peers e localmente
             gun.get('beemote').get('posts').get(postId).put(postData);
             user.get('posts').get(postId).put(postData);
 
@@ -976,7 +1062,7 @@
             setTimeout(loadFeed, 500);
         }
 
-        // PERFIL
+        // ==================== PERFIL ====================
         async function loadProfile() {
             const profile = await getUserProfile(currentUser.pub);
             document.getElementById('profileName').textContent = currentUser.alias;
@@ -1005,7 +1091,6 @@
             });
         }
 
-        // EDIÇÃO DE BIO
         function editBio() {
             const bioEl = document.getElementById('bioText');
             const currentBio = bioEl.textContent.replace('Sem bio (clique para editar)', '');
@@ -1016,7 +1101,7 @@
             }
         }
 
-        // DEPOIMENTOS
+        // ==================== DEPOIMENTOS ====================
         async function loadTestimonials() {
             const wall = document.getElementById('testimonialWall');
             wall.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Carregando depoimentos...</p>';
@@ -1038,10 +1123,10 @@
                     testimonialEl.className = 'testimonial';
                     testimonialEl.innerHTML = `
                         <div class="testimonial-actions">
-                            <button onclick="hideTestimonial('${t.id}')" class="danger">Ocultar</button>
+                            <button onclick="hideTestimonial('${t.id}')" class="danger" style="width: auto;">Ocultar</button>
                         </div>
-                        <p>${t.text}</p>
-                        <small>${author} - ${formatTime(t.timestamp)}</small>
+                        <p style="margin-bottom: 8px;">${t.text}</p>
+                        <small style="color: var(--text-secondary);">${author} - ${formatTime(t.timestamp)}</small>
                     `;
                     wall.appendChild(testimonialEl);
                 }
@@ -1064,10 +1149,11 @@
                     timestamp: Date.now(),
                     hidden: false
                 });
+                alert('Depoimento enviado!');
             }
         }
 
-        // CONTATOS
+        // ==================== CONTATOS ====================
         function loadContacts() {
             const contactsDiv = document.getElementById('contactsList');
             contactsDiv.innerHTML = '';
@@ -1077,14 +1163,16 @@
                 const contactEl = document.createElement('div');
                 contactEl.className = 'contact-item';
                 contactEl.innerHTML = `
-                    <div>
-                        <strong>${data.alias || data.pub}</strong>
-                        <small style="color:var(--text-secondary);">${data.status}</small>
+                    <div style="padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-sm); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border);">
+                        <div>
+                            <strong>${data.alias || data.pub.substring(0, 8)}</strong>
+                            <small style="color:var(--text-secondary); display: block;">${data.status === 'pending' ? 'Pendente' : 'Conectado'}</small>
+                        </div>
+                        ${data.status === 'pending' ? 
+                            `<button onclick="acceptContact('${data.pub}')" style="width: auto;">Aceitar</button>` : 
+                            `<button class="danger" onclick="removeContact('${data.pub}')" style="width: auto;">Remover</button>`
+                        }
                     </div>
-                    ${data.status === 'pending' ? 
-                        `<button onclick="acceptContact('${data.pub}')">Aceitar</button>` : 
-                        `<button class="danger" onclick="removeContact('${data.pub}')">Remover</button>`
-                    }
                 `;
                 contactsDiv.appendChild(contactEl);
             });
@@ -1092,10 +1180,10 @@
 
         async function requestContact() {
             const username = document.getElementById('contactUsername').value.trim();
-            if (!username) return;
+            if (!username) return alert('Digite um nome de usuário');
             
             gun.get('~@' + username).once(data => {
-                if (!data) return alert('Usuário não encontrado');
+                if (!data) return alert('Usuário não encontrado na rede');
                 
                 const pub = data.pub;
                 user.get('contacts').get(pub).put({
@@ -1112,6 +1200,7 @@
                 });
                 
                 document.getElementById('contactUsername').value = '';
+                alert('Solicitação enviada!');
                 loadContacts();
             });
         }
@@ -1127,7 +1216,7 @@
             loadContacts();
         }
 
-        // COMUNIDADES
+        // ==================== COMUNIDADES ====================
         function showCreateCommunity() {
             document.getElementById('communityModal').classList.add('show');
         }
@@ -1142,7 +1231,7 @@
             const name = document.getElementById('communityName').value.trim();
             const desc = document.getElementById('communityDesc').value.trim();
             
-            if (!name) return;
+            if (!name) return alert('Digite um nome para a comunidade');
             
             const communityId = Date.now().toString();
             gun.get('beemote').get('communities').get(communityId).put({
@@ -1168,16 +1257,18 @@
                 const communityEl = document.createElement('div');
                 communityEl.className = 'community-item';
                 communityEl.innerHTML = `
-                    <h3>${data.name}</h3>
-                    <p>${data.desc || 'Sem descrição'}</p>
-                    <div class="community-actions">
-                        ${!isMember ? 
-                            `<button onclick="joinCommunity('${data.id}')">Participar</button>` :
-                            `<button class="secondary" onclick="leaveCommunity('${data.id}')">Sair</button>`
-                        }
-                        ${data.owner === currentUser.pub ? 
-                            `<button class="danger" onclick="deleteCommunity('${data.id}')">Excluir</button>` : ''
-                        }
+                    <div style="padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-sm); margin-bottom: 12px; border: 1px solid var(--border);">
+                        <h3 style="color: var(--accent); margin-bottom: 8px;">${data.name}</h3>
+                        <p style="margin-bottom: 12px;">${data.desc || 'Sem descrição'}</p>
+                        <div class="community-actions" style="display: flex; gap: 8px;">
+                            ${!isMember ? 
+                                `<button onclick="joinCommunity('${data.id}')" style="width: auto;">Participar</button>` :
+                                `<button class="secondary" onclick="leaveCommunity('${data.id}')" style="width: auto;">Sair</button>`
+                            }
+                            ${data.owner === currentUser.pub ? 
+                                `<button class="danger" onclick="deleteCommunity('${data.id}')" style="width: auto;">Excluir</button>` : ''
+                            }
+                        </div>
                     </div>
                 `;
                 communitiesDiv.appendChild(communityEl);
@@ -1186,18 +1277,22 @@
 
         function joinCommunity(id) {
             gun.get('beemote').get('communities').get(id).get('members').get(currentUser.pub).put('member');
+            loadCommunities();
         }
 
         function leaveCommunity(id) {
             gun.get('beemote').get('communities').get(id).get('members').get(currentUser.pub).put(null);
-        }
-
-        function deleteCommunity(id) {
-            gun.get('beemote').get('communities').get(id).put(null);
             loadCommunities();
         }
 
-        // EXPORTAR/IMPORTAR
+        function deleteCommunity(id) {
+            if (confirm('Tem certeza que deseja excluir esta comunidade?')) {
+                gun.get('beemote').get('communities').get(id).put(null);
+                loadCommunities();
+            }
+        }
+
+        // ==================== EXPORTAR/IMPORTAR ====================
         async function exportData() {
             const data = { profile: {}, posts: {}, contacts: {}, testimonials: {} };
             
@@ -1232,7 +1327,7 @@
                     alert('Dados importados com sucesso!');
                     location.reload();
                 } catch (err) {
-                    alert('Erro ao importar dados: arquivo inválido');
+                    alert('Erro ao importar dados: arquivo inválido ou corrompido');
                 }
             };
             reader.readAsText(file);
@@ -1259,18 +1354,101 @@
             });
         }
 
-        // Receber solicitações
-        user.get('contact_requests').map().on(data => {
-            if (data && data.from && data.from !== currentUser.pub) {
-                console.log('Nova solicitação de contato de:', data.alias);
-                loadContacts();
+        function blobToDataURL(blob) {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        // ==================== ÁUDIO ====================
+        async function toggleRecording() {
+            if (!mediaRecorder) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const audioURL = URL.createObjectURL(audioBlob);
+                        const audio = document.getElementById('audioPlayback');
+                        audio.src = audioURL;
+                        audio.classList.remove('hidden');
+                    };
+                    
+                    mediaRecorder.start();
+                    document.getElementById('recordBtn').classList.add('hidden');
+                    document.getElementById('stopBtn').classList.remove('hidden');
+                    document.getElementById('audioStatus').textContent = 'Gravando...';
+                } catch (err) {
+                    alert('Não foi possível acessar o microfone: ' + err.message);
+                }
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                mediaRecorder = null;
+                document.getElementById('stopBtn').classList.add('hidden');
+                document.getElementById('recordBtn').classList.remove('hidden');
+                document.getElementById('audioStatus').textContent = 'Gravação concluída';
+            }
+        }
+
+        // ==================== REAÇÕES E COMENTÁRIOS ====================
+        function react(postId, type) {
+            const postRef = gun.get('beemote').get('posts').get(postId);
+            postRef.get('reactions').get(currentUser.pub).put(type);
+            
+            // Atualiza estatísticas
+            gun.user(postId.split('_')[0]).get('stats').get('likesReceived').once(count => {
+                gun.user(postId.split('_')[0]).get('stats').get('likesReceived').put((count || 0) + 1);
+            });
+            
+            setTimeout(loadFeed, 300);
+        }
+
+        function comment(postId) {
+            const input = document.getElementById(`comment-${postId}`);
+            const text = input.value.trim();
+            if (!text) return;
+            
+            const commentId = Date.now().toString();
+            const commentData = {
+                author: currentUser.pub,
+                authorAlias: currentUser.alias,
+                text,
+                timestamp: Date.now()
+            };
+            
+            gun.get('beemote').get('posts').get(postId).get('comments').get(commentId).put(commentData);
+            gun.get('beemote').get('posts').get(postId).get('bumpedAt').put(Date.now());
+            
+            input.value = '';
+            setTimeout(loadFeed, 300);
+        }
+
+        // Receber atualizações em tempo real
+        gun.get('beemote').get('posts').map().on(() => {
+            if (currentTab === 'feed') {
+                setTimeout(loadFeed, 500);
             }
         });
 
-        // Auto-refresh do feed
+        // Auto-refresh do feed a cada 15 segundos
         setInterval(() => {
-            if (currentTab === 'feed') loadFeed();
-        }, 10000);
+            if (currentTab === 'feed' && currentUser) {
+                loadFeed();
+            }
+        }, 15000);
     </script>
 </body>
 </html>
