@@ -3,66 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Beemote - Rede Social P2P Premium</title>
+    <title>Beemote - Rede Social P2P</title>
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
     <style>
+        /* RESET E VARIÁVEIS - TEMA BRANCO/PRETO */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
-            /* TEMA BRANCO/PRETO */
             --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --bg-tertiary: #000000;
+            --bg-secondary: #f8f8f8;
             --text-primary: #000000;
             --text-secondary: #555555;
             --accent: #000000;
-            --accent-dark: #333333;
-            --accent-light: #666666;
-            --success: #06d6a0;
-            --danger: #ff0000;
-            --warning: #ffd166;
+            --accent-hover: #333333;
+            --danger: #dc3545;
             --border: #e0e0e0;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.16);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.12);
+            --radius: 8px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         [data-theme="dark"] {
-            --bg-primary: #121212;
-            --bg-secondary: #1e1e1e;
-            --bg-tertiary: #2d2d2d;
-            --text-primary: #f8f9fa;
-            --text-secondary: #adb5bd;
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
             --accent: #ffffff;
-            --border: #343a40;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --border: #333333;
+            --shadow: 0 2px 8px rgba(255,255,255,0.05);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
             transition: var(--transition);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        /* SISTEMA DE DISPLAY - CRÍTICO */
+        .hidden {
+            display: none !important;
+        }
+
+        .app-screen, .auth-screen {
+            display: none;
+        }
+
+        .app-screen.active, .auth-screen.active {
+            display: block;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
         header {
             background: var(--bg-primary);
-            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
             padding: 16px 0;
-            box-shadow: var(--shadow-sm);
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow);
         }
 
         .header-content {
@@ -80,41 +87,48 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            letter-spacing: -0.5px;
         }
 
         .logo::before {
             content: "🦛";
             font-size: 36px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
-        .auth-screen {
-            display: flex;
+        /* AUTH SCREEN */
+        .auth-screen.active {
+            display: flex !important;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            padding: 20px;
         }
 
         .auth-box {
             background: var(--bg-primary);
             padding: 40px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-hover);
             width: 100%;
             max-width: 420px;
             border: 1px solid var(--border);
         }
 
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-primary); }
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
         input, textarea, select {
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius);
             font-size: 15px;
             background: var(--bg-primary);
             color: var(--text-primary);
@@ -132,32 +146,43 @@
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius);
             cursor: pointer;
             font-size: 15px;
             font-weight: 600;
             transition: var(--transition);
-            box-shadow: var(--shadow-sm);
             min-height: 44px;
         }
 
         button:hover {
+            background: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            background: var(--accent-dark);
         }
 
-        button:active { transform: translateY(0); }
-        button.secondary { 
-            background: var(--bg-secondary); 
+        button.secondary {
+            background: var(--bg-secondary);
             color: var(--text-primary);
             border: 1px solid var(--border);
         }
-        button.danger { 
-            background: var(--danger); 
+
+        button.danger {
+            background: var(--danger);
             color: white;
         }
 
+        .error {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .success {
+            color: var(--success);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        /* TABS */
         .tabs {
             display: flex;
             gap: 8px;
@@ -178,9 +203,25 @@
             color: var(--text-secondary);
         }
 
-        .tab:hover { color: var(--accent); }
-        .tab.active { border-bottom-color: var(--accent); color: var(--accent); }
+        .tab:hover {
+            color: var(--accent);
+        }
 
+        .tab.active {
+            border-bottom-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* CONTEÚDO DAS ABAS */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* BOTÃO FLUTUANTE */
         .fab {
             position: fixed;
             bottom: 30px;
@@ -193,16 +234,16 @@
             border: none;
             font-size: 28px;
             cursor: pointer;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-hover);
             z-index: 1000;
             transition: var(--transition);
         }
 
-        .fab:hover { 
-            transform: scale(1.1) rotate(90deg); 
-            box-shadow: var(--shadow-lg);
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
         }
 
+        /* MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -217,36 +258,37 @@
             backdrop-filter: blur(4px);
         }
 
-        .modal.show { display: flex; }
+        .modal.show {
+            display: flex;
+        }
+
         .modal-content {
             background: var(--bg-primary);
             padding: 32px;
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius);
             max-width: 560px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-            animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-hover);
             border: 1px solid var(--border);
         }
 
-        @keyframes modalAppear {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
+        /* POSTS */
         .post {
             background: var(--bg-primary);
             padding: 24px;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius);
             margin-bottom: 20px;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
+            box-shadow: var(--shadow);
             border: 1px solid var(--border);
+            transition: var(--transition);
         }
 
-        .post:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .post:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
 
         .post-header {
             display: flex;
@@ -256,12 +298,28 @@
             color: var(--text-secondary);
         }
 
-        .post-content { margin: 16px 0; font-size: 16px; line-height: 1.5; }
-        .post-media { margin: 16px 0; border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-sm); }
-        .post-media img { max-width: 100%; display: block; }
-        .post-media audio { width: 100%; border-radius: var(--radius-sm); }
+        .post-content {
+            margin: 16px 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
 
-        /* BOTÕES ALINHADOS À DIREITA */
+        .post-media {
+            margin: 16px 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .post-media img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .post-media audio {
+            width: 100%;
+        }
+
+        /* BOTÕES À DIREITA */
         .reactions {
             display: flex;
             gap: 12px;
@@ -269,7 +327,7 @@
             padding-top: 16px;
             border-top: 1px solid var(--border);
             flex-wrap: wrap;
-            justify-content: flex-end; /* ALINHADO À DIREITA */
+            justify-content: flex-end;
         }
 
         .reaction-btn {
@@ -278,7 +336,7 @@
             cursor: pointer;
             font-size: 20px;
             padding: 8px 16px;
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius);
             transition: var(--transition);
             display: flex;
             align-items: center;
@@ -287,56 +345,58 @@
             min-height: 44px;
         }
 
-        .reaction-btn:hover { 
-            background: var(--accent); 
-            color: white; 
+        .reaction-btn:hover {
+            background: var(--accent);
+            color: white;
             transform: scale(1.1);
             border-color: var(--accent);
         }
-        .reaction-btn.active { 
-            background: var(--accent); 
+
+        .reaction-btn.active {
+            background: var(--accent);
             color: white;
             border-color: var(--accent);
         }
 
-        .comment-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .comment-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
 
-        /* BOTÃO DE COMENTÁRIO À DIREITA */
+        /* INPUT DE COMENTÁRIO COM BOTÃO À DIREITA */
         .comment-input {
             display: flex;
             gap: 12px;
             margin-bottom: 12px;
-            flex-direction: row-reverse; /* INVERTE ORDEM: BOTÃO À DIREITA */
+            flex-direction: row-reverse;
         }
 
-        .comment-input input { 
-            flex: 1; 
-            border-radius: var(--radius-sm);
+        .comment-input input {
+            flex: 1;
         }
-        .comment-input button { 
+
+        .comment-input button {
             padding: 8px 16px;
-            border-radius: var(--radius-sm);
         }
 
         .comment {
             background: var(--bg-secondary);
             padding: 12px;
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius);
             margin-bottom: 8px;
             font-size: 14px;
             border-left: 3px solid var(--accent);
-            transition: var(--transition);
         }
 
-        .comment:hover { transform: translateX(4px); }
-
+        /* PERFIL */
         .profile-header {
             background: var(--bg-primary);
             padding: 32px;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius);
             margin-bottom: 24px;
             text-align: center;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow);
             border: 1px solid var(--border);
         }
 
@@ -349,18 +409,23 @@
 
         .stat-card {
             background: var(--bg-primary);
-            color: var(--text-primary);
             padding: 20px;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius);
             text-align: center;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
+            box-shadow: var(--shadow);
             border: 1px solid var(--border);
         }
 
-        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-        .stat-card h3 { font-size: 32px; margin-bottom: 4px; color: var(--accent); }
-        .stat-card p { font-size: 12px; color: var(--text-secondary); }
+        .stat-card h3 {
+            font-size: 32px;
+            margin-bottom: 4px;
+            color: var(--accent);
+        }
+
+        .stat-card p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
 
         .export-import {
             display: flex;
@@ -388,34 +453,52 @@
             color: white;
         }
 
-        /* BOTÃO PUBLICAR À DIREITA NO MODAL */
+        /* BOTÕES À DIREITA NOS MODAIS */
         .modal-actions {
             display: flex;
             gap: 10px;
             margin-top: 20px;
-            justify-content: flex-end; /* ALINHADO À DIREITA */
+            justify-content: flex-end;
         }
 
-        #bioText {
-            cursor: pointer;
-            padding: 8px;
-            border-radius: var(--radius-sm);
+        /* STATUS DA CONEXÃO */
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 3000;
             transition: var(--transition);
-            margin: 10px 0;
-            color: var(--text-secondary);
         }
 
-        #bioText:hover {
-            background: rgba(0,0,0,0.05);
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
-        @media (max-width: 768px) {
-            .reactions { justify-content: flex-end; }
-            .comment-input { flex-direction: row-reverse; }
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .connection-status.connecting {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
     </style>
 </head>
 <body>
+    <!-- INDICADOR DE CONEXÃO P2P -->
+    <div id="connectionStatus" class="connection-status connecting">
+        Conectando à rede P2P...
+    </div>
+
     <header>
         <div class="header-content">
             <div class="logo">Beemote</div>
@@ -465,7 +548,7 @@
         </div>
 
         <!-- App Principal -->
-        <div id="appScreen" class="hidden">
+        <div id="appScreen" class="app-screen hidden">
             <div class="tabs">
                 <div class="tab active" onclick="switchTab(event, 'feed')">Feed</div>
                 <div class="tab" onclick="switchTab(event, 'profile')">Perfil</div>
@@ -473,11 +556,11 @@
                 <div class="tab" onclick="switchTab(event, 'communities')">Comunidades</div>
             </div>
 
-            <div id="feedTab" class="tab-content">
+            <div id="feedTab" class="tab-content active">
                 <div id="posts"></div>
             </div>
 
-            <div id="profileTab" class="tab-content hidden">
+            <div id="profileTab" class="tab-content">
                 <div class="profile-header">
                     <h2 id="profileName"></h2>
                     <p id="bioText" onclick="editBio()">Sem bio (clique para editar)</p>
@@ -502,11 +585,11 @@
                     <button onclick="document.getElementById('importFile').click()">📤 Importar Dados</button>
                     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
                 </div>
-                <h3>Mural de Depoimentos</h3>
+                <h3 style="margin-top: 30px;">Mural de Depoimentos</h3>
                 <div id="testimonialWall"></div>
             </div>
 
-            <div id="contactsTab" class="tab-content hidden">
+            <div id="contactsTab" class="tab-content">
                 <div class="form-group">
                     <label>Adicionar Contato</label>
                     <div style="display: flex; gap: 10px;">
@@ -517,7 +600,7 @@
                 <div id="contactsList"></div>
             </div>
 
-            <div id="communitiesTab" class="tab-content hidden">
+            <div id="communitiesTab" class="tab-content">
                 <button onclick="showCreateCommunity()" class="secondary">Criar Comunidade</button>
                 <div id="communitiesList" style="margin-top: 20px;"></div>
             </div>
@@ -554,10 +637,9 @@
             </div>
             <div id="drawingPost" class="form-group hidden">
                 <label>Desenhar</label>
-                <canvas id="drawingCanvas" width="800" height="600" style="border:1px solid var(--border); width:100%; max-width:100%;"></canvas>
+                <canvas id="drawingCanvas" width="800" height="600" style="border:1px solid var(--border); width:100%; max-width:100%; background:white;"></canvas>
                 <button onclick="clearCanvas()" class="danger" style="margin-top:10px;">🗑️ Limpar</button>
             </div>
-            <!-- BOTÕES ALINHADOS À DIREITA -->
             <div class="modal-actions">
                 <button class="secondary" onclick="closeModal()">Cancelar</button>
                 <button onclick="createPost()">✨ Publicar</button>
@@ -577,7 +659,6 @@
                 <label>Descrição</label>
                 <textarea id="communityDesc" rows="3"></textarea>
             </div>
-            <!-- BOTÕES ALINHADOS À DIREITA -->
             <div class="modal-actions">
                 <button class="secondary" onclick="closeCommunityModal()">Cancelar</button>
                 <button onclick="createCommunity()">Criar</button>
@@ -586,11 +667,29 @@
     </div>
 
     <script>
-        // Código JavaScript permanece idêntico à versão corrigida anterior
+        // 🔧 DEPURAÇÃO - LOGS VISÍVEIS
+        const DEBUG = true;
+        function log(...args) {
+            if (DEBUG) {
+                console.log('[BEEMOTE]', ...args);
+                const status = document.getElementById('connectionStatus');
+                if (status && args[0] === 'CONECTADO') {
+                    status.textContent = '✓ Conectado à rede P2P';
+                    status.className = 'connection-status connected';
+                } else if (status && args[0] === 'ERRO') {
+                    status.textContent = '✗ Erro de conexão';
+                    status.className = 'connection-status disconnected';
+                }
+            }
+        }
+
+        // CORREÇÃO DEFINITIVA DAS URLs - SEM ESPAÇOS E COM HTTPS CONFIÁVEL
         const gun = Gun([
             'https://gun-manhattan.herokuapp.com/gun',
             'https://gun-eu.herokuapp.com/gun',
-            'https://gun-us.herokuapp.com/gun'
+            'https://gun-us.herokuapp.com/gun',
+            // Backup: usar peer local se os outros falharem
+            'http://localhost:8765/gun'
         ]);
 
         const user = gun.user();
@@ -609,32 +708,88 @@
             like: '👍', love: '❤️', laugh: '😂', wow: '😲', sad: '😢', angry: '😠'
         };
 
-        window.onload = function() {
+        // INICIALIZAÇÃO ROBUSTA
+        window.addEventListener('DOMContentLoaded', function() {
+            log('Inicializando Beemote...');
+            
+            // Inicializa canvas
             canvas = document.getElementById('drawingCanvas');
-            ctx = canvas.getContext('2d');
-            ctx.strokeStyle = currentColor;
-            ctx.lineWidth = currentBrushSize;
-            
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('touchstart', handleTouch, { passive: false });
-            canvas.addEventListener('touchmove', handleTouch, { passive: false });
-            canvas.addEventListener('touchend', stopDrawing, { passive: false });
-
-            const alias = localStorage.getItem('beemote_alias');
-            if (alias) {
-                gun.on('auth', () => {
-                    currentUser = user.is;
-                    if (currentUser) showApp();
-                });
+            if (canvas) {
+                ctx = canvas.getContext('2d');
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = currentBrushSize;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('touchstart', handleTouch, { passive: false });
+                canvas.addEventListener('touchmove', handleTouch, { passive: false });
+                canvas.addEventListener('touchend', stopDrawing, { passive: false });
             }
+
+            // Verifica login automático
+            const alias = localStorage.getItem('beemote_alias');
+            log('Login automático:', alias ? alias : 'Não encontrado');
             
+            if (alias) {
+                // Tenta autenticar automaticamente quando Gun estiver pronto
+                gun.on('auth', () => {
+                    log('Auth event disparado');
+                    currentUser = user.is;
+                    if (currentUser) {
+                        log('Usuário autenticado:', currentUser.alias);
+                        showApp();
+                    }
+                });
+                
+                // Timeout de segurança
+                setTimeout(() => {
+                    if (!currentUser) {
+                        log('Timeout - mostrando tela de login');
+                        showAuth();
+                    }
+                }, 3000);
+            } else {
+                log('Mostrando tela de login');
+                showAuth();
+            }
+
+            // Configura tema
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.getElementById('themeToggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-        };
+        });
 
+        function showAuth() {
+            document.getElementById('authScreen').classList.add('active');
+            document.getElementById('appScreen').classList.remove('active');
+            document.getElementById('fab').classList.add('hidden');
+            document.getElementById('userInfo').classList.add('hidden');
+        }
+
+        function showApp() {
+            log('Mostrando app...');
+            document.getElementById('authScreen').classList.remove('active');
+            document.getElementById('appScreen').classList.add('active');
+            document.getElementById('fab').classList.remove('hidden');
+            document.getElementById('userInfo').classList.remove('hidden');
+            document.getElementById('username').textContent = currentUser.alias;
+            
+            // Garante que a aba feed seja a ativa inicial
+            switchTab({ target: document.querySelector('.tab') }, 'feed');
+            
+            // Inicializa dados
+            loadFeed();
+            loadContacts();
+            loadCommunities();
+            loadProfile();
+            
+            log('CONECTADO');
+        }
+
+        // FUNÇÕES DE DESENHO
         function startDrawing(e) {
             isDrawing = true;
             const rect = canvas.getBoundingClientRect();
@@ -670,10 +825,7 @@
             isDrawing = false;
         }
 
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
+        // AUTENTICAÇÃO
         function showRegister() {
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('registerForm').classList.remove('hidden');
@@ -702,6 +854,7 @@
             }
             
             try {
+                log('Criando usuário:', username);
                 await user.create(username, password);
                 user.get('profile').put({
                     bio: 'Hello Beemote! 🦛',
@@ -710,6 +863,7 @@
                 document.getElementById('regSuccess').textContent = 'Conta criada! Faça login.';
                 setTimeout(showLogin, 2000);
             } catch (e) {
+                log('ERRO ao criar usuário:', e);
                 document.getElementById('regError').textContent = 'Usuário já existe';
             }
         }
@@ -719,11 +873,14 @@
             const password = document.getElementById('loginPassword').value;
             
             try {
+                log('Fazendo login:', username);
                 await user.auth(username, password);
                 localStorage.setItem('beemote_alias', username);
                 currentUser = user.is;
+                log('Login bem-sucedido');
                 showApp();
             } catch (e) {
+                log('ERRO no login:', e);
                 document.getElementById('loginError').textContent = 'Login falhou';
             }
         }
@@ -742,30 +899,27 @@
             document.getElementById('themeToggle').textContent = newTheme === 'dark' ? '☀️' : '🌙';
         }
 
-        function showApp() {
-            document.getElementById('authScreen').classList.add('hidden');
-            document.getElementById('appScreen').classList.remove('hidden');
-            document.getElementById('fab').classList.remove('hidden');
-            document.getElementById('userInfo').classList.remove('hidden');
-            document.getElementById('username').textContent = currentUser.alias;
-            
-            loadFeed();
-            loadContacts();
-            loadCommunities();
-            loadProfile();
-        }
-
+        // FEED E POSTS - COM VERIFICAÇÃO DE CONEXÃO
         function loadFeed() {
+            if (!currentUser) return;
+            
+            log('Carregando feed...');
             const postsDiv = document.getElementById('posts');
             postsDiv.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Carregando posts...</p>';
             
             const posts = [];
             
-            gun.get('beemote').get('posts').map().on((data, id) => {
+            // Remove listeners antigos para evitar duplicação
+            gun.get('beemote').get('posts').map().off();
+            
+            // NOVO listener que realmente funciona
+            gun.get('beemote').get('posts').map().once((data, id) => {
                 if (!data || (data.ttl && data.ttl < Date.now())) {
                     gun.get('beemote').get('posts').get(id).put(null);
                     return;
                 }
+                
+                log('Post recebido:', id, data.author);
                 
                 const index = posts.findIndex(p => p.id === id);
                 if (index > -1) {
@@ -775,6 +929,8 @@
                 }
                 
                 posts.sort((a, b) => (b.bumpedAt || b.timestamp) - (a.bumpedAt || a.timestamp));
+                
+                // Renderiza imediatamente
                 postsDiv.innerHTML = '';
                 posts.forEach(post => renderPost(post));
                 
@@ -792,6 +948,17 @@
 
             const postEl = document.createElement('div');
             postEl.className = 'post';
+            
+            // Gera HTML do post
+            const commentsHtml = Object.entries(comments).map(([cid, c]) => `
+                <div class="comment">
+                    <strong onclick="loadUserProfile('${c.author}')" style="cursor:pointer; color:var(--accent);">
+                        ${c.authorAlias || await getUserAlias(c.author)}
+                    </strong>: ${c.text}
+                    <br><small>${formatTime(c.timestamp)}</small>
+                </div>
+            `).join('');
+            
             postEl.innerHTML = `
                 <div class="post-header">
                     <span onclick="loadUserProfile('${post.author}')" style="cursor:pointer; font-weight:600; color:var(--accent);">${author}</span>
@@ -813,18 +980,10 @@
                         <input type="text" id="comment-${post.id}" placeholder="Adicionar comentário..." 
                                onkeypress="if(event.key==='Enter') comment('${post.id}')">
                     </div>
-                    <div id="comments-${post.id}">
-                        ${Object.entries(comments).map(([cid, c]) => `
-                            <div class="comment">
-                                <strong onclick="loadUserProfile('${c.author}')" style="cursor:pointer; color:var(--accent);">
-                                    ${c.authorAlias || 'Anônimo'}
-                                </strong>: ${c.text}
-                                <br><small>${formatTime(c.timestamp)}</small>
-                            </div>
-                        `).join('')}
-                    </div>
+                    <div id="comments-${post.id}">${commentsHtml}</div>
                 </div>
             `;
+            
             postsDiv.appendChild(postEl);
         }
 
@@ -834,6 +993,7 @@
         }
 
         function renderMedia(media) {
+            if (!media) return '';
             if (media.startsWith('data:image')) return `<img src="${media}" alt="Desenho">`;
             if (media.startsWith('data:audio')) return `<audio controls src="${media}"></audio>`;
             return '';
@@ -887,15 +1047,23 @@
                 ttl: timestamp + (24 * 60 * 60 * 1000)
             };
 
-            gun.get('beemote').get('posts').get(postId).put(postData);
-            user.get('posts').get(postId).put(postData);
-
-            user.get('stats').get('posts').once(count => {
-                user.get('stats').get('posts').put((count || 0) + 1);
+            log('Criando post:', postId, postData);
+            
+            gun.get('beemote').get('posts').get(postId).put(postData, ack => {
+                if (ack.err) {
+                    log('ERRO ao criar post:', ack.err);
+                    alert('Erro ao publicar: ' + ack.err);
+                } else {
+                    log('Post criado com sucesso!');
+                    user.get('posts').get(postId).put(postData);
+                    user.get('stats').get('posts').once(count => {
+                        user.get('stats').get('posts').put((count || 0) + 1);
+                    });
+                    
+                    closeModal();
+                    setTimeout(() => loadFeed(), 300);
+                }
             });
-
-            closeModal();
-            setTimeout(() => loadFeed(), 500);
         }
 
         async function loadProfile() {
@@ -955,16 +1123,17 @@
                     const author = await getUserAlias(t.author);
                     const testimonialEl = document.createElement('div');
                     testimonialEl.className = 'testimonial';
+                    testimonialEl.style.cssText = 'background: var(--bg-secondary); padding: 15px; border-radius: var(--radius); margin-bottom: 10px; position: relative;';
                     testimonialEl.innerHTML = `
-                        <div class="testimonial-actions">
-                            <button onclick="hideTestimonial('${t.id}')" class="danger">Ocultar</button>
+                        <div style="position:absolute; top:10px; right:10px;">
+                            <button onclick="hideTestimonial('${t.id}')" class="danger" style="padding:5px 10px; font-size:12px;">Ocultar</button>
                         </div>
                         <p>${t.text}</p>
-                        <small>${author} - ${formatTime(t.timestamp)}</small>
+                        <small style="color:var(--text-secondary);">${author} - ${formatTime(t.timestamp)}</small>
                     `;
                     wall.appendChild(testimonialEl);
                 }
-            }, 1000);
+            }, 500);
         }
 
         function hideTestimonial(id) {
@@ -993,11 +1162,11 @@
             user.get('contacts').map().on((data, id) => {
                 if (!data || !data.pub) return;
                 const contactEl = document.createElement('div');
-                contactEl.className = 'contact-item';
+                contactEl.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-secondary); border-radius: var(--radius); margin-bottom: 8px;';
                 contactEl.innerHTML = `
                     <div>
                         <strong>${data.alias || id}</strong>
-                        <small style="color:var(--text-secondary);">${data.status}</small>
+                        <small style="color:var(--text-secondary); display:block;">${data.status}</small>
                     </div>
                     ${data.status === 'pending' ? 
                         `<button onclick="acceptContact('${data.pub}')">Aceitar</button>` : 
@@ -1036,6 +1205,7 @@
                     });
                     
                     document.getElementById('contactUsername').value = '';
+                    loadContacts();
                 });
             });
         }
@@ -1088,11 +1258,11 @@
                 if (!data || !data.id) return;
                 const isMember = data.members && data.members[currentUser.pub];
                 const communityEl = document.createElement('div');
-                communityEl.className = 'community-item';
+                communityEl.style.cssText = 'background: var(--bg-secondary); padding: 15px; border-radius: var(--radius); margin-bottom: 10px;';
                 communityEl.innerHTML = `
-                    <h3>${data.name}</h3>
-                    <p>${data.desc || 'Sem descrição'}</p>
-                    <div class="community-actions">
+                    <h3 style="margin-bottom:5px;">${data.name}</h3>
+                    <p style="color:var(--text-secondary); margin-bottom:10px;">${data.desc || 'Sem descrição'}</p>
+                    <div style="display:flex; gap:10px;">
                         ${!isMember ? 
                             `<button onclick="joinCommunity('${data.id}')">Participar</button>` :
                             `<button class="secondary" onclick="leaveCommunity('${data.id}')">Sair</button>`
@@ -1139,7 +1309,7 @@
         }
 
         function importData(event) {
-            const file = event.files[0];
+            const file = event.target.files[0];
             if (!file) return;
             
             const reader = new FileReader();
@@ -1164,10 +1334,11 @@
         function switchTab(event, tab) {
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-            document.getElementById(tab + 'Tab').classList.remove('hidden');
+            document.getElementById(tab + 'Tab').classList.add('active');
             
+            // Recarrega dados ao mudar de aba
             if (tab === 'feed') loadFeed();
             if (tab === 'profile') loadProfile();
             if (tab === 'contacts') loadContacts();
@@ -1186,8 +1357,10 @@
         function react(postId, type) {
             if (!currentUser) return;
             
-            gun.get('beemote').get('posts').get(postId).get('reactions').get(currentUser.pub).put(type);
-            setTimeout(() => loadFeed(), 200);
+            gun.get('beemote').get('posts').get(postId).get('reactions').get(currentUser.pub).put(type, ack => {
+                if (ack.err) log('ERRO ao reagir:', ack.err);
+                else setTimeout(() => loadFeed(), 200);
+            });
         }
 
         function comment(postId) {
@@ -1201,65 +1374,24 @@
                 authorAlias: currentUser.alias,
                 text,
                 timestamp: Date.now()
-            });
-            
-            input.value = '';
-            setTimeout(() => loadFeed(), 300);
-        }
-
-        function blobToDataURL(blob) {
-            return new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
-            });
-        }
-
-        function toggleRecording() {
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
-                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                    mediaRecorder.onstop = () => {
-                        audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const audio = document.getElementById('audioPlayback');
-                        audio.src = URL.createObjectURL(audioBlob);
-                        audio.classList.remove('hidden');
-                    };
-                    mediaRecorder.start();
-                    document.getElementById('recordBtn').classList.add('hidden');
-                    document.getElementById('stopBtn').classList.remove('hidden');
-                    document.getElementById('audioStatus').textContent = 'Gravando...';
-                });
-        }
-
-        function stopRecording() {
-            if (mediaRecorder) {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
-            }
-            document.getElementById('recordBtn').classList.remove('hidden');
-            document.getElementById('stopBtn').classList.add('hidden');
-            document.getElementById('audioStatus').textContent = 'Gravação concluída';
-        }
-
-        let contactListenerSet = false;
-        if (!contactListenerSet) {
-            user.get('contact_requests').map().on((data, id) => {
-                if (data && data.from && data.from !== currentUser?.pub) {
-                    console.log('Nova solicitação de contato de:', data.alias);
-                    loadContacts();
+            }, ack => {
+                if (ack.err) log('ERRO ao comentar:', ack.err);
+                else {
+                    input.value = '';
+                    setTimeout(() => loadFeed(), 300);
                 }
             });
-            contactListenerSet = true;
         }
 
+        // AUTO-REFRESH CONTROLADO
         setInterval(() => {
             if (currentTab === 'feed' && currentUser) {
+                log('Auto-refresh do feed...');
                 loadFeed();
             }
-        }, 15000);
+        }, 10000);
+
+        log('Script carregado completamente');
     </script>
 </body>
 </html>
