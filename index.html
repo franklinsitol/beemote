@@ -419,7 +419,6 @@
             height: auto;
             max-width: 100%;
             background: white;
-            touch-action: none;
         }
 
         #bioText {
@@ -440,6 +439,18 @@
             .brush-size { justify-content: center; }
             .canvas-container { max-height: 400px; }
             #drawingCanvas { max-height: 350px; }
+        }
+
+        .image-preview {
+            margin: 16px 0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            display: block;
         }
     </style>
 </head>
@@ -563,6 +574,7 @@
                 <label>Tipo de Conteúdo</label>
                 <select id="postType" onchange="changePostType()">
                     <option value="text">Texto</option>
+                    <option value="image">Imagem</option>
                     <option value="audio">Áudio</option>
                     <option value="drawing">Desenho</option>
                 </select>
@@ -570,6 +582,11 @@
             <div id="textPost" class="form-group">
                 <label>Texto</label>
                 <textarea id="postText" rows="4" placeholder="O que está pensando?"></textarea>
+            </div>
+            <div id="imagePost" class="form-group hidden">
+                <label>Imagem</label>
+                <input type="file" id="imageFile" accept="image/*" onchange="previewImage(event)">
+                <div id="imagePreview" class="image-preview hidden"></div>
             </div>
             <div id="audioPost" class="form-group hidden">
                 <label>Gravar Áudio</label>
@@ -646,6 +663,7 @@
         let ctx = null;
         let currentColor = '#000000';
         let currentBrushSize = 3;
+        let imageFile = null; // NOVO: Para armazenar a imagem selecionada
 
         const REACTION_EMOJIS = {
             like: '👍', love: '❤️', laugh: '😂', wow: '😲', sad: '😢', angry: '😠'
@@ -741,6 +759,25 @@
 
         function clearCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // NOVO: PRÉ-VISUALIZAR IMAGEM
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                document.getElementById('imagePreview').classList.add('hidden');
+                imageFile = null;
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagePreview');
+                preview.innerHTML = `<img src="${e.target.result}" alt="Prévia">`;
+                preview.classList.remove('hidden');
+                imageFile = file;
+            };
+            reader.readAsDataURL(file);
         }
 
         // AUTENTICAÇÃO
@@ -911,7 +948,7 @@
         }
 
         function renderMedia(media) {
-            if (media.startsWith('data:image')) return `<img src="${media}" alt="Desenho">`;
+            if (media.startsWith('data:image')) return `<img src="${media}" alt="Imagem">`;
             if (media.startsWith('data:audio')) return `<audio controls src="${media}"></audio>`;
             return '';
         }
@@ -928,12 +965,16 @@
             document.getElementById('createPostModal').classList.remove('show');
             document.getElementById('postText').value = '';
             document.getElementById('audioPlayback').classList.add('hidden');
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('imageFile').value = '';
+            imageFile = null;
             clearCanvas();
         }
 
         function changePostType() {
             const type = document.getElementById('postType').value;
             document.getElementById('textPost').classList.toggle('hidden', type !== 'text');
+            document.getElementById('imagePost').classList.toggle('hidden', type !== 'image');
             document.getElementById('audioPost').classList.toggle('hidden', type !== 'audio');
             document.getElementById('drawingPost').classList.toggle('hidden', type !== 'drawing');
         }
@@ -946,6 +987,8 @@
             if (type === 'text') {
                 content = document.getElementById('postText').value.trim();
                 if (!content) return alert('Escreva algo!');
+            } else if (type === 'image' && imageFile) {
+                media = await fileToDataURL(imageFile);
             } else if (type === 'audio' && audioBlob) {
                 media = await blobToDataURL(audioBlob);
             } else if (type === 'drawing') {
@@ -974,6 +1017,15 @@
 
             closeModal();
             setTimeout(loadFeed, 500);
+        }
+
+        // NOVO: Converter arquivo para Data URL
+        function fileToDataURL(file) {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            });
         }
 
         // PERFIL
@@ -1005,7 +1057,6 @@
             });
         }
 
-        // EDIÇÃO DE BIO
         function editBio() {
             const bioEl = document.getElementById('bioText');
             const currentBio = bioEl.textContent.replace('Sem bio (clique para editar)', '');
