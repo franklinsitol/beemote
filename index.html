@@ -1008,7 +1008,7 @@
     (function() {
         'use strict';
         
-        // CORREÇÃO 1: Lista de Peers Robusta
+        // CONFIGURAÇÃO ATUALIZADA
         const CONFIG = {
             GUN_PEERS: [
                 'https://gun-manhattan.herokuapp.com/gun',
@@ -1019,13 +1019,12 @@
             MAX_POST_LENGTH: 500,
             MAX_BIO_LENGTH: 200,
             AVATAR_MAX_SIZE: 2 * 1024 * 1024, // 2MB
-            // CORREÇÃO 2: Namespace Único para evitar colisão
-            APP_NAMESPACE: 'beemote_posts_v1' 
+            // NAMESPACE GLOBAL PARA POSTS COMPARTILHADOS
+            POSTS_NAMESPACE: 'beemote_global_posts_v3'
         };
         
         // State management
         const state = {
-            // CORREÇÃO 3: localStorage: true para salvar se a net cair
             gun: Gun({ peers: CONFIG.GUN_PEERS, localStorage: true, radisk: true }),
             user: null,
             currentPage: 'feed',
@@ -1038,7 +1037,7 @@
             currentUserProfile: null
         };
 
-        // CORREÇÃO 4: Monitor de Status
+        // Monitor de Status de Conexão
         const monitorConnection = () => {
             setInterval(() => {
                 const peers = state.gun._.opt.peers;
@@ -1277,7 +1276,7 @@
             }
         };
         
-        // Feed functionality
+        // Feed functionality - ATUALIZADA
         const loadFeed = () => {
             ui.postsContainer.innerHTML = `
                 <div class="loading">
@@ -1312,19 +1311,42 @@
                 ui.feedHeaderContainer.classList.add('hidden');
             }
             
-            // CORREÇÃO: Usando o namespace do app em vez de 'posts' genérico
-            const sub = state.gun.get(CONFIG.APP_NAMESPACE).map().on((post, id) => {
-                if (!post) return;
+            // CORREÇÃO: Escuta todos os posts do namespace global compartilhado
+            const sub = state.gun.get(CONFIG.POSTS_NAMESPACE).map().on(async (post, id) => {
+                if (!post || !post.content) return;
                 
-                if (post.content && post.lastActivityAt) {
-                    // Check if post belongs to current community
-                    if (state.currentCommunity.id && post.communityId !== state.currentCommunity.id) {
-                        state.postsData.delete(id);
-                    } else {
-                        state.postsData.set(id, { ...post, id });
-                    }
-                } else {
+                const now = Date.now();
+                
+                // Filtra posts expirados
+                if (post.expiresAt && now > post.expiresAt) {
                     state.postsData.delete(id);
+                    renderSortedFeed();
+                    return;
+                }
+                
+                // Filtra por comunidade se necessário
+                if (state.currentCommunity.id && post.communityId !== state.currentCommunity.id) {
+                    state.postsData.delete(id);
+                } else {
+                    // Busca informações atualizadas do autor
+                    let authorProfile = state.usersCache.get(post.authorPub);
+                    if (!authorProfile && post.authorPub) {
+                        authorProfile = await new Promise(resolve => {
+                            state.gun.get(`~${post.authorPub}`).once(profile => {
+                                const profileData = profile || { 
+                                    alias: post.authorAlias || 'Anônimo' 
+                                };
+                                state.usersCache.set(post.authorPub, profileData);
+                                resolve(profileData);
+                            });
+                        });
+                    }
+                    
+                    state.postsData.set(id, { 
+                        ...post, 
+                        id,
+                        authorProfile: authorProfile || { alias: post.authorAlias || 'Anônimo' }
+                    });
                 }
                 
                 renderSortedFeed();
@@ -1339,7 +1361,13 @@
         const renderSortedFeed = () => {
             const now = Date.now();
             const validPosts = Array.from(state.postsData.values())
-                .filter(p => (now - p.lastActivityAt < CONFIG.POST_EXPIRATION_MS))
+                .filter(p => {
+                    // Filtra posts expirados usando expiresAt ou lastActivityAt
+                    if (p.expiresAt) {
+                        return now < p.expiresAt;
+                    }
+                    return (now - p.lastActivityAt < CONFIG.POST_EXPIRATION_MS);
+                })
                 .sort((a, b) => b.lastActivityAt - a.lastActivityAt);
                 
             if (validPosts.length === 0) {
@@ -1362,7 +1390,7 @@
             });
         };
         
-        const renderPost = async (post) => {
+        const renderPost = (post) => {
             // Check if post already exists to avoid duplication
             if (document.getElementById(`post-${post.id}`)) {
                 updatePost(post);
@@ -1373,24 +1401,15 @@
             postEl.className = 'card fade-in';
             postEl.id = `post-${post.id}`;
             
-            // Get author profile from cache if available
-            let authorProfile = state.usersCache.get(post.authorPub);
-            if (!authorProfile) {
-                authorProfile = await new Promise(resolve => {
-                    state.gun.get(`~${post.authorPub}`).once(profile => {
-                        const profileData = profile || { alias: 'Anônimo' };
-                        state.usersCache.set(post.authorPub, profileData);
-                        resolve(profileData);
-                    });
-                });
-            }
+            // Usa informações do autor do cache ou do próprio post
+            const authorAlias = post.authorProfile?.alias || post.authorAlias || 'Anônimo';
             
             postEl.innerHTML = `
                 <div class="post-header">
                     <div class="post-author-info">
-                        ${renderAvatar(authorProfile)}
+                        ${renderAvatar(post.authorProfile || { alias: authorAlias })}
                         <div>
-                            <div class="post-author">${sanitizeHTML(authorProfile.alias)}</div>
+                            <div class="post-author">${sanitizeHTML(authorAlias)}</div>
                             <div class="post-time">${formatTime(post.createdAt)}</div>
                         </div>
                     </div>
@@ -1399,6 +1418,9 @@
                     </div>
                 </div>
                 <div class="post-content">${sanitizeHTML(post.content)}</div>
+                ${post.communityName ? `<div style="color: var(--primary); font-size: 0.8rem; margin-bottom: 10px;">
+                    <i class="fas fa-users"></i> ${sanitizeHTML(post.communityName)}
+                </div>` : ''}
                 <div class="post-actions">
                     <div class="post-action" data-action="like">
                         <i class="fas fa-heart"></i> 
@@ -1441,6 +1463,7 @@
             }
         };
         
+        // CORREÇÃO: Função createPost atualizada para namespace global
         const createPost = () => {
             const content = ui.postContent.value.trim();
             
@@ -1457,35 +1480,44 @@
             }
             
             const now = Date.now();
+            const postId = Gun.text.random(16); // Gera ID único
+            
             const postData = {
+                id: postId,
                 authorPub: state.user.is.pub,
+                authorAlias: state.user.is.alias,
                 content: content,
                 createdAt: now,
-                lastActivityAt: now
+                lastActivityAt: now,
+                expiresAt: now + CONFIG.POST_EXPIRATION_MS
             };
             
             if (state.currentCommunity.id) {
                 postData.communityId = state.currentCommunity.id;
+                postData.communityName = state.currentCommunity.name;
             }
             
-            // CORREÇÃO: Salvando no namespace correto do App
-            const postRef = state.gun.get(CONFIG.APP_NAMESPACE).set(postData);
-            state.gun.user().get('posts').set(postRef);
+            // CORREÇÃO: Salva no namespace global compartilhado
+            state.gun.get(CONFIG.POSTS_NAMESPACE).get(postId).put(postData);
+            
+            // Também salva referência no perfil do usuário
+            state.gun.user().get('myPosts').get(postId).put({ id: postId, createdAt: now });
             
             ui.postContent.value = '';
             showNotification('Post publicado com sucesso!');
         };
         
+        // CORREÇÃO: Funções de interação atualizadas para namespace global
         const handlePostInteraction = (postId, type) => {
             if (!state.user?.is) {
                 return showNotification('Faça login para interagir.', 'error');
             }
             
-            // Update last activity (using correct namespace path)
-            state.gun.get(CONFIG.APP_NAMESPACE).get(postId).get('lastActivityAt').put(Date.now());
+            // Atualiza lastActivityAt no post global
+            state.gun.get(CONFIG.POSTS_NAMESPACE).get(postId).get('lastActivityAt').put(Date.now());
             
             if (type === 'like') {
-                const likeRef = state.gun.get(CONFIG.APP_NAMESPACE).get(postId).get('likes').get(state.user.is.pub);
+                const likeRef = state.gun.get(CONFIG.POSTS_NAMESPACE).get(postId).get('likes').get(state.user.is.pub);
                 likeRef.once(currentVal => {
                     likeRef.put(!currentVal);
                     
@@ -1503,7 +1535,7 @@
         };
         
         const updateLikes = (postId, postEl) => {
-            const likesRef = state.gun.get(CONFIG.APP_NAMESPACE).get(postId).get('likes');
+            const likesRef = state.gun.get(CONFIG.POSTS_NAMESPACE).get(postId).get('likes');
             const likeCountEl = postEl.querySelector('.like-count');
             const likeActionEl = postEl.querySelector('[data-action="like"]');
             
@@ -1548,7 +1580,9 @@
             });
             
             const listEl = container.querySelector('.comments-list');
-            const sub = state.gun.get(CONFIG.APP_NAMESPACE).get(postId).get('comments').map().on(async (comment, id) => {
+            
+            // CORREÇÃO: Comentários também no namespace global
+            const sub = state.gun.get(CONFIG.POSTS_NAMESPACE).get(postId).get('comments').map().on(async (comment, id) => {
                 if (!comment?.content) {
                     const el = document.getElementById(id);
                     if (el) el.remove();
@@ -1603,7 +1637,8 @@
                 createdAt: Date.now()
             };
             
-            state.gun.get(CONFIG.APP_NAMESPACE).get(postId).get('comments').set(commentData);
+            // CORREÇÃO: Comentário no namespace global
+            state.gun.get(CONFIG.POSTS_NAMESPACE).get(postId).get('comments').set(commentData);
             input.value = '';
         };
         
@@ -1614,7 +1649,8 @@
                     el.textContent = formatCountdown(timestamp);
                     
                     // Remove expired posts from view
-                    if (Date.now() - timestamp > CONFIG.POST_EXPIRATION_MS) {
+                    const now = Date.now();
+                    if (now - timestamp > CONFIG.POST_EXPIRATION_MS) {
                         const postId = el.closest('.card')?.id.replace('post-', '');
                         if (postId) {
                             state.postsData.delete(postId);
@@ -1763,7 +1799,7 @@
             const userRef = state.gun.user();
             
             // Count posts
-            userRef.get('posts').map().once(() => {
+            userRef.get('myPosts').map().once(() => {
                 postCount++;
                 document.getElementById('post-count').textContent = postCount;
             });
@@ -1839,25 +1875,30 @@
             container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div>Carregando posts...</div></div>';
             
             let hasPosts = false;
-            state.gun.user().get('posts').map().on(postRef => {
+            state.gun.user().get('myPosts').map().on(postRef => {
                 postRef.once(post => {
-                    if (post?.content) {
-                        if (!hasPosts) {
-                            container.innerHTML = '';
-                            hasPosts = true;
-                        }
-                        
-                        const postEl = document.createElement('div');
-                        postEl.className = 'item-card fade-in';
-                        postEl.innerHTML = `
-                            <div style="flex: 1;">
-                                <div>${sanitizeHTML(post.content)}</div>
-                                <div style="color: var(--gray); font-size: 0.8rem; margin-top: 5px;">
-                                    ${formatTime(post.createdAt)}
-                                </div>
-                            </div>
-                        `;
-                        container.prepend(postEl);
+                    if (post?.id) {
+                        // Busca o post completo no namespace global
+                        state.gun.get(CONFIG.POSTS_NAMESPACE).get(post.id).once(fullPost => {
+                            if (fullPost?.content) {
+                                if (!hasPosts) {
+                                    container.innerHTML = '';
+                                    hasPosts = true;
+                                }
+                                
+                                const postEl = document.createElement('div');
+                                postEl.className = 'item-card fade-in';
+                                postEl.innerHTML = `
+                                    <div style="flex: 1;">
+                                        <div>${sanitizeHTML(fullPost.content)}</div>
+                                        <div style="color: var(--gray); font-size: 0.8rem; margin-top: 5px;">
+                                            ${formatTime(fullPost.createdAt)}
+                                        </div>
+                                    </div>
+                                `;
+                                container.prepend(postEl);
+                            }
+                        });
                     }
                 });
             });
