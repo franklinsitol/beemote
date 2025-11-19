@@ -50,6 +50,7 @@
             transition: var(--transition);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            touch-action: manipulation;
         }
 
         .container { max-width: 800px; margin: 0 auto; padding: 20px; }
@@ -410,6 +411,7 @@
             margin: 10px 0;
             position: relative;
             overflow: hidden;
+            touch-action: none; /* PREVINE SCROLL NO MOBILE */
         }
 
         #drawingCanvas {
@@ -418,39 +420,17 @@
             width: 100%;
             height: auto;
             max-width: 100%;
-            background: white;
+            touch-action: none; /* PREVINE SCROLL NO MOBILE */
+            background: white; /* Fundo branco para desenho */
         }
 
-        #bioText {
-            cursor: pointer;
-            padding: 8px;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
-            margin: 10px 0;
-        }
-
-        #bioText:hover {
-            background: rgba(0,0,0,0.05);
-        }
-
+        /* Melhorar área de toque no mobile */
         @media (max-width: 768px) {
             .drawing-toolbar { flex-direction: column; align-items: stretch; }
             .color-pickers { justify-content: center; }
             .brush-size { justify-content: center; }
-            .canvas-container { max-height: 400px; }
-            #drawingCanvas { max-height: 350px; }
-        }
-
-        .image-preview {
-            margin: 16px 0;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .image-preview img {
-            max-width: 100%;
-            display: block;
+            .canvas-container { max-height: 50vh; }
+            #drawingCanvas { max-height: 45vh; }
         }
     </style>
 </head>
@@ -467,6 +447,7 @@
     </header>
 
     <div class="container">
+        <!-- ... (todo o HTML do app - mantido) ... -->
         <!-- Tela de Login/Cadastro -->
         <div id="authScreen" class="auth-screen">
             <div class="auth-box">
@@ -519,7 +500,7 @@
             <div id="profileTab" class="tab-content hidden">
                 <div class="profile-header">
                     <h2 id="profileName"></h2>
-                    <p id="bioText" onclick="editBio()">Sem bio (clique para editar)</p>
+                    <p id="profileBio"></p>
                     <small id="profileJoined"></small>
                 </div>
                 <div class="stats">
@@ -574,7 +555,6 @@
                 <label>Tipo de Conteúdo</label>
                 <select id="postType" onchange="changePostType()">
                     <option value="text">Texto</option>
-                    <option value="image">Imagem</option>
                     <option value="audio">Áudio</option>
                     <option value="drawing">Desenho</option>
                 </select>
@@ -582,11 +562,6 @@
             <div id="textPost" class="form-group">
                 <label>Texto</label>
                 <textarea id="postText" rows="4" placeholder="O que está pensando?"></textarea>
-            </div>
-            <div id="imagePost" class="form-group hidden">
-                <label>Imagem</label>
-                <input type="file" id="imageFile" accept="image/*" onchange="previewImage(event)">
-                <div id="imagePreview" class="image-preview hidden"></div>
             </div>
             <div id="audioPost" class="form-group hidden">
                 <label>Gravar Áudio</label>
@@ -663,7 +638,6 @@
         let ctx = null;
         let currentColor = '#000000';
         let currentBrushSize = 3;
-        let imageFile = null; // NOVO: Para armazenar a imagem selecionada
 
         const REACTION_EMOJIS = {
             like: '👍', love: '❤️', laugh: '😂', wow: '😲', sad: '😢', angry: '😠'
@@ -676,15 +650,13 @@
             ctx.strokeStyle = currentColor;
             ctx.lineWidth = currentBrushSize;
             ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
             
-            // EVENTOS DE MOUSE
             canvas.addEventListener('mousedown', startDrawing);
             canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('mouseup', stopDrawing);
             canvas.addEventListener('mouseout', stopDrawing);
 
-            // EVENTOS DE TOUCH PARA MOBILE
+            // REGISTRAR EVENTOS DE TOUCH CORRETAMENTE
             canvas.addEventListener('touchstart', handleTouch, { passive: false });
             canvas.addEventListener('touchmove', handleTouch, { passive: false });
             canvas.addEventListener('touchend', stopDrawing, { passive: false });
@@ -712,32 +684,35 @@
             document.getElementById('sizePreview').style.transform = `scale(${currentBrushSize / 5})`;
         }
 
-        // DESENHO - MOUSE
+        // DESENHO - EVENTOS DE MOUSE
         function startDrawing(e) {
             isDrawing = true;
             const rect = canvas.getBoundingClientRect();
-            const x = e.offsetX || (e.clientX - rect.left);
-            const y = e.offsetY || (e.clientY - rect.top);
             ctx.beginPath();
-            ctx.moveTo(x, y);
+            ctx.moveTo(e.offsetX, e.offsetY);
         }
 
         function draw(e) {
             if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.offsetX || (e.clientX - rect.left);
-            const y = e.offsetY || (e.clientY - rect.top);
-            ctx.lineTo(x, y);
+            ctx.lineTo(e.offsetX, e.offsetY);
             ctx.stroke();
         }
 
-        // DESENHO - TOUCH
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // DESENHO - EVENTOS DE TOUCH PARA MOBILE
         function handleTouch(e) {
-            e.preventDefault();
+            e.preventDefault(); // PREVINE SCROLL E ZOOM
             const touch = e.touches[0];
             const rect = canvas.getBoundingClientRect();
             
-            // CORREÇÃO DE ESCALA PARA MOBILE
+            // CALCULAR COORDENADAS CORRETAS COM ESCALA
             const scaleX = canvas.width / rect.width;
             const scaleY = canvas.height / rect.height;
             const canvasX = (touch.clientX - rect.left) * scaleX;
@@ -751,33 +726,6 @@
                 ctx.lineTo(canvasX, canvasY);
                 ctx.stroke();
             }
-        }
-
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        // NOVO: PRÉ-VISUALIZAR IMAGEM
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (!file) {
-                document.getElementById('imagePreview').classList.add('hidden');
-                imageFile = null;
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('imagePreview');
-                preview.innerHTML = `<img src="${e.target.result}" alt="Prévia">`;
-                preview.classList.remove('hidden');
-                imageFile = file;
-            };
-            reader.readAsDataURL(file);
         }
 
         // AUTENTICAÇÃO
@@ -948,7 +896,7 @@
         }
 
         function renderMedia(media) {
-            if (media.startsWith('data:image')) return `<img src="${media}" alt="Imagem">`;
+            if (media.startsWith('data:image')) return `<img src="${media}" alt="Desenho">`;
             if (media.startsWith('data:audio')) return `<audio controls src="${media}"></audio>`;
             return '';
         }
@@ -965,16 +913,12 @@
             document.getElementById('createPostModal').classList.remove('show');
             document.getElementById('postText').value = '';
             document.getElementById('audioPlayback').classList.add('hidden');
-            document.getElementById('imagePreview').classList.add('hidden');
-            document.getElementById('imageFile').value = '';
-            imageFile = null;
             clearCanvas();
         }
 
         function changePostType() {
             const type = document.getElementById('postType').value;
             document.getElementById('textPost').classList.toggle('hidden', type !== 'text');
-            document.getElementById('imagePost').classList.toggle('hidden', type !== 'image');
             document.getElementById('audioPost').classList.toggle('hidden', type !== 'audio');
             document.getElementById('drawingPost').classList.toggle('hidden', type !== 'drawing');
         }
@@ -987,8 +931,6 @@
             if (type === 'text') {
                 content = document.getElementById('postText').value.trim();
                 if (!content) return alert('Escreva algo!');
-            } else if (type === 'image' && imageFile) {
-                media = await fileToDataURL(imageFile);
             } else if (type === 'audio' && audioBlob) {
                 media = await blobToDataURL(audioBlob);
             } else if (type === 'drawing') {
@@ -1019,25 +961,91 @@
             setTimeout(loadFeed, 500);
         }
 
-        // NOVO: Converter arquivo para Data URL
-        function fileToDataURL(file) {
+        // ÁUDIO
+        async function toggleRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const player = document.getElementById('audioPlayback');
+                    player.src = audioUrl;
+                    player.classList.remove('hidden');
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                mediaRecorder.start();
+                document.getElementById('recordBtn').classList.add('hidden');
+                document.getElementById('stopBtn').classList.remove('hidden');
+                document.getElementById('audioStatus').textContent = 'Gravando...';
+            } catch (e) {
+                alert('Permissão de microfone negada');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                document.getElementById('stopBtn').classList.add('hidden');
+                document.getElementById('recordBtn').classList.remove('hidden');
+                document.getElementById('audioStatus').textContent = 'Gravação concluída';
+            }
+        }
+
+        async function blobToDataURL(blob) {
             return new Promise(resolve => {
                 const reader = new FileReader();
                 reader.onload = () => resolve(reader.result);
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(blob);
             });
+        }
+
+        // REAÇÕES E COMENTÁRIOS
+        async function react(postId, type) {
+            gun.get('beemote').get('posts').get(postId).get('reactions').get(currentUser.pub).once(current => {
+                if (current === type) {
+                    gun.get('beemote').get('posts').get(postId).get('reactions').get(currentUser.pub).put(null);
+                } else {
+                    gun.get('beemote').get('posts').get(postId).get('reactions').get(currentUser.pub).put(type);
+                }
+                renewPost(postId);
+            });
+        }
+
+        async function comment(postId) {
+            const input = document.getElementById(`comment-${postId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const commentId = Date.now().toString();
+            const commentData = {
+                text,
+                author: currentUser.pub,
+                authorAlias: currentUser.alias,
+                timestamp: Date.now()
+            };
+
+            gun.get('beemote').get('posts').get(postId).get('comments').get(commentId).put(commentData);
+            input.value = '';
+            renewPost(postId);
+        }
+
+        function renewPost(postId) {
+            const newTTL = Date.now() + (24 * 60 * 60 * 1000);
+            gun.get('beemote').get('posts').get(postId).get('ttl').put(newTTL);
+            gun.get('beemote').get('posts').get(postId).get('bumpedAt').put(Date.now());
         }
 
         // PERFIL
         async function loadProfile() {
             const profile = await getUserProfile(currentUser.pub);
             document.getElementById('profileName').textContent = currentUser.alias;
-            
-            const bioEl = document.getElementById('bioText');
-            bioEl.textContent = profile.bio || 'Sem bio (clique para editar)';
-            
-            const joinedDate = profile.joined ? new Date(profile.joined) : new Date();
-            document.getElementById('profileJoined').textContent = `Membro desde: ${joinedDate.toLocaleDateString('pt-BR')}`;
+            document.getElementById('profileBio').textContent = profile.bio || 'Sem bio';
+            document.getElementById('profileJoined').textContent = `Membro desde: ${new Date(profile.joined || 0).toLocaleDateString('pt-BR')}`;
 
             const stats = profile.stats || {};
             document.getElementById('statPosts').textContent = stats.posts || 0;
@@ -1049,22 +1057,12 @@
 
         function getUserProfile(pub) {
             return new Promise(resolve => {
-                const profile = { stats: {}, joined: Date.now(), bio: '' };
+                const profile = { stats: {} };
                 gun.user(pub).get('profile').once(data => {
                     if (data) Object.assign(profile, data);
                     resolve(profile);
                 });
             });
-        }
-
-        function editBio() {
-            const bioEl = document.getElementById('bioText');
-            const currentBio = bioEl.textContent.replace('Sem bio (clique para editar)', '');
-            const newBio = prompt('Edite sua bio:', currentBio);
-            if (newBio !== null) {
-                user.get('profile').get('bio').put(newBio);
-                bioEl.textContent = newBio || 'Sem bio (clique para editar)';
-            }
         }
 
         // DEPOIMENTOS
@@ -1107,15 +1105,15 @@
         async function loadUserProfile(pub) {
             const alias = await getUserAlias(pub);
             const text = prompt(`Escreva um depoimento para @${alias}:`);
-            if (text && text.trim()) {
-                const id = Date.now().toString();
-                gun.user(pub).get('testimonials').get(id).put({
-                    author: currentUser.pub,
-                    text: text.trim(),
-                    timestamp: Date.now(),
-                    hidden: false
-                });
-            }
+            if (!text) return;
+
+            const id = Date.now().toString();
+            gun.user(pub).get('testimonials').get(id).put({
+                author: currentUser.pub,
+                text,
+                timestamp: Date.now(),
+                hidden: false
+            });
         }
 
         // CONTATOS
