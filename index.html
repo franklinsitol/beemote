@@ -2,312 +2,1049 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VoiceAI P2P</title>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ==================== SEO & META TAGS ==================== -->
+    <title>Beemote | Sistemas, Apps e Automações Inteligentes com IA</title>
+    <meta name="description" content="A Beemote desenvolve sistemas web, aplicativos mobile e automações corporativas potencializados por Inteligência Artificial. Redução drástica de custos e alta performance.">
+    <meta name="keywords" content="Beemote, desenvolvimento de sistemas, criação de aplicativos, automação com IA, inteligência artificial para empresas, software sob medida, Beemote tech">
+    <meta name="author" content="Beemote">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://beemote.com.br/">
+
+    <!-- Open Graph (WhatsApp, LinkedIn, Instagram) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Beemote | Software & Automações com IA de Alto Impacto">
+    <meta property="og:description" content="Sistemas, apps e automações corporativas acelerados por Inteligência Artificial com economia de até 65%. Fale com a Beemote.">
+    <meta property="og:image" content="logo.png">
+    <meta property="og:url" content="https://beemote.com.br/">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Beemote | Transformação Digital com Inteligência Artificial">
+    <meta name="twitter:description" content="Desenvolva seu app ou automatize processos com Inteligência Artificial e custos reduzidos.">
+    <meta name="twitter:image" content="logo.png">
+
+    <!-- Schema.org JSON-LD para o Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Beemote",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "description": "Desenvolvimento de software sob medida, aplicativos móveis e fluxos de automação com IA pela Beemote.",
+      "telephone": "+5511957321727",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "BRL",
+        "price": "Sob Consulta"
+      }
+    }
+    </script>
+
+    <!-- Fontes & Ícones -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Three.js (Motor 3D) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
-        :root { --bg: #000; --card: #1c1c1e; --green: #30d158; --red: #ff453a; --blue: #0a84ff; --text: #fff; --btn-r: 16px; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .phone { width: 100%; max-width: 420px; height: 100%; background: #111; position: relative; display: flex; flex-direction: column; border-radius: 0; }
-        
-        /* VIEWS */
-        .screen { flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
-        .screen.active { display: flex; }
+        :root {
+            --bg-dark: #050711;
+            --bg-card: rgba(15, 20, 39, 0.65);
+            --primary: #9d4edd;
+            --secondary: #00f0ff;
+            --accent: #ff007f;
+            --mint: #05ffa1;
+            --whatsapp-color: #25d366;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --gradient-beemote: linear-gradient(135deg, #00f0ff 0%, #a855f7 50%, #ec4899 100%);
+            --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-        h2 { margin-bottom: 10px; font-weight: 500; }
-        .hint { color: #666; font-size: 14px; margin-bottom: 30px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
 
-        /* INPUTS & BUTTONS */
-        .big-input { background: #222; border: 1px solid #333; color: white; font-size: 24px; text-align: center; width: 100%; padding: 15px; border-radius: var(--btn-r); margin-bottom: 20px; outline: none; }
-        .btn { width: 100%; padding: 18px; border-radius: var(--btn-r); border: none; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-green { background: var(--green); color: white; }
-        .btn-blue { background: var(--blue); color: white; }
-        .btn-red { background: var(--red); color: white; }
-        .btn-outline { background: transparent; border: 1px solid #444; color: #aaa; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
 
-        /* ANIMATIONS */
-        .pulse-ring { width: 120px; height: 120px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 50px; margin-bottom: 30px; color: var(--blue); position: relative; }
-        .waiting .pulse-ring { animation: pulse 2s infinite; color: var(--green); }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(48, 209, 88, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(48, 209, 88, 0); } 100% { box-shadow: 0 0 0 0 rgba(48, 209, 88, 0); } }
+        h1, h2, h3, h4, .brand-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
 
-        /* CALL UI */
-        .captions { height: 80px; width: 100%; background: #222; border-radius: 15px; padding: 15px; display: flex; align-items: center; justify-content: center; font-style: italic; color: #ddd; margin-bottom: 20px; border: 1px solid #333; font-size: 14px; }
-        .controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
-        .ctrl-btn { background: #2c2c2e; color: white; border: none; padding: 15px; border-radius: 15px; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
-        .ctrl-btn.active { background: white; color: black; }
-        .ctrl-btn i { font-size: 20px; }
-        .hangup { grid-column: span 2; background: var(--red); color: white; }
+        /* Ambient Glow Backgrounds */
+        .ambient-glow {
+            position: fixed;
+            width: 550px;
+            height: 550px;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.18;
+            z-index: 0;
+            pointer-events: none;
+            animation: floatGlow 14s infinite alternate ease-in-out;
+        }
+
+        .glow-1 { top: -100px; left: -100px; background: var(--secondary); }
+        .glow-2 { top: 40%; right: -150px; background: var(--accent); }
+        .glow-3 { bottom: -100px; left: 25%; background: var(--primary); }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, 80px) scale(1.15); }
+        }
+
+        /* 3D Canvas Background */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header & Nav */
+        header {
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(5, 7, 17, 0.75);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 100;
+        }
+
+        .navbar {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transition);
+        }
+
+        .brand:hover .logo-img {
+            transform: scale(1.08) rotate(6deg);
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.7);
+        }
+
+        .brand-text {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: var(--gradient-beemote);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+        }
+
+        .btn-cta {
+            background: var(--gradient-beemote);
+            color: #fff;
+            padding: 0.75rem 1.7rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+            transition: var(--transition);
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.7);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 88vh;
+            display: flex;
+            align-items: center;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+            position: relative;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .badge-ai {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            color: var(--secondary);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero h1 {
+            font-size: 3.6rem;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 .gradient-text {
+            background: var(--gradient-beemote);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2.2rem;
+            max-width: 580px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 0.75rem 1.7rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--secondary);
+            background: rgba(0, 240, 255, 0.08);
+        }
+
+        /* 3D Interactive Card in Hero */
+        .hero-interactive-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-interactive-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-beemote);
+        }
+
+        .card-stat-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .card-stat-pill:hover {
+            border-color: var(--secondary);
+            transform: translateX(6px);
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--mint);
+        }
+
+        /* Global Sections */
+        section {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto 4rem auto;
+        }
+
+        .section-header h2 {
+            font-size: 2.6rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Services Grid (Tilt Cards) */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            position: relative;
+            backdrop-filter: blur(16px);
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            transform-style: preserve-3d;
+        }
+
+        .service-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 15px 40px rgba(0, 240, 255, 0.15);
+        }
+
+        .service-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+            transition: var(--transition);
+        }
+
+        .service-card:hover .service-icon {
+            background: var(--gradient-beemote);
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .service-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* AI Difference Comparison */
+        .comparison-box {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 3rem;
+            backdrop-filter: blur(20px);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            position: relative;
+        }
+
+        .comparison-col {
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .col-traditional {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+
+        .col-beemote {
+            background: rgba(0, 240, 255, 0.04);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            position: relative;
+        }
+
+        .col-beemote::before {
+            content: "MÉTODO BEEMOTE";
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--mint);
+            color: #050711;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+
+        .comparison-list {
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+
+        .comparison-list li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        /* Simulator Section */
+        .simulator-section {
+            background: linear-gradient(180deg, rgba(168, 85, 247, 0.06) 0%, rgba(5, 7, 17, 0) 100%);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 3.5rem 2rem;
+            margin-top: 2rem;
+        }
+
+        .slider-container {
+            margin: 2rem 0;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--secondary);
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--secondary);
+        }
+
+        .calc-results {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .calc-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .calc-number {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'Space Grotesk';
+            color: var(--secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3.5rem;
+            align-items: center;
+        }
+
+        .contact-form {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.9rem 1.2rem;
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+        }
+
+        /* Floating WhatsApp Button */
+        .floating-whatsapp {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: var(--whatsapp-color);
+            color: #fff;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 25px rgba(37, 211, 102, 0.5);
+            z-index: 999;
+            text-decoration: none;
+            transition: var(--transition);
+            animation: pulseWa 2.2s infinite;
+        }
+
+        .floating-whatsapp:hover {
+            transform: scale(1.12);
+            box-shadow: 0 8px 35px rgba(37, 211, 102, 0.8);
+        }
+
+        @keyframes pulseWa {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { box-shadow: 0 0 0 16px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 992px) {
+            .hero-grid, .comparison-box, .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 { font-size: 2.7rem; }
+            .calc-results { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
     </style>
 </head>
 <body>
 
-<div class="phone">
+    <!-- Ambient Lights -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
 
-    <!-- TELA 1: LOGIN (Criar sua ID) -->
-    <div id="screen-login" class="screen active">
-        <div class="pulse-ring"><i class="fas fa-fingerprint"></i></div>
-        <h2>VoiceAI P2P</h2>
-        <p class="hint">Crie um ID para receber chamadas</p>
-        
-        <input type="text" id="my-id" class="big-input" placeholder="Seu Nome/ID">
-        
-        <button class="btn btn-blue" onclick="register()">
-            <i class="fas fa-power-off"></i> Ficar Online
-        </button>
+    <!-- 3D Interactive Canvas -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Botão Flutuante do WhatsApp Beemote -->
+    <a href="https://wa.me/5511957321727?text=Olá!%20Vim%20pelo%20site%20da%20Beemote%20e%20gostaria%20de%20um%20orçamento%20para%20o%20meu%20projeto." 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       class="floating-whatsapp" 
+       title="Conversar com a Beemote no WhatsApp"
+       aria-label="Fale conosco no WhatsApp">
+        <i data-lucide="message-circle" size="32"></i>
+    </a>
+
+    <div class="content-layer">
+
+        <!-- Navigation Bar -->
+        <header>
+            <nav class="navbar" aria-label="Navegação Principal">
+                <a href="#" class="brand">
+                    <img src="logo.png" alt="Logo Beemote" class="logo-img" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop'">
+                    <span class="brand-text">Beemote</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#servicos">O Que Criamos</a></li>
+                    <li><a href="#diferencial">Economia com IA</a></li>
+                    <li><a href="#simulador">Simulador</a></li>
+                    <li><a href="#contato">Fale Conosco</a></li>
+                </ul>
+                <a href="https://wa.me/5511957321727?text=Olá!%20Gostaria%20de%20iniciar%20um%20projeto%20com%20a%20Beemote." target="_blank" class="btn-cta">
+                    <i data-lucide="zap"></i> Iniciar Projeto
+                </a>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <main>
+            <section class="hero">
+                <div class="hero-grid">
+                    <div>
+                        <div class="badge-ai">
+                            <i data-lucide="sparkles" size="16"></i> Desenvolvimento Acelerado por Inteligência Artificial
+                        </div>
+                        <h1>
+                            Sistemas, Apps e Automações: <span class="gradient-text">Máxima Performance, Fração do Custo.</span>
+                        </h1>
+                        <p>
+                            A <strong>Beemote</strong> reinventou o desenvolvimento de tecnologia. Criamos softwares personalizados, aplicativos e automações inteligentes com IA que poupam meses de espera e reduzem o custo para a sua empresa.
+                        </p>
+                        <div class="hero-actions">
+                            <a href="#simulador" class="btn-cta">
+                                <i data-lucide="calculator"></i> Calcular Economia
+                            </a>
+                            <a href="https://wa.me/5511957321727?text=Olá!%20Quero%20falar%20diretamente%20com%20um%20especialista%20da%20Beemote." target="_blank" class="btn-outline">
+                                <i data-lucide="message-square"></i> WhatsApp Direto
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Glass Card -->
+                    <div class="hero-interactive-card">
+                        <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                            <i data-lucide="cpu" style="color: var(--secondary);"></i> Beemote Engine v3.0
+                        </h3>
+                        <div class="card-stat-pill">
+                            <span>Redução Média de Custo</span>
+                            <span class="stat-value">-65%</span>
+                        </div>
+                        <div class="card-stat-pill">
+                            <span>Velocidade de Entrega</span>
+                            <span class="stat-value" style="color: var(--secondary);">3.5x Mais Ágil</span>
+                        </div>
+                        <div class="card-stat-pill">
+                            <span>Arquitetura Inteligente</span>
+                            <span class="stat-value" style="color: var(--accent);">100% IA Pronta</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
+                            Softwares sob medida com código próprio, limpo e segurança militar para qualquer modelo de negócio.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Services Section -->
+            <section id="servicos">
+                <div class="section-header">
+                    <h2>Soluções Tecnológicas Beemote</h2>
+                    <p>Da ideia ao deploy, construímos exatamente o que sua empresa precisa sem cobrar fortunas de horas manuais.</p>
+                </div>
+
+                <div class="services-grid">
+                    <div class="service-card" data-tilt>
+                        <div class="service-icon"><i data-lucide="layers" size="32"></i></div>
+                        <h3>Sistemas Web & ERPs Sob Medida</h3>
+                        <p>Plataformas robustas para gestão interna, controle financeiro, esteiras operacionais e dashboards analíticos que rodam direto no navegador.</p>
+                    </div>
+
+                    <div class="service-card" data-tilt>
+                        <div class="service-icon"><i data-lucide="smartphone" size="32"></i></div>
+                        <h3>Aplicativos Mobile (iOS & Android)</h3>
+                        <p>Apps nativos fluidos, responsivos e prontos para publicação na App Store e Google Play com alta experiência para seus usuários.</p>
+                    </div>
+
+                    <div class="service-card" data-tilt>
+                        <div class="service-icon"><i data-lucide="globe" size="32"></i></div>
+                        <h3>Sites & Web Apps de Alta Conversão</h3>
+                        <p>Portais institucionais e páginas rápidas com SEO de elite no Google, design futurista e foco em gerar novos negócios todos os dias.</p>
+                    </div>
+
+                    <div class="service-card" data-tilt>
+                        <div class="service-icon"><i data-lucide="bot" size="32"></i></div>
+                        <h3>Automações com Agentes de IA</h3>
+                        <p>Robôs autônomos para atendimento via WhatsApp, classificação de documentos, relatórios preditivos e conexões entre sistemas sem erro humano.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Difference Section -->
+            <section id="diferencial">
+                <div class="section-header">
+                    <h2>Por que o Modelo Beemote Vence?</h2>
+                    <p>Agências antigas cobram milhares de horas de desenvolvimento lento. A Beemote utiliza engenharia auxiliada por IA de última geração.</p>
+                </div>
+
+                <div class="comparison-box">
+                    <div class="comparison-col col-traditional">
+                        <h3 style="color: var(--text-muted); margin-bottom: 0.5rem;">Desenvolvimento Tradicional</h3>
+                        <p style="font-size: 0.9rem; color: #64748b;">Fábricas de software ultrapassadas</p>
+                        <ul class="comparison-list">
+                            <li><i data-lucide="x-circle" color="#ef4444"></i> Orçamentos gigantescos por excesso de trabalho braçal</li>
+                            <li><i data-lucide="x-circle" color="#ef4444"></i> De 6 a 10 meses apenas para entregar a versão inicial</li>
+                            <li><i data-lucide="x-circle" color="#ef4444"></i> Complexidade desnecessária e manutenção cara</li>
+                            <li><i data-lucide="x-circle" color="#ef4444"></i> Automação cobrada à parte como serviço caro</li>
+                        </ul>
+                    </div>
+
+                    <div class="comparison-col col-beemote">
+                        <h3 style="color: var(--secondary); margin-bottom: 0.5rem;">Desenvolvimento Beemote</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Inteligência Artificial aplicada ao código</p>
+                        <ul class="comparison-list">
+                            <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Até 65% de economia direta</strong> em cada etapa</li>
+                            <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Entregas funcionais em semanas</strong></li>
+                            <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Agentes de IA inclusos</strong> para reduzir tarefas manuais</li>
+                            <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Código 100% seu</strong>, flexível e pronto para crescer</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Simulator Section -->
+            <section id="simulador">
+                <div class="simulator-section">
+                    <div class="section-header" style="margin-bottom: 2rem;">
+                        <h2>Simulador de Economia Beemote</h2>
+                        <p>Arraste para selecionar a complexidade e compare tempo e investimento.</p>
+                    </div>
+
+                    <div style="max-width: 650px; margin: 0 auto; text-align: center;">
+                        <label for="complexityRange" style="font-weight: 600; color: var(--text-muted);">
+                            Complexidade: <span id="complexityLabel" style="color: var(--secondary);">Média (Sistema Web / App Comercial)</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" min="1" max="3" value="2" class="slider" id="complexityRange">
+                        </div>
+                    </div>
+
+                    <div class="calc-results">
+                        <div class="calc-card">
+                            <span style="color: var(--text-muted); font-size: 0.9rem;">Tempo Tradicional</span>
+                            <div class="calc-number" id="timeTrad" style="color: #ef4444;">4 a 6 Meses</div>
+                        </div>
+                        <div class="calc-card" style="border-color: var(--secondary); background: rgba(0, 240, 255, 0.05);">
+                            <span style="color: var(--secondary); font-size: 0.9rem;">Tempo Beemote</span>
+                            <div class="calc-number" id="timeHippo" style="color: var(--mint);">3 a 5 Semanas</div>
+                        </div>
+                        <div class="calc-card" style="border-color: var(--accent); background: rgba(236, 72, 153, 0.05);">
+                            <span style="color: var(--accent); font-size: 0.9rem;">Economia de Custo</span>
+                            <div class="calc-number" id="costSaved" style="color: #fff;">~ 62%</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section id="contato">
+                <div class="contact-grid">
+                    <div>
+                        <h2>Tire sua Ideia do Papel com a Beemote</h2>
+                        <p style="color: var(--text-muted); margin: 1.5rem 0 2rem 0;">
+                            Envie os detalhes do seu projeto pelo formulário. Nossa IA e nossos engenheiros montam uma estimativa clara e sem custos.
+                        </p>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <i data-lucide="phone" style="color: var(--mint);"></i> WhatsApp: <strong>(11) 95732-1727</strong>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <i data-lucide="clock" style="color: var(--secondary);"></i> Resposta rápida em até 2 horas
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <i data-lucide="shield-check" style="color: var(--accent);"></i> Acordo de Confidencialidade (NDA) Garantido
+                            </div>
+                        </div>
+                    </div>
+
+                    <form class="contact-form" id="contactForm" onsubmit="handleFormSubmit(event)">
+                        <div class="form-group">
+                            <label for="name">Seu Nome / Nome da Empresa</label>
+                            <input type="text" id="name" class="form-control" placeholder="Ex: Lucas Mendes (Minha Empresa)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="whatsapp">Seu WhatsApp</label>
+                            <input type="tel" id="whatsapp" class="form-control" placeholder="(11) 99999-9999" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="projectType">O que deseja desenvolver?</label>
+                            <select id="projectType" class="form-control" style="background-color: #0f1427;">
+                                <option value="Sistema de Gestão / ERP Web">Sistema de Gestão / ERP Web Sob Medida</option>
+                                <option value="Aplicativo Mobile (iOS/Android)">Aplicativo Mobile (iOS e Android)</option>
+                                <option value="Site de Alta Conversão">Site / Portal / Landing Page</option>
+                                <option value="Automação com IA">Automação de Processos com Inteligência Artificial</option>
+                                <option value="Outro Desafio Digital">Outro Desafio Digital</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Conte sobre a necessidade do projeto</label>
+                            <textarea id="message" class="form-control" rows="3" placeholder="Quais processos precisam ser melhorados ou automatizados?"></textarea>
+                        </div>
+                        <button type="submit" class="btn-cta" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                            <i data-lucide="send"></i> Enviar Diretamente no WhatsApp
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <img src="logo.png" alt="Logo Beemote" style="width: 32px; height: 32px; border-radius: 50%;" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop'">
+                <span class="brand-font" style="font-weight: 800; font-size: 1.2rem; color: #fff;">Beemote</span>
+            </div>
+            <p>© 2026 Beemote. Todos os direitos reservados. Inteligência, Sistemas e Apps sob medida.</p>
+        </footer>
     </div>
 
-    <!-- TELA 2: AGUARDANDO (Compartilhar Link) -->
-    <div id="screen-waiting" class="screen">
-        <div class="pulse-ring waiting"><i class="fas fa-wifi"></i></div>
-        <h2 id="display-id">...</h2>
-        <p class="hint">Você está online. Envie o link para alguém te ligar.</p>
+    <!-- ==================== SCRIPTS & 3D ENGINE ==================== -->
+    <script>
+        // Inicializar ícones
+        lucide.createIcons();
 
-        <button class="btn btn-green" onclick="shareWhatsapp()">
-            <i class="fab fa-whatsapp"></i> Convidar Amigo
-        </button>
-        
-        <div style="width:100%; border-top:1px solid #333; margin:20px 0;"></div>
-        <p class="hint" style="margin-bottom:10px">Ou digite para ligar:</p>
-        <input type="text" id="target-id" class="big-input" placeholder="ID do Amigo">
-        <button class="btn btn-outline" onclick="manualCall()">Ligar Agora</button>
-    </div>
+        /* Three.js Background Hologram Canvas */
+        const canvas = document.getElementById('webgl-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
 
-    <!-- TELA 3: CHAMADA (Voz + IA) -->
-    <div id="screen-call" class="screen">
-        <div class="pulse-ring" style="color:white; width:80px; height:80px; font-size:30px;"><i class="fas fa-user"></i></div>
-        <h3 id="call-status">Conectado</h3>
-        <p class="hint" id="timer">00:00</p>
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        <!-- Legendas -->
-        <div class="captions" id="caption-box">"Aguardando fala..."</div>
+        // Partículas 3D com paleta Beemote (Ciano, Roxo, Rosa)
+        const geometry = new THREE.BufferGeometry();
+        const particlesCount = 1800;
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
 
-        <div class="controls">
-            <button class="ctrl-btn active" id="btn-mode" onclick="toggleAudioMode()">
-                <i class="fas fa-ear-listen"></i> <span id="mode-text">Natural</span>
-            </button>
-            <button class="ctrl-btn" id="btn-lang" onclick="cycleLang()">
-                <i class="fas fa-language"></i> <span id="lang-text">Traduzir: OFF</span>
-            </button>
-            <button class="ctrl-btn" id="btn-mic" onclick="toggleMic()">
-                <i class="fas fa-microphone"></i> <span>Mic ON</span>
-            </button>
-            <button class="ctrl-btn" onclick="toggleMuteOutput()">
-                <i class="fas fa-volume-high"></i> <span id="spk-text">Som ON</span>
-            </button>
-            <button class="btn hangup" onclick="endCall()">
-                <i class="fas fa-phone-slash"></i> Encerrar
-            </button>
-        </div>
+        const color1 = new THREE.Color('#00f0ff');
+        const color2 = new THREE.Color('#a855f7');
+        const color3 = new THREE.Color('#ff007f');
 
-        <audio id="remote-audio" autoplay></audio>
-    </div>
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            const u = Math.random();
+            const v = Math.random();
+            const theta = u * 2.0 * Math.PI;
+            const phi = Math.acos(2.0 * v - 1.0);
+            const r = Math.cbrt(Math.random()) * 8;
 
-</div>
+            positions[i] = r * Math.sin(phi) * Math.cos(theta);
+            positions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+            positions[i + 2] = r * Math.cos(phi);
 
-<script>
-    // --- ESTADOS ---
-    let peer, conn, mediaCall, localStream;
-    let myPeerId = "";
-    let listenMode = "natural"; // 'natural' | 'ai'
-    let targetLang = "pt";
-    let isTranslating = false;
-    let callInterval, seconds = 0;
-
-    // --- AUTO-BOOTSTRAP (Verifica se veio pelo link) ---
-    window.onload = () => {
-        const params = new URLSearchParams(window.location.search);
-        const target = params.get('ligar_para');
-        
-        // Se abriu pelo link do WhatsApp
-        if (target) {
-            // Gera um ID aleatório para o convidado
-            const guestId = "Visitante_" + Math.floor(Math.random() * 9999);
-            document.getElementById('my-id').value = guestId;
-            
-            // Registra e já liga
-            register(target); 
+            const mixedColor = color1.clone().lerp(color2, Math.random()).lerp(color3, Math.random());
+            colors[i] = mixedColor.r;
+            colors[i + 1] = mixedColor.g;
+            colors[i + 2] = mixedColor.b;
         }
-    };
 
-    // --- 1. REGISTRO P2P ---
-    function register(autoCallTarget = null) {
-        let id = document.getElementById('my-id').value.trim();
-        if (!id) return alert("Digite um ID");
-        // Limpa caracteres especiais do ID para evitar erros na URL
-        id = id.replace(/[^a-zA-Z0-9_-]/g, '');
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-        myPeerId = id;
-
-        peer = new Peer(myPeerId, { debug: 1 });
-
-        peer.on('open', (id) => {
-            console.log("Online como: " + id);
-            
-            // Pega microfone
-            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                localStream = stream;
-                initRecognition();
-                
-                if (autoCallTarget) {
-                    // Se veio do link, liga direto
-                    switchScreen('call');
-                    document.getElementById('call-status').innerText = "Ligando para " + autoCallTarget + "...";
-                    connectToPeer(autoCallTarget);
-                } else {
-                    // Se é o anfitrião, vai para sala de espera
-                    document.getElementById('display-id').innerText = id;
-                    switchScreen('waiting');
-                }
-            }).catch(e => alert("Erro Mic: " + e));
+        const material = new THREE.PointsMaterial({
+            size: 0.05,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.75,
+            blending: THREE.AdditiveBlending
         });
 
-        // Receber Chamada
-        peer.on('call', (call) => {
-            if(confirm("Recebendo chamada! Atender?")) {
-                call.answer(localStream);
-                setupMediaCall(call);
-                switchScreen('call');
+        const particleMesh = new THREE.Points(geometry, material);
+        scene.add(particleMesh);
+
+        // Anel orbital tecnológico
+        const ringGeo = new THREE.TorusGeometry(5, 0.03, 16, 100);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.25 });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.rotation.x = Math.PI / 3;
+        scene.add(ringMesh);
+
+        camera.position.z = 10;
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.0012;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.0012;
+        });
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            targetX = mouseX * 2;
+            targetY = mouseY * 2;
+
+            particleMesh.rotation.y = elapsedTime * 0.08 + targetX;
+            particleMesh.rotation.x = elapsedTime * 0.04 + targetY;
+
+            ringMesh.rotation.z = elapsedTime * 0.15;
+            ringMesh.rotation.y = elapsedTime * 0.05;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        /* Efeito 3D Tilt nos Cards */
+        const cards = document.querySelectorAll('[data-tilt]');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                const rotateX = (-y / rect.height) * 16;
+                const rotateY = (x / rect.width) * 16;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)`;
+            });
+        });
+
+        /* Simulador Dinâmico */
+        const range = document.getElementById('complexityRange');
+        const label = document.getElementById('complexityLabel');
+        const timeTrad = document.getElementById('timeTrad');
+        const timeHippo = document.getElementById('timeHippo');
+        const costSaved = document.getElementById('costSaved');
+
+        const simulatorData = {
+            1: {
+                title: "Inicial (Site Institucional / Landing Page / Automação Rápida)",
+                trad: "3 a 6 Semanas",
+                hippo: "3 a 7 Dias",
+                save: "~ 70%"
+            },
+            2: {
+                title: "Média (Sistema Web / App Comercial / Painel de Clientes)",
+                trad: "4 a 6 Meses",
+                hippo: "3 a 5 Semanas",
+                save: "~ 62%"
+            },
+            3: {
+                title: "Avançada (ERP Completo / IA Integrada / Multi-plataformas)",
+                trad: "8 a 14 Meses",
+                hippo: "2 a 3 Meses",
+                save: "~ 55%"
             }
-        });
-
-        peer.on('connection', (c) => {
-            conn = c;
-            setupDataConnection();
-        });
-
-        peer.on('error', (err) => {
-            if(err.type === 'unavailable-id') alert("ID em uso! Tente outro.");
-            else alert("Erro: " + err.type);
-        });
-    }
-
-    // --- 2. CONVITE WHATSAPP ---
-    function shareWhatsapp() {
-        const url = window.location.href.split('?')[0];
-        const link = `${url}?ligar_para=${myPeerId}`;
-        const msg = `📞 Estou online no VoiceAI.\nClique para falar comigo: ${link}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function manualCall() {
-        const target = document.getElementById('target-id').value;
-        if(target) connectToPeer(target);
-    }
-
-    // --- 3. CONEXÃO ---
-    function connectToPeer(targetId) {
-        // Conecta Dados (Texto)
-        conn = peer.connect(targetId);
-        conn.on('open', setupDataConnection);
-        
-        // Conecta Voz (Áudio)
-        const call = peer.call(targetId, localStream);
-        setupMediaCall(call);
-    }
-
-    function setupMediaCall(call) {
-        mediaCall = call;
-        call.on('stream', (remoteStream) => {
-            document.getElementById('remote-audio').srcObject = remoteStream;
-            document.getElementById('call-status').innerText = "Conectado";
-            startTimer();
-        });
-        call.on('close', endCall);
-    }
-
-    function setupDataConnection() {
-        conn.on('data', (data) => {
-            // Chegou texto
-            document.getElementById('caption-box').innerText = data.text;
-            if (listenMode === 'ai') speak(data.text);
-        });
-    }
-
-    // --- 4. STT (Reconhecimento) ---
-    function initRecognition() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if(!SpeechRecognition) return;
-        
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.lang = 'pt-BR';
-        recognition.interimResults = false;
-
-        recognition.onresult = (e) => {
-            const text = e.results[e.results.length - 1][0].transcript;
-            if(conn && conn.open) conn.send({ text: text });
         };
-        
-        recognition.start();
-        recognition.onend = () => { if(localStream) recognition.start(); };
-    }
 
-    // --- 5. TTS (Fala) ---
-    function speak(text) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = isTranslating ? (targetLang==='en'?'en-US':'es-ES') : 'pt-BR';
-        window.speechSynthesis.speak(utter);
-    }
+        range.addEventListener('input', (e) => {
+            const val = e.target.value;
+            label.textContent = simulatorData[val].title;
+            timeTrad.textContent = simulatorData[val].trad;
+            timeHippo.textContent = simulatorData[val].hippo;
+            costSaved.textContent = simulatorData[val].save;
+        });
 
-    // --- UI HELPER ---
-    function switchScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('screen-'+id).classList.add('active');
-    }
+        /* Envio Direto para o WhatsApp da Beemote (11 95732-1727) */
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const whatsapp = document.getElementById('whatsapp').value;
+            const project = document.getElementById('projectType').value;
+            const msg = document.getElementById('message').value;
 
-    function startTimer() {
-        if(callInterval) return;
-        callInterval = setInterval(() => {
-            seconds++;
-            const m = Math.floor(seconds/60).toString().padStart(2,'0');
-            const s = (seconds%60).toString().padStart(2,'0');
-            document.getElementById('timer').innerText = `${m}:${s}`;
-        }, 1000);
-    }
+            const beemoteWhatsApp = "5511957321727"; 
+            
+            const textoWhatsApp = encodeURIComponent(
+                `*Novo Contato via Site Beemote!*\n\n` +
+                `👤 *Nome/Empresa:* ${name}\n` +
+                `📱 *WhatsApp do Cliente:* ${whatsapp}\n` +
+                `🎯 *Projeto:* ${project}\n` +
+                `📝 *Detalhes:* ${msg || 'Sem detalhes adicionais'}`
+            );
 
-    function endCall() {
-        if(mediaCall) mediaCall.close();
-        if(conn) conn.close();
-        location.href = window.location.href.split('?')[0]; // Reset total
-    }
-
-    // --- CONTROLES ---
-    function toggleAudioMode() {
-        const el = document.getElementById('remote-audio');
-        if(listenMode==='natural') {
-            listenMode='ai'; el.muted=true;
-            document.getElementById('btn-mode').classList.remove('active');
-            document.getElementById('mode-text').innerText = 'IA (Robô)';
-        } else {
-            listenMode='natural'; el.muted=false;
-            document.getElementById('btn-mode').classList.add('active');
-            document.getElementById('mode-text').innerText = 'Natural';
+            window.open(`https://wa.me/${beemoteWhatsApp}?text=${textoWhatsApp}`, '_blank');
         }
-    }
-
-    function cycleLang() {
-        const t = document.getElementById('lang-text');
-        const b = document.getElementById('btn-lang');
-        if(!isTranslating) { isTranslating=true; targetLang='en'; t.innerText="Trad: EN"; b.classList.add('active'); if(listenMode==='natural') toggleAudioMode(); }
-        else if(targetLang==='en') { targetLang='es'; t.innerText="Trad: ES"; }
-        else { isTranslating=false; targetLang='pt'; t.innerText="Trad: OFF"; b.classList.remove('active'); }
-    }
-
-    function toggleMic() {
-        const t = localStream.getAudioTracks()[0];
-        t.enabled = !t.enabled;
-        document.getElementById('btn-mic').style.opacity = t.enabled ? '1' : '0.5';
-    }
-    
-    function toggleMuteOutput() {
-        const el = document.getElementById('remote-audio');
-        // Apenas para áudio natural, não TTS
-        if(listenMode === 'natural') el.muted = !el.muted;
-        document.getElementById('spk-text').innerText = el.muted ? "Som OFF" : "Som ON";
-    }
-
-</script>
+    </script>
 </body>
 </html>
