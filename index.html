@@ -7,12 +7,12 @@
     <!-- ==================== SEO & META TAGS ==================== -->
     <title>Beemote | Fábrica de Software, Apps e Automações com IA</title>
     <meta name="description" content="A Beemote desenvolve sistemas web, aplicativos móveis e automações corporativas sob medida potencializados por Inteligência Artificial. Redução drástica de prazos e custos.">
-    <meta name="keywords" content="Beemote, fábrica de software, desenvolvimento de sistemas, criação de aplicativos, automação com IA, software sob medida sp, programação com inteligência artificial">
+    <meta name="keywords" content="Beemote, fábrica de software, desenvolvimento de sistemas, criação de aplicativos, automação com IA, software sob medida, programação com inteligência artificial">
     <meta name="author" content="Beemote">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://beemote.com.br/">
 
-    <!-- Open Graph (WhatsApp, LinkedIn, Instagram) -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Beemote | Fábrica de Software de Alta Performance com IA">
     <meta property="og:description" content="Sistemas web, aplicativos e automações corporativas com inteligência artificial e economia de até 65%. Fale com a Beemote.">
@@ -85,26 +85,26 @@
             font-family: 'Space Grotesk', sans-serif;
         }
 
-        /* Ambient Glow Backgrounds */
+        /* Ambient Glow Backgrounds (Agora bem difusas, sem formato de bola) */
         .ambient-glow {
             position: fixed;
-            width: 550px;
-            height: 550px;
+            width: 700px;
+            height: 700px;
             border-radius: 50%;
-            filter: blur(140px);
-            opacity: 0.18;
+            filter: blur(180px);
+            opacity: 0.15;
             z-index: 0;
             pointer-events: none;
             animation: floatGlow 14s infinite alternate ease-in-out;
         }
 
-        .glow-1 { top: -100px; left: -100px; background: var(--secondary); }
-        .glow-2 { top: 40%; right: -150px; background: var(--accent); }
-        .glow-3 { bottom: -100px; left: 25%; background: var(--primary); }
+        .glow-1 { top: -200px; left: -150px; background: var(--secondary); }
+        .glow-2 { top: 40%; right: -200px; background: var(--accent); }
+        .glow-3 { bottom: -200px; left: 20%; background: var(--primary); }
 
         @keyframes floatGlow {
             0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(60px, 80px) scale(1.15); }
+            100% { transform: translate(50px, 60px) scale(1.1); }
         }
 
         /* 3D Canvas Background */
@@ -365,7 +365,7 @@
             font-size: 1.1rem;
         }
 
-        /* Services Grid (Tilt Cards) */
+        /* Services Grid */
         .services-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -419,7 +419,7 @@
             line-height: 1.6;
         }
 
-        /* Process / Como Trabalhamos */
+        /* Metodologia */
         .process-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -651,12 +651,12 @@
 </head>
 <body>
 
-    <!-- Ambient Lights -->
+    <!-- Ambient Lights Suaves -->
     <div class="ambient-glow glow-1"></div>
     <div class="ambient-glow glow-2"></div>
     <div class="ambient-glow glow-3"></div>
 
-    <!-- 3D Interactive Canvas -->
+    <!-- 3D Interactive Canvas (Apenas poeira cósmica/partículas de IA, sem círculos) -->
     <canvas id="webgl-canvas"></canvas>
 
     <!-- Botão Flutuante do WhatsApp -->
@@ -942,7 +942,7 @@
     <script>
         lucide.createIcons();
 
-        /* Three.js Background Hologram Canvas */
+        /* Three.js Background Hologram Canvas (Poeira Cósmica Pura) */
         const canvas = document.getElementById('webgl-canvas');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -991,11 +991,7 @@
         const particleMesh = new THREE.Points(geometry, material);
         scene.add(particleMesh);
 
-        const ringGeo = new THREE.TorusGeometry(5, 0.03, 16, 100);
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.25 });
-        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-        ringMesh.rotation.x = Math.PI / 3;
-        scene.add(ringMesh);
+        // O anel/círculo que girava foi 100% removido daqui!
 
         camera.position.z = 10;
 
@@ -1020,9 +1016,6 @@
 
             particleMesh.rotation.y = elapsedTime * 0.08 + targetX;
             particleMesh.rotation.x = elapsedTime * 0.04 + targetY;
-
-            ringMesh.rotation.z = elapsedTime * 0.15;
-            ringMesh.rotation.y = elapsedTime * 0.05;
 
             renderer.render(scene, camera);
         }
