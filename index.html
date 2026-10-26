@@ -5,40 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- ==================== SEO & META TAGS ==================== -->
-    <title>Beemote | Sistemas, Apps e Automações Inteligentes com IA</title>
-    <meta name="description" content="A Beemote desenvolve sistemas web, aplicativos mobile e automações corporativas potencializados por Inteligência Artificial. Redução drástica de custos e alta performance.">
-    <meta name="keywords" content="Beemote, desenvolvimento de sistemas, criação de aplicativos, automação com IA, inteligência artificial para empresas, software sob medida, Beemote tech">
+    <title>Beemote | Fábrica de Software, Apps e Automações com IA</title>
+    <meta name="description" content="A Beemote desenvolve sistemas web, aplicativos móveis e automações corporativas sob medida potencializados por Inteligência Artificial. Redução drástica de prazos e custos.">
+    <meta name="keywords" content="Beemote, fábrica de software, desenvolvimento de sistemas, criação de aplicativos, automação com IA, software sob medida sp, programação com inteligência artificial">
     <meta name="author" content="Beemote">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://beemote.com.br/">
 
     <!-- Open Graph (WhatsApp, LinkedIn, Instagram) -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Beemote | Software & Automações com IA de Alto Impacto">
-    <meta property="og:description" content="Sistemas, apps e automações corporativas acelerados por Inteligência Artificial com economia de até 65%. Fale com a Beemote.">
+    <meta property="og:title" content="Beemote | Fábrica de Software de Alta Performance com IA">
+    <meta property="og:description" content="Sistemas web, aplicativos e automações corporativas com inteligência artificial e economia de até 65%. Fale com a Beemote.">
     <meta property="og:image" content="logo.png">
     <meta property="og:url" content="https://beemote.com.br/">
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Beemote | Transformação Digital com Inteligência Artificial">
-    <meta name="twitter:description" content="Desenvolva seu app ou automatize processos com Inteligência Artificial e custos reduzidos.">
+    <meta name="twitter:title" content="Beemote | Software House & Automações com IA">
+    <meta name="twitter:description" content="Desenvolvimento de sistemas e aplicativos sob medida com custos e prazos reduzidos por IA.">
     <meta name="twitter:image" content="logo.png">
 
     <!-- Schema.org JSON-LD para o Google -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
+      "@type": "ProfessionalService",
       "name": "Beemote",
-      "applicationCategory": "BusinessApplication",
-      "operatingSystem": "Web, iOS, Android",
-      "description": "Desenvolvimento de software sob medida, aplicativos móveis e fluxos de automação com IA pela Beemote.",
+      "image": "logo.png",
+      "description": "Fábrica de software sob medida, desenvolvimento de aplicativos e automações corporativas com IA.",
       "telephone": "+5511957321727",
-      "offers": {
-        "@type": "Offer",
-        "priceCurrency": "BRL",
-        "price": "Sob Consulta"
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "BR"
       }
     }
     </script>
@@ -55,6 +54,7 @@
         :root {
             --bg-dark: #050711;
             --bg-card: rgba(15, 20, 39, 0.65);
+            --bg-card-hover: rgba(22, 30, 58, 0.85);
             --primary: #9d4edd;
             --secondary: #00f0ff;
             --accent: #ff007f;
@@ -178,6 +178,7 @@
             display: flex;
             gap: 2rem;
             list-style: none;
+            align-items: center;
         }
 
         .nav-links a {
@@ -349,7 +350,7 @@
 
         .section-header {
             text-align: center;
-            max-width: 680px;
+            max-width: 720px;
             margin: 0 auto 4rem auto;
         }
 
@@ -418,7 +419,33 @@
             line-height: 1.6;
         }
 
-        /* AI Difference Comparison */
+        /* Process / Como Trabalhamos */
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .process-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .process-num {
+            font-family: 'Space Grotesk';
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-beemote);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Comparison Section */
         .comparison-box {
             background: var(--bg-card);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -632,19 +659,19 @@
     <!-- 3D Interactive Canvas -->
     <canvas id="webgl-canvas"></canvas>
 
-    <!-- Botão Flutuante do WhatsApp Beemote -->
+    <!-- Botão Flutuante do WhatsApp -->
     <a href="https://wa.me/5511957321727?text=Olá!%20Vim%20pelo%20site%20da%20Beemote%20e%20gostaria%20de%20um%20orçamento%20para%20o%20meu%20projeto." 
        target="_blank" 
        rel="noopener noreferrer" 
        class="floating-whatsapp" 
-       title="Conversar com a Beemote no WhatsApp"
+       title="Fale com a Beemote no WhatsApp"
        aria-label="Fale conosco no WhatsApp">
         <i data-lucide="message-circle" size="32"></i>
     </a>
 
     <div class="content-layer">
 
-        <!-- Navigation Bar -->
+        <!-- Header -->
         <header>
             <nav class="navbar" aria-label="Navegação Principal">
                 <a href="#" class="brand">
@@ -653,12 +680,13 @@
                 </a>
                 <ul class="nav-links">
                     <li><a href="#servicos">O Que Criamos</a></li>
-                    <li><a href="#diferencial">Economia com IA</a></li>
+                    <li><a href="#metodologia">Como Funciona</a></li>
+                    <li><a href="#diferencial">Vantagem com IA</a></li>
                     <li><a href="#simulador">Simulador</a></li>
                     <li><a href="#contato">Fale Conosco</a></li>
                 </ul>
-                <a href="https://wa.me/5511957321727?text=Olá!%20Gostaria%20de%20iniciar%20um%20projeto%20com%20a%20Beemote." target="_blank" class="btn-cta">
-                    <i data-lucide="zap"></i> Iniciar Projeto
+                <a href="https://wa.me/5511957321727?text=Olá!%20Gostaria%20de%20solicitar%20um%20orçamento%20com%20a%20Beemote." target="_blank" class="btn-cta">
+                    <i data-lucide="zap"></i> Pedir Orçamento
                 </a>
             </nav>
         </header>
@@ -669,20 +697,20 @@
                 <div class="hero-grid">
                     <div>
                         <div class="badge-ai">
-                            <i data-lucide="sparkles" size="16"></i> Desenvolvimento Acelerado por Inteligência Artificial
+                            <i data-lucide="sparkles" size="16"></i> Fábrica de Software Acelerada por IA
                         </div>
                         <h1>
-                            Sistemas, Apps e Automações: <span class="gradient-text">Máxima Performance, Fração do Custo.</span>
+                            Sistemas, Apps e Automações: <span class="gradient-text">Alta Engenharia, Fração do Custo.</span>
                         </h1>
                         <p>
-                            A <strong>Beemote</strong> reinventou o desenvolvimento de tecnologia. Criamos softwares personalizados, aplicativos e automações inteligentes com IA que poupam meses de espera e reduzem o custo para a sua empresa.
+                            A <strong>Beemote</strong> substituiu a lentidão e os custos exorbitantes das agências antigas. Criamos softwares sob medida, aplicativos mobile e agentes de IA com entregas em semanas e até 65% de economia real.
                         </p>
                         <div class="hero-actions">
                             <a href="#simulador" class="btn-cta">
                                 <i data-lucide="calculator"></i> Calcular Economia
                             </a>
-                            <a href="https://wa.me/5511957321727?text=Olá!%20Quero%20falar%20diretamente%20com%20um%20especialista%20da%20Beemote." target="_blank" class="btn-outline">
-                                <i data-lucide="message-square"></i> WhatsApp Direto
+                            <a href="#contato" class="btn-outline">
+                                <i data-lucide="send"></i> Falar com Especialista
                             </a>
                         </div>
                     </div>
@@ -690,7 +718,7 @@
                     <!-- Interactive Glass Card -->
                     <div class="hero-interactive-card">
                         <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
-                            <i data-lucide="cpu" style="color: var(--secondary);"></i> Beemote Engine v3.0
+                            <i data-lucide="cpu" style="color: var(--secondary);"></i> Beemote Engine Status
                         </h3>
                         <div class="card-stat-pill">
                             <span>Redução Média de Custo</span>
@@ -701,11 +729,11 @@
                             <span class="stat-value" style="color: var(--secondary);">3.5x Mais Ágil</span>
                         </div>
                         <div class="card-stat-pill">
-                            <span>Arquitetura Inteligente</span>
-                            <span class="stat-value" style="color: var(--accent);">100% IA Pronta</span>
+                            <span>Propriedade do Código</span>
+                            <span class="stat-value" style="color: var(--mint);">100% Seu</span>
                         </div>
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
-                            Softwares sob medida com código próprio, limpo e segurança militar para qualquer modelo de negócio.
+                            Projetamos códigos limpos, escaláveis e sob medida para empresas de qualquer porte ou setor.
                         </p>
                     </div>
                 </div>
@@ -714,33 +742,67 @@
             <!-- Services Section -->
             <section id="servicos">
                 <div class="section-header">
-                    <h2>Soluções Tecnológicas Beemote</h2>
-                    <p>Da ideia ao deploy, construímos exatamente o que sua empresa precisa sem cobrar fortunas de horas manuais.</p>
+                    <h2>O Que Nós Desenvolvemos</h2>
+                    <p>Combinamos design moderno, arquitetura em nuvem e inteligência de dados para destravar o crescimento da sua empresa.</p>
                 </div>
 
                 <div class="services-grid">
                     <div class="service-card" data-tilt>
                         <div class="service-icon"><i data-lucide="layers" size="32"></i></div>
                         <h3>Sistemas Web & ERPs Sob Medida</h3>
-                        <p>Plataformas robustas para gestão interna, controle financeiro, esteiras operacionais e dashboards analíticos que rodam direto no navegador.</p>
+                        <p>Plataformas corporativas inteligentes para gestão operacional, controle financeiro e dashboards analíticos que rodam direto no navegador.</p>
                     </div>
 
                     <div class="service-card" data-tilt>
                         <div class="service-icon"><i data-lucide="smartphone" size="32"></i></div>
                         <h3>Aplicativos Mobile (iOS & Android)</h3>
-                        <p>Apps nativos fluidos, responsivos e prontos para publicação na App Store e Google Play com alta experiência para seus usuários.</p>
+                        <p>Apps nativos fluidos e intuitivos, prontos para publicação na App Store e Google Play com alta retenção de usuários.</p>
                     </div>
 
                     <div class="service-card" data-tilt>
                         <div class="service-icon"><i data-lucide="globe" size="32"></i></div>
                         <h3>Sites & Web Apps de Alta Conversão</h3>
-                        <p>Portais institucionais e páginas rápidas com SEO de elite no Google, design futurista e foco em gerar novos negócios todos os dias.</p>
+                        <p>Páginas ultrarrápidas com SEO técnico de elite no Google e design moderno pensado para atrair e fechar novos contratos todos os dias.</p>
                     </div>
 
                     <div class="service-card" data-tilt>
                         <div class="service-icon"><i data-lucide="bot" size="32"></i></div>
-                        <h3>Automações com Agentes de IA</h3>
-                        <p>Robôs autônomos para atendimento via WhatsApp, classificação de documentos, relatórios preditivos e conexões entre sistemas sem erro humano.</p>
+                        <h3>Automações & Agentes com IA</h3>
+                        <p>Robôs inteligentes para atendimento 24/7 no WhatsApp, triagem automática de documentos e integrações entre sistemas sem erro humano.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Metodologia / Como Funciona -->
+            <section id="metodologia">
+                <div class="section-header">
+                    <h2>Do Diagnóstico à Entrega em Tempo Recorde</h2>
+                    <p>Como a esteira de desenvolvimento com IA da Beemote funciona na prática:</p>
+                </div>
+
+                <div class="process-grid">
+                    <div class="process-card">
+                        <div class="process-num">01</div>
+                        <h4 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Diagnóstico & Escopo</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Mapeamos os processos, dores e requisitos exatos do seu negócio sem enrolação.</p>
+                    </div>
+
+                    <div class="process-card">
+                        <div class="process-num">02</div>
+                        <h4 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Engenharia com IA</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Usamos modelos de inteligência artificial avançados para acelerar a geração do código limpo.</p>
+                    </div>
+
+                    <div class="process-card">
+                        <div class="process-num">03</div>
+                        <h4 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Homologação & Deploy</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Testes rigorosos de segurança e publicação do sistema em nuvem de alta disponibilidade.</p>
+                    </div>
+
+                    <div class="process-card">
+                        <div class="process-num">04</div>
+                        <h4 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Sustentação Contínua</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Garantia técnica inclusa com opções de planos mensais de suporte e evolução contínua.</p>
                     </div>
                 </div>
             </section>
@@ -748,30 +810,30 @@
             <!-- AI Difference Section -->
             <section id="diferencial">
                 <div class="section-header">
-                    <h2>Por que o Modelo Beemote Vence?</h2>
-                    <p>Agências antigas cobram milhares de horas de desenvolvimento lento. A Beemote utiliza engenharia auxiliada por IA de última geração.</p>
+                    <h2>Por que o Modelo Beemote é Superior?</h2>
+                    <p>Fábricas de software convencionais ainda cobram por meses de trabalho manual. A Beemote utiliza engenharia auxiliada por IA de última geração.</p>
                 </div>
 
                 <div class="comparison-box">
                     <div class="comparison-col col-traditional">
                         <h3 style="color: var(--text-muted); margin-bottom: 0.5rem;">Desenvolvimento Tradicional</h3>
-                        <p style="font-size: 0.9rem; color: #64748b;">Fábricas de software ultrapassadas</p>
+                        <p style="font-size: 0.9rem; color: #64748b;">Agências e fábricas antigas</p>
                         <ul class="comparison-list">
-                            <li><i data-lucide="x-circle" color="#ef4444"></i> Orçamentos gigantescos por excesso de trabalho braçal</li>
-                            <li><i data-lucide="x-circle" color="#ef4444"></i> De 6 a 10 meses apenas para entregar a versão inicial</li>
-                            <li><i data-lucide="x-circle" color="#ef4444"></i> Complexidade desnecessária e manutenção cara</li>
-                            <li><i data-lucide="x-circle" color="#ef4444"></i> Automação cobrada à parte como serviço caro</li>
+                            <li><i data-lucide="x-circle" color="#ef4444"></i> Cobranças de R$ 50 mil a R$ 100 mil por horas de digitação manual</li>
+                            <li><i data-lucide="x-circle" color="#ef4444"></i> De 6 a 10 meses apenas para entregar a primeira versão</li>
+                            <li><i data-lucide="x-circle" color="#ef4444"></i> Burocracia excessiva e dificuldade para fazer alterações</li>
+                            <li><i data-lucide="x-circle" color="#ef4444"></i> Automação com IA cobrada como adicional inacessível</li>
                         </ul>
                     </div>
 
                     <div class="comparison-col col-beemote">
                         <h3 style="color: var(--secondary); margin-bottom: 0.5rem;">Desenvolvimento Beemote</h3>
-                        <p style="font-size: 0.9rem; color: var(--text-muted);">Inteligência Artificial aplicada ao código</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Engenharia de software com Inteligência Artificial</p>
                         <ul class="comparison-list">
-                            <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Até 65% de economia direta</strong> em cada etapa</li>
+                            <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Até 65% de economia direta</strong> em todo o projeto</li>
                             <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Entregas funcionais em semanas</strong></li>
-                            <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Agentes de IA inclusos</strong> para reduzir tarefas manuais</li>
-                            <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Código 100% seu</strong>, flexível e pronto para crescer</li>
+                            <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Código 100% de sua propriedade</strong>, escalável e sem amarras</li>
+                            <li><i data-lucide="check-circle-2" color="#05ffa1"></i> <strong>Inteligência Artificial nativa</strong> integrada aos seus processos</li>
                         </ul>
                     </div>
                 </div>
@@ -782,7 +844,7 @@
                 <div class="simulator-section">
                     <div class="section-header" style="margin-bottom: 2rem;">
                         <h2>Simulador de Economia Beemote</h2>
-                        <p>Arraste para selecionar a complexidade e compare tempo e investimento.</p>
+                        <p>Selecione a complexidade estimada e compare tempo e investimento.</p>
                     </div>
 
                     <div style="max-width: 650px; margin: 0 auto; text-align: center;">
@@ -804,7 +866,7 @@
                             <div class="calc-number" id="timeHippo" style="color: var(--mint);">3 a 5 Semanas</div>
                         </div>
                         <div class="calc-card" style="border-color: var(--accent); background: rgba(236, 72, 153, 0.05);">
-                            <span style="color: var(--accent); font-size: 0.9rem;">Economia de Custo</span>
+                            <span style="color: var(--accent); font-size: 0.9rem;">Economia Estimada</span>
                             <div class="calc-number" id="costSaved" style="color: #fff;">~ 62%</div>
                         </div>
                     </div>
@@ -815,11 +877,11 @@
             <section id="contato">
                 <div class="contact-grid">
                     <div>
-                        <h2>Tire sua Ideia do Papel com a Beemote</h2>
+                        <h2>Pronto para Digitalizar ou Automatizar sua Empresa?</h2>
                         <p style="color: var(--text-muted); margin: 1.5rem 0 2rem 0;">
-                            Envie os detalhes do seu projeto pelo formulário. Nossa IA e nossos engenheiros montam uma estimativa clara e sem custos.
+                            Conte-nos o que você deseja criar. Nossa equipe técnica analisa sua demanda e envia um diagnóstico completo com proposta em menos de 2 horas.
                         </p>
-                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; flex-direction: column; gap: 1.2rem;">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <i data-lucide="phone" style="color: var(--mint);"></i> WhatsApp: <strong>(11) 95732-1727</strong>
                             </div>
@@ -828,6 +890,9 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <i data-lucide="shield-check" style="color: var(--accent);"></i> Acordo de Confidencialidade (NDA) Garantido
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <i data-lucide="check" style="color: var(--mint);"></i> Atendimento para empresas de qualquer porte ou nicho
                             </div>
                         </div>
                     </div>
@@ -842,21 +907,21 @@
                             <input type="tel" id="whatsapp" class="form-control" placeholder="(11) 99999-9999" required>
                         </div>
                         <div class="form-group">
-                            <label for="projectType">O que deseja desenvolver?</label>
+                            <label for="projectType">O que você precisa?</label>
                             <select id="projectType" class="form-control" style="background-color: #0f1427;">
                                 <option value="Sistema de Gestão / ERP Web">Sistema de Gestão / ERP Web Sob Medida</option>
                                 <option value="Aplicativo Mobile (iOS/Android)">Aplicativo Mobile (iOS e Android)</option>
                                 <option value="Site de Alta Conversão">Site / Portal / Landing Page</option>
                                 <option value="Automação com IA">Automação de Processos com Inteligência Artificial</option>
-                                <option value="Outro Desafio Digital">Outro Desafio Digital</option>
+                                <option value="Outro Desafio Digital">Outro Desafio Tecnológico</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="message">Conte sobre a necessidade do projeto</label>
-                            <textarea id="message" class="form-control" rows="3" placeholder="Quais processos precisam ser melhorados ou automatizados?"></textarea>
+                            <textarea id="message" class="form-control" rows="3" placeholder="Quais problemas ou recursos seu software deve resolver?"></textarea>
                         </div>
                         <button type="submit" class="btn-cta" style="width: 100%; justify-content: center; margin-top: 1rem;">
-                            <i data-lucide="send"></i> Enviar Diretamente no WhatsApp
+                            <i data-lucide="send"></i> Solicitar Orçamento no WhatsApp
                         </button>
                     </form>
                 </div>
@@ -869,13 +934,12 @@
                 <img src="logo.png" alt="Logo Beemote" style="width: 32px; height: 32px; border-radius: 50%;" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop'">
                 <span class="brand-font" style="font-weight: 800; font-size: 1.2rem; color: #fff;">Beemote</span>
             </div>
-            <p>© 2026 Beemote. Todos os direitos reservados. Inteligência, Sistemas e Apps sob medida.</p>
+            <p>© 2026 Beemote. Todos os direitos reservados. Sistemas, Aplicativos e Automações com Inteligência Artificial.</p>
         </footer>
     </div>
 
     <!-- ==================== SCRIPTS & 3D ENGINE ==================== -->
     <script>
-        // Inicializar ícones
         lucide.createIcons();
 
         /* Three.js Background Hologram Canvas */
@@ -887,7 +951,6 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // Partículas 3D com paleta Beemote (Ciano, Roxo, Rosa)
         const geometry = new THREE.BufferGeometry();
         const particlesCount = 1800;
         const positions = new Float32Array(particlesCount * 3);
@@ -928,7 +991,6 @@
         const particleMesh = new THREE.Points(geometry, material);
         scene.add(particleMesh);
 
-        // Anel orbital tecnológico
         const ringGeo = new THREE.TorusGeometry(5, 0.03, 16, 100);
         const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.25 });
         const ringMesh = new THREE.Mesh(ringGeo, ringMat);
@@ -972,7 +1034,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        /* Efeito 3D Tilt nos Cards */
+        /* Efeito Tilt nos Cards */
         const cards = document.querySelectorAll('[data-tilt]');
         cards.forEach(card => {
             card.addEventListener('mousemove', (e) => {
@@ -989,7 +1051,7 @@
             });
         });
 
-        /* Simulador Dinâmico */
+        /* Simulador */
         const range = document.getElementById('complexityRange');
         const label = document.getElementById('complexityLabel');
         const timeTrad = document.getElementById('timeTrad');
@@ -1025,7 +1087,9 @@
             costSaved.textContent = simulatorData[val].save;
         });
 
-        /* Envio Direto para o WhatsApp da Beemote (11 95732-1727) */
+        const beemoteWhatsApp = "5511957321727";
+
+        /* Envio de Contato Corporativo */
         function handleFormSubmit(e) {
             e.preventDefault();
             const name = document.getElementById('name').value;
@@ -1033,8 +1097,6 @@
             const project = document.getElementById('projectType').value;
             const msg = document.getElementById('message').value;
 
-            const beemoteWhatsApp = "5511957321727"; 
-            
             const textoWhatsApp = encodeURIComponent(
                 `*Novo Contato via Site Beemote!*\n\n` +
                 `👤 *Nome/Empresa:* ${name}\n` +
