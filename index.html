@@ -85,7 +85,7 @@
             font-family: 'Space Grotesk', sans-serif;
         }
 
-        /* Ambient Glow Backgrounds (Agora bem difusas, sem formato de bola) */
+        /* Ambient Glow Backgrounds */
         .ambient-glow {
             position: fixed;
             width: 700px;
@@ -209,6 +209,7 @@
             cursor: pointer;
             box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
             transition: var(--transition);
+            white-space: nowrap;
         }
 
         .btn-cta:hover {
@@ -288,6 +289,7 @@
             align-items: center;
             gap: 8px;
             transition: var(--transition);
+            white-space: nowrap;
         }
 
         .btn-outline:hover {
@@ -639,6 +641,7 @@
             font-size: 0.9rem;
         }
 
+        /* ==================== RESPONSIVO / MOBILE AJUSTADO ==================== */
         @media (max-width: 992px) {
             .hero-grid, .comparison-box, .contact-grid {
                 grid-template-columns: 1fr;
@@ -646,6 +649,61 @@
             .hero h1 { font-size: 2.7rem; }
             .calc-results { grid-template-columns: 1fr; }
             .nav-links { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.75rem 1rem;
+            }
+
+            /* Ajuste de tamanho da logo e texto no celular */
+            .logo-img {
+                width: 38px;
+                height: 38px;
+            }
+            .brand-text {
+                font-size: 1.35rem;
+            }
+
+            /* Botão "Pedir Orçamento" compacto e elegante no topo */
+            .navbar .btn-cta {
+                padding: 0.48rem 0.95rem;
+                font-size: 0.82rem;
+                gap: 5px;
+                box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
+            }
+
+            /* Botões do Hero ocupando largura confortável */
+            .hero-actions {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .hero-actions .btn-cta,
+            .hero-actions .btn-outline {
+                width: 100%;
+                justify-content: center;
+                padding: 0.8rem 1.2rem;
+            }
+
+            .hero {
+                padding: 2.5rem 1rem;
+            }
+
+            .hero-interactive-card {
+                padding: 1.5rem;
+            }
+
+            .contact-form {
+                padding: 1.5rem;
+            }
+
+            /* Botão flutuante WhatsApp ligeiramente menor no celular */
+            .floating-whatsapp {
+                width: 52px;
+                height: 52px;
+                bottom: 20px;
+                right: 20px;
+            }
         }
     </style>
 </head>
@@ -656,7 +714,7 @@
     <div class="ambient-glow glow-2"></div>
     <div class="ambient-glow glow-3"></div>
 
-    <!-- 3D Interactive Canvas (Apenas poeira cósmica/partículas de IA, sem círculos) -->
+    <!-- 3D Interactive Canvas -->
     <canvas id="webgl-canvas"></canvas>
 
     <!-- Botão Flutuante do WhatsApp -->
@@ -666,7 +724,7 @@
        class="floating-whatsapp" 
        title="Fale com a Beemote no WhatsApp"
        aria-label="Fale conosco no WhatsApp">
-        <i data-lucide="message-circle" size="32"></i>
+        <i data-lucide="message-circle" size="28"></i>
     </a>
 
     <div class="content-layer">
@@ -686,7 +744,7 @@
                     <li><a href="#contato">Fale Conosco</a></li>
                 </ul>
                 <a href="https://wa.me/5511957321727?text=Olá!%20Gostaria%20de%20solicitar%20um%20orçamento%20com%20a%20Beemote." target="_blank" class="btn-cta">
-                    <i data-lucide="zap"></i> Pedir Orçamento
+                    <i data-lucide="zap" size="15"></i> Pedir Orçamento
                 </a>
             </nav>
         </header>
@@ -942,7 +1000,7 @@
     <script>
         lucide.createIcons();
 
-        /* Three.js Background Hologram Canvas (Poeira Cósmica Pura) */
+        /* Three.js Background Canvas */
         const canvas = document.getElementById('webgl-canvas');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -990,8 +1048,6 @@
 
         const particleMesh = new THREE.Points(geometry, material);
         scene.add(particleMesh);
-
-        // O anel/círculo que girava foi 100% removido daqui!
 
         camera.position.z = 10;
 
@@ -1082,7 +1138,7 @@
 
         const beemoteWhatsApp = "5511957321727";
 
-        /* Envio de Contato Corporativo */
+        /* Envio de Contato */
         function handleFormSubmit(e) {
             e.preventDefault();
             const name = document.getElementById('name').value;
